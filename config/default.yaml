@@ -1,0 +1,40 @@
+# ArXiv Pipeline Configuration
+
+# MongoDB settings
+mongo:
+  connection_string: "mongodb://mongodb:27017/"
+  db_name: "arxiv_papers"
+  
+# Neo4j settings
+neo4j:
+  url: "bolt://localhost:7687"
+  user: "neo4j"
+  password: "password"
+
+# Qdrant settings
+qdrant:
+  url: "http://localhost:6333"
+  collection_name: "arxiv_papers"
+  vector_size: 768  # For sentence-transformers models
+
+# ArXiv API settings
+arxiv:
+  categories:
+    - "cs.AI"
+  max_results: 100
+  sort_by: "submittedDate"
+  sort_order: "descending"
+  max_iterations: 20000
+  rate_limit_seconds: 3
+  start_date: "2023-01-01"
+  end_date: "2024-03-31"
+
+# Embedding model settings
+embedding:
+  model_name: "all-MiniLM-L6-v2"  # Smaller model to start with
+  batch_size: 32
+
+# Logging settings
+logging:
+  level: "INFO"
+  file: "logs/pipeline.log"
