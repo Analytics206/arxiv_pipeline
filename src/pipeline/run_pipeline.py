@@ -51,6 +51,8 @@ def run_ingestion_pipeline(config: Dict[str, Any]):
         start = 0
         max_iterations = config['arxiv'].get('max_iterations', 2)
         total_papers = 0
+        empty_batches = 0
+        max_results = config['arxiv']['max_results']
         
         # Fetch and store papers with pagination
         for iteration in range(max_iterations):
@@ -68,21 +70,39 @@ def run_ingestion_pipeline(config: Dict[str, Any]):
             end_date = config['arxiv'].get('end_date')
             if start_date and end_date:
                 papers = filter_papers_by_date(papers, start_date, end_date)
-            
+
             if not papers:
-                logger.info("No more papers to fetch")
+                empty_batches += 1
+                logger.info(f"Empty batch {empty_batches}, continuing...")
+            else:
+                empty_batches = 0  # Reset if we get papers
+                # Store papers
+                stats = mongo_storage.store_papers(papers)
+                total_papers += len(papers)
+
+            # Always increment start by max_results to avoid infinite loop
+            start += max_results
+
+            if empty_batches >= 5:
+                logger.info("No more papers to fetch after 5 empty batches")
                 break
-                
-            # Store papers
-            stats = mongo_storage.store_papers(papers)
-            total_papers += len(papers)
-            
-            # Update start for next iteration
-            start += len(papers)
-            
+
             # Log progress
             logger.info(f"Progress: {total_papers} papers processed so far")
             
+            logger.info(f"Fetching batch {iteration+1}/{max_iterations}, start={start}")
+            papers = arxiv_client.fetch_papers(
+                category=category,
+                search_query=config['arxiv'].get('search_query'),
+                start=start
+            )
+            logger.info(f"Fetched {len(papers)} papers from arXiv before filtering.")
+            start_date = config['arxiv'].get('start_date')
+            end_date = config['arxiv'].get('end_date')
+            if start_date and end_date:
+                papers = filter_papers_by_date(papers, start_date, end_date)
+                logger.info(f"{len(papers)} papers remain after date filtering.")
+
             # Optional rate limiting
             if config['arxiv'].get('rate_limit_seconds'):
                 import time

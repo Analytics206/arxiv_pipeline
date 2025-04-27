@@ -65,7 +65,7 @@ source .venv/bin/activate
 ### Running the Pipeline Locally
 
 ```bash
-python src/pipeline/run_pipeline.py --config config/default.yaml
+python -m src.pipeline.run_pipeline --config config/default.yaml
 ```
 
 ---
@@ -76,7 +76,8 @@ python src/pipeline/run_pipeline.py --config config/default.yaml
    ```bash
    docker-compose up --build
    ```
-
+   docker-compose down
+   
 2. **(Optional) Rebuild the app service after code changes:**
    ```bash
    docker-compose build app

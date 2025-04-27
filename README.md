@@ -45,7 +45,7 @@ source .venv/bin/activate
 ### Running the Pipeline Locally
 
 ```bash
-python src/pipeline/run_pipeline.py --config config/default.yaml
+python -m src.pipeline.run_pipeline --config config/default.yaml
 ```
 
 ---
@@ -56,7 +56,8 @@ python src/pipeline/run_pipeline.py --config config/default.yaml
    ```bash
    docker-compose up --build
    ```
-
+   docker-compose down
+   
 2. **(Optional) Rebuild the app service after code changes:**
    ```bash
    docker-compose build app
@@ -69,7 +70,7 @@ python src/pipeline/run_pipeline.py --config config/default.yaml
 3. **Access MongoDB, Neo4j, and Qdrant via their exposed ports.**
 
 ---
-
+docker compose up --build sync-neo4j
 ### Configuration
 
 - Edit `config/default.yaml` to change categories, fetch limits, or database settings.

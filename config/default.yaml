@@ -7,7 +7,7 @@ mongo:
   
 # Neo4j settings
 neo4j:
-  url: "bolt://localhost:7687"
+  url: "bolt://neo4j:7687"
   user: "neo4j"
   password: "password"
 
@@ -21,13 +21,13 @@ qdrant:
 arxiv:
   categories:
     - "cs.AI"
-  max_results: 100
+  max_results: 10000
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 20000
+  max_iterations: 2000000
   rate_limit_seconds: 3
-  start_date: "2023-01-01"
-  end_date: "2024-03-31"
+  start_date: "2013-01-01"
+  end_date: "2025-01-01"
 
 # Embedding model settings
 embedding:

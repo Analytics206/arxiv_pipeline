@@ -12,7 +12,7 @@ class ArxivClient:
     BASE_URL = "http://export.arxiv.org/api/query"
     
     def __init__(self, 
-                 max_results: int = 100, 
+                 max_results: int = 10000, 
                  sort_by: str = "submittedDate", 
                  sort_order: str = "descending"):
         self.max_results = max_results

@@ -9,6 +9,8 @@ src/arxiv_pipeline.egg-info/requires.txt
 src/arxiv_pipeline.egg-info/top_level.txt
 src/embedding/embed.py
 src/graph/neo4j.py
+src/graph/neo4j_sync.py
+src/graph/sync_mongo_to_neo4j.py
 src/ingestion/fetch.py
 src/pipeline/run_pipeline.py
 src/storage/mongo.py

@@ -1,7 +1,4 @@
-version: '3.8'
-
 services:
-  # MongoDB service (FR-DAT-01)
   mongodb:
     image: mongo:latest
     ports:
@@ -10,29 +7,26 @@ services:
       - mongo_data:/data/db
     restart: unless-stopped
 
-  # Neo4j service (FR-GPH-01)
   neo4j:
     image: neo4j:latest
     ports:
-      - "7474:7474"  # HTTP
-      - "7687:7687"  # Bolt
+      - "7474:7474"
+      - "7687:7687"
     volumes:
       - neo4j_data:/data
     environment:
       - NEO4J_AUTH=neo4j/password
     restart: unless-stopped
 
-  # Qdrant service (FR-VEC-03)
   qdrant:
     image: qdrant/qdrant:latest
     ports:
-      - "6333:6333"  # HTTP
-      - "6334:6334"  # GRPC
+      - "6333:6333"
+      - "6334:6334"
     volumes:
       - qdrant_data:/qdrant/storage
     restart: unless-stopped
 
-  # Application service
   app:
     build: .
     depends_on:
@@ -48,7 +42,21 @@ services:
     volumes:
       - ./config:/app/config
       - ./data:/app/data
-    # restart: unless-stopped
+      
+  sync-neo4j:
+    build: .
+    command: python -m src.graph.sync_mongo_to_neo4j
+    depends_on:
+      - mongodb
+      - neo4j
+    environment:
+      - MONGO_CONNECTION_STRING=mongodb://mongodb:27017/
+      - NEO4J_URL=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=password
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
 
 volumes:
   mongo_data:
