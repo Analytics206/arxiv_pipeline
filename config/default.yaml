@@ -21,13 +21,28 @@ qdrant:
 arxiv:
   categories:
     - "cs.AI"
-  max_results: 10000
+    - "cs.CV"
+    - "cs.CL"
+    - "cs.DS"
+    - "cs.GT" 
+    - "cs.LG"  
+    - "cs.LO"
+    - "cs.MA"
+    - "cs.NA"
+    - "cs.NE"
+    - "math.PR"
+    - "physics.data-an"
+    - "q-bio.NC"
+    - "stat"
+    - "stat.ML"
+    - "stat.TH"
+  max_results: 1000
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 2000000
+  max_iterations: 20000
   rate_limit_seconds: 3
   start_date: "2013-01-01"
-  end_date: "2025-01-01"
+  end_date: "2025-04-30"
 
 # Embedding model settings
 embedding:

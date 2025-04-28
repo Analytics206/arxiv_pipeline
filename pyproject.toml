@@ -17,6 +17,8 @@ dependencies = [
     "qdrant-client>=1.1.0",
     "sentence-transformers>=2.2.0",
     "pydantic>=2.0.0",
+    "langchain>=0.1.0",                # Add LangChain
+    "langchain-community>=0.0.30",     # For Neo4j and Qdrant integrations
 ]
 
 [project.optional-dependencies]
