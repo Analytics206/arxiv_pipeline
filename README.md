@@ -6,7 +6,7 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 🚀 Key Features
 Local-first: Everything runs offline—no cloud dependencies but can deploy to cloud in containers.
 
-arXiv Ingestion: Fetch papers from the cs.AI category (configurable) see list down document.
+arXiv Ingestion: Fetch papers from the cs.AI category (configurable) see list down of document.
 
 MongoDB Storage: Stores structured and raw metadata.
 
@@ -136,8 +136,33 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
 - For Docker issues, ensure Docker Desktop is running and you have sufficient permissions.
 
 ---
+📊 Optional Enhancements
+These features are supported or planned:
 
-### API Address 
+Local web dashboard for visual exploration
+
+PDF downloading and section parsing
+
+Citation parsing
+
+Scheduled updates (cron)
+
+Example notebooks for research
+
+All components are modular and can be swapped or extended via config.
+
+---
+💡 Use Cases
+Build local AI paper libraries
+
+Graph analysis of research trends
+
+Offline semantic paper search
+
+Prototyping citation or influence mapping tools
+
+---
+## API Address 
 http://export.arxiv.org/api/query
 ---
 cs.AI - Artificial Intelligence
