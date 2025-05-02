@@ -91,30 +91,34 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    ```bash
    docker-compose up --build
    ```
-   docker-compose down
-   
 2. **(Optional) Rebuild the app service after code changes:**
    ```bash
    docker-compose build app
    ```
-   OR better option
-
+   OR run with logs
+   ```bash
    docker compose up -d app 
    docker compose logs -f app
-
+   ```
+   To shutdown docker env
+   ```bash
+   docker-compose down
+   ```
 3. **Access MongoDB, Neo4j, and Qdrant via their exposed ports.**
 
----
-docker compose up --build sync-neo4j
-
-$env:MONGO_URI="mongodb://localhost:27017/onfig"
-python src/utils/download_pdfs.py
-
+   ---
+   ```bash
+   docker compose up --build sync-neo4j
+   ```
+   Download papers
+   ```bash
+   $env:MONGO_URI="mongodb://localhost:27017/onfig"
+   python src/utils/download_pdfs.py
+   ```
 ---
 ### Configuration
 
 - Edit `config/default.yaml` to change categories, fetch limits, or database settings.
-
 
 ---
 
@@ -133,7 +137,8 @@ python src/utils/download_pdfs.py
 
 ---
 
-### API Address
+### API Address 
+http://export.arxiv.org/api/query
 ---
 cs.AI - Artificial Intelligence
 
