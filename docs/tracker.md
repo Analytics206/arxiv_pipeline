@@ -16,6 +16,10 @@ This file tracks the implementation status of all PRD requirements, linking them
 
 | PRD ID      | Description                                              | Linked BRD ID | Status | Notes                      |
 |-------------|----------------------------------------------------------|---------------|--------|----------------------------|
+| FR-DCK-01   | Dockerfiles for each service                             | BRD-00        | ✅     |                            |
+| FR-DCK-02   | Docker Compose for orchestration                         | BRD-00        | ✅     |                            |
+| FR-DCK-03   | Volume support for persistent local data                 | BRD-00        | ✅     |                            |
+
 | FR-ING-01   | Fetch metadata from arXiv Atom XML API                   | BRD-01        | ✅     | Implemented in fetch.py    |
 | FR-ING-02   | Configurable category querying (initial: cs.AI)          | BRD-01        | ✅     | Implemented in fetch.py    |
 | FR-ING-03   | Configurable result limits                               | BRD-01        | ✅     | Implemented in fetch.py    |
@@ -44,10 +48,6 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-LOG-01   | Log processing steps                                     | BRD-06        | 🔧     | Basic logging in place     |
 | FR-LOG-02   | Log network and processing errors                        | BRD-06        | 🔧     | Basic logging in place     |
 | FR-LOG-03   | Log reasons for skipped entries                          | BRD-06        | ❌     |                            |
-
-| FR-DCK-01   | Dockerfiles for each service                             | BRD-08        | ✅     |                            |
-| FR-DCK-02   | Docker Compose for orchestration                         | BRD-08        | ✅     |                            |
-| FR-DCK-03   | Volume support for persistent local data                 | BRD-08        | ❌     |                            |
 
 | FR-UI-01    | Local web dashboard                                      | BRD-07        | ⏳     | Optional/Nice-to-have      |
 

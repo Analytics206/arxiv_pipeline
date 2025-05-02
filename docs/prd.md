@@ -3,6 +3,11 @@
 
 ## Functional Requirements
 
+### 3.0 Dockerization (FR-DCK)
+- **FR-DCK-01**: System shall provide Dockerfiles for each service (ingestion, db, embedding, etc.)
+- **FR-DCK-02**: System shall include a `docker-compose.yml` file to orchestrate local setup
+- **FR-DCK-03**: Docker containers shall support volume mounting for persistent local data
+
 ### 3.1 Ingestion (FR-ING)
 - **FR-ING-01**: Support fetching metadata from arXiv Atom XML API
 - **FR-ING-02**: Support configurable category-based querying (initial: cs.AI)
@@ -37,11 +42,6 @@
 - **FR-LOG-01**: Log ingestion/storage/indexing steps
 - **FR-LOG-02**: Log network and processing errors
 - **FR-LOG-03**: Log reasons for skipped entries
-
-### 3.7 Dockerization (FR-DCK)
-- **FR-DCK-01**: System shall provide Dockerfiles for each service (ingestion, db, embedding, etc.)
-- **FR-DCK-02**: System shall include a `docker-compose.yml` file to orchestrate local setup
-- **FR-DCK-03**: Docker containers shall support volume mounting for persistent local data
 
 ### Optional/Nice-to-Have Features
 - **FR-UI-01**: Local web dashboard to explore graph/search
