@@ -36,12 +36,12 @@ arxiv:
     - "stat"
     - "stat.ML"
     - "stat.TH"
-  max_results: 1000
+  max_results: 100
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 20000
+  max_iterations: 2
   rate_limit_seconds: 3
-  start_date: "2013-01-01"
+  start_date: "2014-12-31"
   end_date: "2025-04-30"
 
 # Embedding model settings

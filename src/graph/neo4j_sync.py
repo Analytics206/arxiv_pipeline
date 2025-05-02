@@ -14,16 +14,25 @@ class Neo4jSync:
     def sync_papers(self, papers: List[Dict[str, Any]]):
         with self.driver.session() as session:
             for paper in papers:
-                session.write_transaction(self._create_paper_with_authors_and_categories, paper)
+                session.write_transaction(self._create_paper, paper)
+                for author in paper.get('authors', []):
+                    session.write_transaction(self._create_author_and_relationship, paper['id'], author)
+                for category in paper.get('categories', []):
+                    session.write_transaction(self._create_category_and_relationship, paper['id'], category)
 
     @staticmethod
-    def _create_paper_with_authors_and_categories(tx, paper: Dict[str, Any]):
+    def _create_paper(tx, paper: Dict[str, Any]):
         tx.run(
             """
             MERGE (p:Paper {id: $id})
-            SET p.title = $title, p.summary = $summary, p.published = $published, p.updated = $updated, p.arxiv_url = $arxiv_url, p.pdf_url = $pdf_url
+            SET p.title = $title,
+                p.summary = $summary,
+                p.published = $published,
+                p.updated = $updated,
+                p.arxiv_url = $arxiv_url,
+                p.pdf_url = $pdf_url
             """,
-            id=paper['id'],
+            id=paper.get('id', ''),
             title=paper.get('title', ''),
             summary=paper.get('summary', ''),
             published=paper.get('published', ''),
@@ -31,23 +40,27 @@ class Neo4jSync:
             arxiv_url=paper.get('arxiv_url', ''),
             pdf_url=paper.get('pdf_url', '')
         )
-        for author in paper.get('authors', []):
-            tx.run(
-                """
-                MERGE (a:Author {name: $name})
-                MERGE (p:Paper {id: $paper_id})
-                MERGE (a)-[:AUTHORED]->(p)
-                """,
-                name=author,
-                paper_id=paper['id']
-            )
-        for category in paper.get('categories', []):
-            tx.run(
-                """
-                MERGE (c:Category {name: $cat})
-                MERGE (p:Paper {id: $paper_id})
-                MERGE (p)-[:IN_CATEGORY]->(c)
-                """,
-                cat=category,
-                paper_id=paper['id']
-            )
+
+    @staticmethod
+    def _create_author_and_relationship(tx, paper_id: str, author_name: str):
+        tx.run(
+            """
+            MERGE (a:Author {name: $author_name})
+            MERGE (p:Paper {id: $paper_id})
+            MERGE (a)-[:AUTHORED]->(p)
+            """,
+            author_name=author_name,
+            paper_id=paper_id
+        )
+
+    @staticmethod
+    def _create_category_and_relationship(tx, paper_id: str, category: str):
+        tx.run(
+            """
+            MERGE (c:Category {name: $category})
+            MERGE (p:Paper {id: $paper_id})
+            MERGE (p)-[:IN_CATEGORY]->(c)
+            """,
+            category=category,
+            paper_id=paper_id
+        )

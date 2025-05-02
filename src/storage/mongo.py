@@ -1,12 +1,18 @@
-import pymongo
 from typing import Dict, List, Any, Optional
 import logging
 from datetime import datetime
 
+from langchain_community.document_loaders.mongodb import MongoDBLoader
+from langchain_community.vectorstores.mongodb_atlas import MongoDBAtlasVectorSearch
+from langchain_community.vectorstores.mongodb_atlas import MongoDBAtlasVectorSearchResult
+from langchain_community.vectorstores.mongodb_atlas import MongoDBAtlasVectorSearchStats
+
+import pymongo
+
 logger = logging.getLogger(__name__)
 
 class MongoStorage:
-    """MongoDB storage for arXiv papers."""
+    """MongoDB storage for arXiv papers, using LangChain."""
 
     def __init__(
         self,
@@ -24,6 +30,13 @@ class MongoStorage:
         self.db = self.client[db_name]
         self.papers = self.db.papers
         self.stats = self.db.ingestion_stats
+
+        # LangChain MongoDB loader for document operations
+        self.loader = MongoDBLoader(
+            connection_string=connection_string,
+            db_name=db_name,
+            collection_name="papers"
+        )
 
         # Create indexes
         self._setup_indexes()
@@ -55,6 +68,9 @@ class MongoStorage:
         for paper in papers:
             try:
                 paper['ingestion_timestamp'] = datetime.utcnow()
+                # Use LangChain loader for upsert
+                # loader.add_documents expects a list of dicts
+                # But we want to upsert by "id", so we use update_one directly
                 result = self.papers.update_one(
                     {"id": paper["id"]},
                     {"$set": paper},
@@ -146,7 +162,11 @@ class MongoStorage:
 
     def get_paper(self, paper_id: str) -> Optional[Dict]:
         """Retrieve single paper by ID."""
-        return self.papers.find_one({"id": paper_id})
+        # Use LangChain loader for retrieval
+        docs = self.loader.load({"id": paper_id})
+        if docs:
+            return docs[0]
+        return None
 
     def get_papers(
         self,
@@ -172,10 +192,14 @@ class MongoStorage:
         if filter_query is None:
             filter_query = {}
 
-        cursor = self.papers.find(filter_query)
-        cursor = cursor.sort(sort_by, sort_order).skip(skip).limit(limit)
-
-        return list(cursor)
+        # Use LangChain loader for retrieval
+        docs = self.loader.load(
+            filter_query,
+            limit=limit,
+            skip=skip,
+            sort=[(sort_by, sort_order)]
+        )
+        return docs
 
     def get_stats(self, limit: int = 10) -> List[Dict]:
         """Get recent ingestion statistics."""

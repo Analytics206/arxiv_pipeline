@@ -1,5 +1,35 @@
 # ArXiv Research Pipeline
 
+🧠 ArXiv Local AI Research Pipeline
+A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. It allows offline graph-based and semantic search through MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker for easy, consistent local deployment.
+
+🚀 Key Features
+Local-first: Everything runs offline—no cloud dependencies.
+
+arXiv Ingestion: Fetch papers from the cs.AI category (configurable).
+
+MongoDB Storage: Stores structured and raw metadata.
+
+Graph Representation: Neo4j graph database captures relationships between papers, authors, and categories.
+
+Semantic Embeddings: Embeds text using Hugging Face models, stored in Qdrant for similarity search.
+
+Configurable & Modular: Centralized settings let you switch categories, models, and components.
+
+Containerized: Fully Dockerized for isolated, repeatable setup.
+
+📦 System Components
+| Component             | Purpose                                      |
+| --------------------- | -------------------------------------------- |
+| **Ingestion Service** | Fetches papers using arXiv Atom XML API      |
+| **MongoDB**           | Stores raw and normalized metadata           |
+| **Neo4j**             | Stores the author-paper-category graph       |
+| **Qdrant**            | Stores vector embeddings for semantic search |
+| **Config Manager**    | Central config for category, limits, model   |
+| **Logger**            | Tracks events, errors, and skipped entries   |
+| **Docker Compose**    | Brings it all together for local use         |
+
+
 A local, platform-independent pipeline for processing research papers from arXiv.org.
 
 ## Setup Instructions
@@ -71,9 +101,15 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
 
 ---
 docker compose up --build sync-neo4j
+
+$env:MONGO_URI="mongodb://localhost:27017/onfig"
+python src/utils/download_pdfs.py
+
+---
 ### Configuration
 
 - Edit `config/default.yaml` to change categories, fetch limits, or database settings.
+
 
 ---
 

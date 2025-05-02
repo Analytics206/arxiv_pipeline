@@ -17,8 +17,17 @@ dependencies = [
     "qdrant-client>=1.1.0",
     "sentence-transformers>=2.2.0",
     "pydantic>=2.0.0",
-    "langchain>=0.1.0",                # Add LangChain
-    "langchain-community>=0.0.30",     # For Neo4j and Qdrant integrations
+    "langchain>=0.1.0",
+    "langchain-community>=0.0.30",
+    "tqdm>=4.64.0",
+    "pillow>=10.0.0",
+    "pymupdf>=1.23.0",
+    "motor>=3.3.0",
+    "transformers",
+    "torch",
+    "ollama",                        # For local LLM support with Ollama
+    "pypdf",                         # Required for PDF loading with LangChain
+    # "openai>=1.0.0",               # <-- Commented out, not needed for local-only
 ]
 
 [project.optional-dependencies]
