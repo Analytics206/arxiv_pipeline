@@ -41,7 +41,7 @@ This project works on both Windows and Ubuntu/Linux environments.
 ### Prerequisites
 
 - Git
-- Python 3.8+ (Python 3.10 recommended)
+- Python 3.9+ (Python 3.11 recommended)
 - [UV](https://github.com/astral-sh/uv) (for fast Python dependency management)
 - Docker and Docker Compose (for containerized deployment)
 
