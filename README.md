@@ -4,17 +4,21 @@
 A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. It allows offline graph-based and semantic search through MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker for easy, consistent local deployment.
 
 🚀 Key Features
-Local-first: Everything runs offline—no cloud dependencies.
+Local-first: Everything runs offline—no cloud dependencies but can deploy to cloud in containers.
 
-arXiv Ingestion: Fetch papers from the cs.AI category (configurable).
+arXiv Ingestion: Fetch papers from the cs.AI category (configurable) see list down document.
 
 MongoDB Storage: Stores structured and raw metadata.
 
 Graph Representation: Neo4j graph database captures relationships between papers, authors, and categories.
 
+LLM Category Summary: LLM reads papers to categories by subject, architecture and mathatical models.
+
 Semantic Embeddings: Embeds text using Hugging Face models, stored in Qdrant for similarity search.
 
 Configurable & Modular: Centralized settings let you switch categories, models, and components.
+
+User Inferace: User friendly interface for explore datasets, knowledge graphs and similarity search.
 
 Containerized: Fully Dockerized for isolated, repeatable setup.
 
@@ -26,6 +30,7 @@ Containerized: Fully Dockerized for isolated, repeatable setup.
 | **Neo4j**             | Stores the author-paper-category graph       |
 | **Qdrant**            | Stores vector embeddings for semantic search |
 | **Config Manager**    | Central config for category, limits, model   |
+| **User Interface**    | Web UI for interaction with graphs           |
 | **Logger**            | Tracks events, errors, and skipped entries   |
 | **Docker Compose**    | Brings it all together for local use         |
 
@@ -131,20 +136,35 @@ python src/utils/download_pdfs.py
 ### API Address
 ---
 cs.AI - Artificial Intelligence
+
 cs.GT - Computer Science and Game Theory
+
 cs.CV - Computer Vision and Pattern Recognition
+
 cs.CL - Computation and Language
+
 cs.DS - Data Structures and Algorithms
+
 cs.LO - Logic in Computer Science
+
 cs.LG - Machine Learning
+
 cs.MA - Multiagent Systems
+
 cs.NE - Neural and Evolutionary Computing
+
 cs.NA - Numerical Analysis
+
 stat - Statistics
+
 stat.ML - Machine Learning
+
 stat.TH - Statistics Theory
+
 math.PR - Probability
+
 q-bio.NC - Neurons and Cognition
+
 physics.data-an - Data Analysis, Statistics and Probability
 
 cs.AI, cs.GT, cs.CV, cs.DS, cs.LO, cs.LG, cs.MA, cs.NE
