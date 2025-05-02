@@ -41,7 +41,7 @@ This project works on both Windows and Ubuntu/Linux environments.
 ### Prerequisites
 
 - Git
-- Python 3.9+ (Python 3.11 recommended)
+- Python 3.9+ (Python 3.12-slim recommended)
 - [UV](https://github.com/astral-sh/uv) (for fast Python dependency management)
 - Docker and Docker Compose (for containerized deployment)
 
@@ -115,7 +115,7 @@ python src/utils/download_pdfs.py
 
 ### Notes
 
-- The default Python version for Docker is now `python:3.10-slim`.
+- The default Python version for Docker is now `python:3.12-slim`.
 - All persistent data (MongoDB, Neo4j, Qdrant) is stored in Docker volumes.
 - For development, use the local virtual environment; for production or multi-service orchestration, use Docker Compose.
 
