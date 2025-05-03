@@ -38,10 +38,17 @@ def run_ingestion_pipeline(config: Dict[str, Any]):
         sort_order=config['arxiv']['sort_order']
     )
     
+    # Use environment variable if available, otherwise use config
+    import os
+    mongo_uri = os.environ.get('MONGO_URI', config['mongo']['connection_string'])
+    
     mongo_storage = MongoStorage(
-        connection_string=config['mongo']['connection_string'],
+        connection_string=mongo_uri,
         db_name=config['mongo']['db_name']
     )
+    
+    logger.info(f"Using MongoDB connection: {mongo_uri}")
+    
     
     # Process each category
     for category in config['arxiv']['categories']:

@@ -2,10 +2,8 @@ from typing import Dict, List, Any, Optional
 import logging
 from datetime import datetime
 
-from langchain_community.document_loaders.mongodb import MongoDBLoader
+from langchain_community.document_loaders.mongodb import MongodbLoader
 from langchain_community.vectorstores.mongodb_atlas import MongoDBAtlasVectorSearch
-from langchain_community.vectorstores.mongodb_atlas import MongoDBAtlasVectorSearchResult
-from langchain_community.vectorstores.mongodb_atlas import MongoDBAtlasVectorSearchStats
 
 import pymongo
 
@@ -32,7 +30,7 @@ class MongoStorage:
         self.stats = self.db.ingestion_stats
 
         # LangChain MongoDB loader for document operations
-        self.loader = MongoDBLoader(
+        self.loader = MongodbLoader(
             connection_string=connection_string,
             db_name=db_name,
             collection_name="papers"

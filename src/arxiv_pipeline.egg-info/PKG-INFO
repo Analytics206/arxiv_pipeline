@@ -166,6 +166,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    http://localhost:3000
 ---
 ### Configuration
+![Image](https://github.com/user-attachments/assets/7d68b38e-b4a1-49d9-acf4-17b74fb05e22)
 
 - Edit `config/default.yaml` to change categories, fetch limits, or database settings.
 
