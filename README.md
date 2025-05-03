@@ -264,39 +264,92 @@ These tools provide graphical interfaces to explore, query, and visualize the da
 ---
 📊 Optional Enhancements
 These features are supported or planned:
+### Future Features
 
-Local web dashboard for visual exploration
+The following features are planned for future development to enhance the research pipeline:
 
-PDF section parsing
+#### Data Analysis and Visualization
+- **Jupyter Lab Integration**: Add a dedicated Jupyter service with pre-built notebooks for research analysis
+- **Example Notebooks for Research**: Create ready-to-use notebooks for common research tasks and analyses
+- **Topic Modeling**: Implement BERTopic or LDA for automatic discovery of research themes
+- **Time-Series Analysis**: Track the evolution of research topics over time
 
-Citation parsing
+#### Research Enhancement Tools
+- **PDF Section Parsing**: Intelligently extract structured sections from research papers (abstract, methods, results, etc.)
+- **Citation Parsing**: Extract and normalize citations from paper references
+- **Mathematical Model Extraction**: Identify and extract mathematical formulas and models from papers
+- **Citation Graph Analysis**: Build a graph of paper citations to identify seminal works
+- **Researcher Networks**: Map collaboration networks among authors
+- **Multi-Modal Analysis**: Extract and analyze figures and tables from papers
 
-Mathatical model extraction
+#### Infrastructure Improvements
+- **LangChain-based Research Assistant**: Natural language interface to query the database
+- **Hybrid Search**: Combine keyword and semantic search for better results
+- **Export Tools**: Add BibTeX and PDF collection exports
 
-Example notebooks for research
+### To-Do List
 
-All components are modular and can be swapped or extended via config.
+- [ ] **Short-term Tasks**
+  - [ ] Optimize PDF download with parallel processing
+  - [ ] Add citation extraction from PDF full text
+  - [ ] Implement paper similarity metrics
+  - [ ] Create basic analytics dashboard
+  - [ ] Develop basic PDF section parser to extract abstracts and conclusions
+
+- [ ] **Medium-term Tasks**
+  - [ ] Extend Neo4j schema to include citations between papers
+  - [ ] Add full-text search capabilities
+  - [ ] Implement comprehensive citation parsing system
+  - [ ] Create example Jupyter notebooks for research workflows
+  - [ ] Develop mathematical formula extraction and indexing
+  - [ ] Implement automated paper summarization
+  - [ ] Set up scheduled runs for continuous updates
+
+- [ ] **Long-term Tasks**
+  - [ ] Build a recommendation system for related papers
+  - [ ] Develop a natural language query interface
+  - [ ] Create a researcher profile system
+  - [ ] Add support for other research paper repositories (e.g., PubMed, IEEE)
+
+- [ ] **Infrastructure Tasks**
+  - [ ] Add Prometheus/Grafana for monitoring
+  - [ ] Implement automated testing
+  - [ ] Set up CI/CD pipeline for continuous deployment
+  - [ ] Optimize vector storage for large-scale collections
 
 ---
-💡 Use Cases
-Build local AI paper libraries
 
-Graph analysis of research trends
+### 💡 Use Cases
 
-Offline semantic paper search
+#### Research & Knowledge Management
+- **Build Personal Research Libraries**: Create customized collections of AI papers organized by category and relevance
+- **Offline Semantic Paper Search**: Find relevant papers without relying on online search engines
+- **Research Gap Identification**: Analyze research areas to identify unexplored topics and opportunities
+- **Literature Review Automation**: Quickly build comprehensive literature reviews for specific research questions
 
-Prototyping citation or influence mapping tools
+#### Data Science & Analysis
+- **Research Trend Analysis**: Apply time-series analysis to identify emerging and declining research topics
+- **Citation Impact Visualization**: Build network graphs to identify the most influential papers and authors
+- **Cross-Domain Knowledge Transfer**: Discover applications of techniques across different research domains
+- **Research Benchmarking**: Track performance improvements in specific algorithms or methods over time
 
-Using similarity search to find related papers to use with LLM to create new papers
+#### AI-Assisted Research
+- **Paper Summarization**: Generate concise summaries of complex research papers
+- **Similar Papers Discovery**: Use vector similarity to find related work not linked by citations
+- **Research Idea Generation**: Use paper combinations with LLMs to explore novel research directions
+- **Algorithm Implementation Assistance**: Extract mathematical models for implementation in your own projects
 
-Overview extraction
+#### Education & Learning
+- **Personalized Learning Paths**: Create sequential reading lists for specific AI topics
+- **Concept Visualization**: Extract and visualize key concepts across multiple papers
+- **Interactive Research Exploration**: Navigate research spaces through concept and citation graphs
+- **Teaching Material Preparation**: Curate papers and extract examples for courses and tutorials
 ---
 
-## API Address 
+## ArXiv API Address to fetch papers metadata
 http://export.arxiv.org/api/query
 
-List used is in config/defaults.yaml these are for reference, there are more categories available. 
-
+List used is in config/defaults.yaml for reference, more categories available. 
 ---
 cs.AI - Artificial Intelligence
 
