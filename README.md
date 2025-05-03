@@ -39,9 +39,9 @@ Containerized: Fully Dockerized for isolated, repeatable setup.
 
 A local, platform-independent pipeline for processing research papers from arXiv.org.
 
-## Setup InstructionsPDF_DIR = r"E:\AI Research"
+## Setup Instructions
 
-pdf directory is set to E:\AI Research\ in utils/download_pdfs.py
+pdf directory is set to E:\AI Research\ in "src\utils\download_pdfs.py"
 
 PDF_DIR = r"E:\AI Research"
 
@@ -83,7 +83,7 @@ source .venv/bin/activate
 
 ---
 ### Running the Pipeline Locally
-
+Not recommended better to run in docker
 ```bash
 python -m src.pipeline.run_pipeline --config config/default.yaml
 ```
@@ -105,22 +105,22 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    docker compose up -d app 
    docker compose logs -f app
    ```
-   To shutdown docker env
+   When you want to shutdown docker env, need it up to explore data
    ```bash
    docker-compose down
    ```
 3. **Access MongoDB, Neo4j, and Qdrant via their exposed ports.**
-
    ---
+   This runs sync-neo4j service for new pdfs inserted from MongoDB or 1st time run.
    ```bash
    docker compose up --build sync-neo4j
    ```
    Download papers *issue, sometimes you need to you use
    mongodb://localhost:27017/onfig
    
-   or default in config/defaults.yaml
+   default in config/defaults.yaml
    below changes default and runs. Default may not need to be changed though
-   
+
    mongodb://mongodb:27017/
    ```bash
    $env:MONGO_URI="mongodb://localhost:27017/onfig"
@@ -137,7 +137,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
 
 - The default Python version for Docker is now `python:3.12-slim`.
 - All persistent data (MongoDB, Neo4j, Qdrant) is stored in Docker volumes.
-- For development, use the local virtual environment; for production or multi-service orchestration, use Docker Compose.
+- For development, use the local virtual environment; for production or multi-service orchestration, use Docker Compose. OR ALWAYS use docker.
 
 ---
 
@@ -152,11 +152,11 @@ These features are supported or planned:
 
 Local web dashboard for visual exploration
 
-PDF downloading and section parsing
+PDF section parsing
 
 Citation parsing
 
-Scheduled updates (cron)
+Mathatical model extraction
 
 Example notebooks for research
 
@@ -172,9 +172,16 @@ Offline semantic paper search
 
 Prototyping citation or influence mapping tools
 
+Using similarity search to find related papers to use with LLM to create new papers
+
+Overview extraction
 ---
+
 ## API Address 
 http://export.arxiv.org/api/query
+
+List used is in config/defaults.yaml these are for reference
+
 ---
 cs.AI - Artificial Intelligence
 
@@ -212,4 +219,4 @@ cs.AI, cs.GT, cs.CV, cs.DS, cs.LO, cs.LG, cs.MA, cs.NE
 cs.NA, stat, stat.ML, math.PR, q-bio.NC, physics.data-an
 
 ---
-For more details, see the `docs/` directory.
+For more details about project and status, see the `docs/` directory.
