@@ -4,7 +4,7 @@
 A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. It allows offline graph-based and semantic search through MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker for easy, consistent local deployment.
 
 🚀 Key Features
-Local-first: Everything runs offline—no cloud dependencies but can deploy to cloud in containers.
+Local-first: Everything runs offline—no cloud dependencies but can deploy to cloud in containers. Fetching papers requires internet connection.
 
 arXiv Ingestion: Fetch papers from the cs.AI category (configurable) see list bottom of document. Duplicate papers are discarded.
 
@@ -39,7 +39,11 @@ Containerized: Fully Dockerized for isolated, repeatable setup.
 
 A local, platform-independent pipeline for processing research papers from arXiv.org.
 
-## Setup Instructions
+## Setup InstructionsPDF_DIR = r"E:\AI Research"
+
+pdf directory is set to E:\AI Research\ in utils/download_pdfs.py
+
+PDF_DIR = r"E:\AI Research"
 
 This project works on both Windows and Ubuntu/Linux environments.
 
@@ -78,7 +82,6 @@ source .venv/bin/activate
 ```
 
 ---
-
 ### Running the Pipeline Locally
 
 ```bash
@@ -88,7 +91,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
 ---
 
 ### Dockerized Deployment
-
+0. Suggested run in venv from scripts above for your OS
 1. **Build and start all services:**
    ```bash
    docker-compose up --build
@@ -112,7 +115,13 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    ```bash
    docker compose up --build sync-neo4j
    ```
-   Download papers
+   Download papers *issue, sometimes you need to you use
+   mongodb://localhost:27017/onfig
+   
+   or default in config/defaults.yaml
+   below changes default and runs. Default may not need to be changed though
+   
+   mongodb://mongodb:27017/
    ```bash
    $env:MONGO_URI="mongodb://localhost:27017/onfig"
    python src/utils/download_pdfs.py
