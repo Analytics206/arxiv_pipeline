@@ -125,7 +125,7 @@ function App() {
         </div>
       </main>
       <footer className="App-footer">
-        <p>ArXiv Pipeline Project - Data Science Tool</p>
+        <p>ArXiv Pipeline - Data Science Deep Research Tool</p>
       </footer>
     </div>
   );
