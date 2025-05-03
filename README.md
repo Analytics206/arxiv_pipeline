@@ -1,12 +1,12 @@
 # ArXiv Research Pipeline
 
-🧠 ArXiv Local AI Research Pipeline
+🧠 ArXiv Local AI Deep Research Pipeline
 A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. It allows offline graph-based and semantic search through MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker for easy, consistent local deployment.
 
 🚀 Key Features
 Local-first: Everything runs offline—no cloud dependencies but can deploy to cloud in containers. Fetching papers requires internet connection.
 
-arXiv Ingestion: Fetch papers from the cs.AI category (configurable) see list bottom of document. Duplicate papers are discarded.
+ArXiv Ingestion: Fetch non-duplicate papers saved locally from the cs.AI category (configurable) see list bottom of document.
 
 MongoDB Storage: Stores structured and raw metadata.
 
@@ -41,7 +41,7 @@ A local, platform-independent pipeline for processing research papers from arXiv
 
 ## Setup Instructions
 
-pdf directory is set to E:\AI Research\ in "src\utils\download_pdfs.py"
+pdf save directory is set to E:\AI Research\ in "src\utils\download_pdfs.py"
 
 PDF_DIR = r"E:\AI Research"
 
@@ -83,13 +83,12 @@ source .venv/bin/activate
 
 ---
 ### Running the Pipeline Locally
-Not recommended better to run in docker
+Not recommended better to run in docker and this option might be removed.
 ```bash
 python -m src.pipeline.run_pipeline --config config/default.yaml
 ```
 
 ---
-
 ### Dockerized Deployment
 0. Suggested run in venv from scripts above for your OS
 1. **Build and start all services:**
@@ -115,11 +114,11 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    ```bash
    docker compose up --build sync-neo4j
    ```
-   Download papers *issue, sometimes you need to you use
+   *issue, sometimes you need to you use
    mongodb://localhost:27017/onfig
    
    default in config/defaults.yaml
-   below changes default and runs. Default may not need to be changed though
+   below changes default and runs. Default may not need to be changed.
 
    mongodb://mongodb:27017/
    ```bash
