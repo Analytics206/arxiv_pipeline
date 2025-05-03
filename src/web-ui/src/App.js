@@ -45,24 +45,14 @@ function App() {
     setError(null); // Clear any previous errors
     
     try {
+      // Use actual data from Neo4j query
       const data = await runQuery(selectedQuery.cypher);
       setGraphData(data);
     } catch (err) {
       console.error('Error executing query:', err);
       setError(`Error executing query: ${err.message}`);
-      
-      // Provide mock data even when there's an error, so the UI doesn't go blank
-      setGraphData({
-        nodes: [
-          { data: { id: '1', label: 'Paper 1', type: 'Paper' } },
-          { data: { id: '2', label: 'Author 1', type: 'Author' } },
-          { data: { id: '3', label: 'Category 1', type: 'Category' } }
-        ],
-        edges: [
-          { data: { id: '1-2', source: '1', target: '2', label: 'AUTHORED_BY' } },
-          { data: { id: '1-3', source: '1', target: '3', label: 'IN_CATEGORY' } }
-        ]
-      });
+      // Don't set any mock data on error
+      setGraphData(null);
     } finally {
       setQueryRunning(false);
     }
@@ -101,7 +91,7 @@ function App() {
         {error && (
           <div className="error-message">
             <p>{error}</p>
-            <p>Using mock data for visualization demonstration.</p>
+            <p>Please check your Neo4j connection and try again.</p>
           </div>
         )}
         

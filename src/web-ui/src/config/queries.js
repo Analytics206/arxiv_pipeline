@@ -21,7 +21,14 @@ const queries = {
       description: "Show papers by category with category sizes proportional to paper count",
       category: "Categories",
       cypher: "MATCH (p:Paper)-[:BELONGS_TO]->(c:Category) RETURN p, c LIMIT 200"
-    }
+    },
+    {
+        id: "Author_Connections",
+        name: "Author Connections",
+        description: "Show papers by author connections",
+        category: "Authors",
+        cypher: "MATCH (a:Author)-[:AUTHORED]->(p:Paper)RETURN a, p LIMIT 20"
+      }
   ]
 };
 
