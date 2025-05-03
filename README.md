@@ -83,13 +83,13 @@ source .venv/bin/activate
 
 ---
 ### Running the Pipeline Locally
-Not recommended better to run in docker and this option might be removed.
+Not recommended better to run in docker and this option might be removed or unsupported.
 ```bash
 python -m src.pipeline.run_pipeline --config config/default.yaml
 ```
 
 ---
-### Dockerized Deployment
+### Dockerized Deployment - Docker Desktop Running
 0. Suggested run in venv from scripts above for your OS
 1. **Build and start all services:**
    ```bash
@@ -179,7 +179,7 @@ Overview extraction
 ## API Address 
 http://export.arxiv.org/api/query
 
-List used is in config/defaults.yaml these are for reference
+List used is in config/defaults.yaml these are for reference, there are more categories available. 
 
 ---
 cs.AI - Artificial Intelligence

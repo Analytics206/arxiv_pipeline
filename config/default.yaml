@@ -36,13 +36,13 @@ arxiv:
     - "stat"
     - "stat.ML"
     - "stat.TH"
-  max_results: 100
+  max_results: 100 # 200 is max but often fails
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 2
+  max_iterations: 5 # this is for each category above
   rate_limit_seconds: 3
   start_date: "2014-12-31"
-  end_date: "2025-04-30"
+  end_date: "2025-05-31" # end_date is not used in arxiv api call, they only have start_date, this is used when saving pdfs
 
 # Embedding model settings
 embedding:
