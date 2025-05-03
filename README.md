@@ -6,7 +6,7 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 🚀 Key Features
 Local-first: Everything runs offline—no cloud dependencies but can deploy to cloud in containers.
 
-arXiv Ingestion: Fetch papers from the cs.AI category (configurable) see list down of document. Duplicate papers are discarded.
+arXiv Ingestion: Fetch papers from the cs.AI category (configurable) see list bottom of document. Duplicate papers are discarded.
 
 MongoDB Storage: Stores structured and raw metadata.
 
