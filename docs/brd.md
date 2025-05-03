@@ -24,5 +24,5 @@ A modular, offline-capable pipeline that fetches and stores research papers from
 | BRD-05     | Central configuration to enable modularity | FR-CON-01 to FR-CON-03 |
 | BRD-06     | Track system operation and errors | FR-LOG-01 to FR-LOG-03 |
 | BRD-07     | Enable future expansion (PDFs, citations, UI) | FR-UI-01, FR-PDF-01, FR-REF-01, FR-CRON-01, FR-REP-01 |
-
+| BRD-08     | Web UI to explore graph/search | FR-UI-01 |
 

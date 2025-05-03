@@ -57,6 +57,21 @@ services:
     volumes:
       - ./config:/app/config
       - ./data:/app/data
+      
+  web-ui:
+    build:
+      context: ./src/web-ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - neo4j
+    environment:
+      - REACT_APP_NEO4J_URI=bolt://neo4j:7687
+      - REACT_APP_NEO4J_USER=neo4j
+      - REACT_APP_NEO4J_PASSWORD=password
+    volumes:
+      - ./src/web-ui/src/config:/app/public/config
 
 volumes:
   mongo_data:

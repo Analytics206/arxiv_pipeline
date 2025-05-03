@@ -20,7 +20,7 @@ Configurable & Modular: Centralized settings let you switch categories, models, 
 
 User Inferace: User friendly interface for explore datasets, knowledge graphs and similarity search.
 
-Containerized: Fully Dockerized for isolated, repeatable setup.
+Containerized: Fully Dockerized for isolated, repeatable setup with persistent Docker volumes for data storage.
 
 ![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
 
@@ -93,22 +93,23 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
 0. Suggested run in venv from scripts above for your OS
 1. **Build and start all services:**
    ```bash
-   docker-compose up --build
+   docker compose up -d
    ```
 2. **(Optional) Rebuild the app service after code changes:**
    ```bash
-   docker-compose build app
+   docker compose up -d
    ```
-   OR run with logs
+3. **Build the app service wth logs:**
+   run with logs
    ```bash
-   docker compose up -d app 
-   docker compose logs -f app
+   docker compose up -d
+   docker compose logs -f
    ```
    When you want to shutdown docker env, need it up to explore data
    ```bash
-   docker-compose down
+   docker compose down
    ```
-3. **Access MongoDB, Neo4j, and Qdrant via their exposed ports.**
+4. **Access MongoDB, Neo4j, and Qdrant via their exposed ports.**
    ---
    This runs sync-neo4j service for new pdfs inserted from MongoDB or 1st time run.
    ```bash
@@ -125,6 +126,14 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    $env:MONGO_URI="mongodb://localhost:27017/onfig"
    python src/utils/download_pdfs.py
    ```
+
+5. **Web UI**
+   ---
+   To run the web UI, use only, not sure why, or restart Web UI docker service
+   ```bash
+   docker-compose up -d web-ui
+   ```
+   http://localhost:3000
 ---
 ### Configuration
 

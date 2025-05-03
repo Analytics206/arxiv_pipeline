@@ -43,8 +43,12 @@
 - **FR-LOG-02**: Log network and processing errors
 - **FR-LOG-03**: Log reasons for skipped entries
 
+### 3.7 Web UI (FR-UI-01)
+- **FR-UI-01**: Web UI to explore neo4j graph/search
+- **FR-UI-02**: Extend to MongoDB
+- **FR-UI-03**: Extend to Qdrant
+
 ### Optional/Nice-to-Have Features
-- **FR-UI-01**: Local web dashboard to explore graph/search
 - **FR-PDF-01**: Optional PDF downloading/section parsing
 - **FR-REF-01**: Parse citation relationships
 - **FR-CRON-01**: Schedule periodic updates

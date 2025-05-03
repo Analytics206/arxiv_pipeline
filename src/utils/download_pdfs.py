@@ -2,6 +2,7 @@ import os
 import requests
 from pymongo import MongoClient
 from tqdm import tqdm
+# should be renamed this imports pds into MongoDB
 
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/")
 DB_NAME = "arxiv_papers"

@@ -30,13 +30,13 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-DAT-03   | Modular MongoDB interface                                | BRD-02        | ✅     | Implemented in mongo.py    |
 | FR-DAT-04   | Log ingestion statistics and anomalies                   | BRD-02        | ✅     | Implemented in mongo.py    |
 
-| FR-GPH-01   | Convert Mongo data to Neo4j                              | BRD-03        | ❌     |                            |
-| FR-GPH-02   | Represent papers in Neo4j                                | BRD-03        | ❌     |                            |
-| FR-GPH-03   | Represent authors/categories in Neo4j                    | BRD-03        | ❌     |                            |
-| FR-GPH-04   | Author to paper relationship                             | BRD-03        | ❌     |                            |
-| FR-GPH-05   | Paper to category relationship                           | BRD-03        | ❌     |                            |
+| FR-GPH-01   | Convert Mongo data to Neo4j                              | BRD-03        | ✅    |                            |
+| FR-GPH-02   | Represent papers in Neo4j                                | BRD-03        | ✅    |                            |
+| FR-GPH-03   | Represent authors/categories in Neo4j                    | BRD-03        | ✅   |                            |
+| FR-GPH-04   | Author to paper relationship                             | BRD-03        | ✅    |                            |
+| FR-GPH-05   | Paper to category relationship                           | BRD-03        | ✅    |                            |
 
-| FR-VEC-01   | Use Hugging Face model for embedding                     | BRD-04        | ❌     |                            |
+| FR-VEC-01   | Use Hugging Face model for embedding                     | BRD-04        | ❌     | Implemented in docker compose up --build sync-neo4j                           |
 | FR-VEC-02   | Embed title + abstract                                   | BRD-04        | ❌     |                            |
 | FR-VEC-03   | Store vectors in Qdrant                                  | BRD-04        | ❌     |                            |
 | FR-VEC-04   | Model switching via config                               | BRD-04        | ❌     |                            |
@@ -49,7 +49,7 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-LOG-02   | Log network and processing errors                        | BRD-06        | 🔧     | Basic logging in place     |
 | FR-LOG-03   | Log reasons for skipped entries                          | BRD-06        | ❌     |                            |
 
-| FR-UI-01    | Local web dashboard                                      | BRD-07        | ⏳     | Optional/Nice-to-have      |
+| FR-UI-01    | Local web dashboard                                      | BRD-07        | ⏳     | Web UI to explore graph/search      |
 
 | FR-PDF-01   | Optional PDF parsing                                     | BRD-07        | ⏳     | Optional/Nice-to-have      |
 

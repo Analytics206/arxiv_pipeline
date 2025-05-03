@@ -1,0 +1,80 @@
+# Neo4j Graph Queries Configuration
+# 
+# This file contains named queries that will appear in the UI dropdown
+# Each query has:
+#   - name: Display name for the UI
+#   - description: Explains what the query shows
+#   - cypher: The actual Neo4j Cypher query
+#   - category: For organizing queries in the UI
+#   - graph_options: Visual styling options for Cytoscape.js
+
+queries:
+  - id: "papers_count"
+    name: "Papers Count"
+    description: "Show count of papers in the database"
+    category: "Overview"
+    cypher: "MATCH (p:Paper)RETURN count(p) AS paper_count"
+    graph_options:
+      layout: "cose"
+      node_size_property: "published"
+      node_color_map:
+        "Paper": "#6495ED"
+        "Category": "#32CD32"
+      
+  - id: "author_network"
+    name: "Author Collaboration Network"
+    description: "Show authors who have collaborated on papers"
+    category: "Authors"
+    cypher: "MATCH (a1:Author)-[:AUTHORED]->(p:Paper)<-[:AUTHORED]-(a2:Author) WHERE a1 <> a2 RETURN a1, a2, p LIMIT 200"
+    graph_options:
+      layout: "cola"
+      node_size_property: "papers_count"
+      node_color_map:
+        "Author": "#FF7F50"
+        "Paper": "#6495ED"
+        
+  - id: "category_distribution"
+    name: "Category Distribution"
+    description: "Show papers by category with category sizes proportional to paper count"
+    category: "Categories"
+    cypher: "MATCH (p:Paper)-[:BELONGS_TO]->(c:Category) RETURN p, c LIMIT 200"
+    graph_options:
+      layout: "concentric"
+      node_size_property: "papers_count"
+      node_color_map:
+        "Paper": "#6495ED"
+        "Category": "#32CD32"
+        
+  - id: "paper_similarity"
+    name: "Paper Similarity Network"
+    description: "Show papers that share categories"
+    category: "Papers"
+    cypher: "MATCH (p1:Paper)-[:BELONGS_TO]->(c:Category)<-[:BELONGS_TO]-(p2:Paper) WHERE p1 <> p2 RETURN p1, p2, c LIMIT 150"
+    graph_options:
+      layout: "dagre"
+      node_size_property: "published"
+      node_color_map:
+        "Paper": "#6495ED"
+        "Category": "#32CD32"
+  
+  - id: "latest_papers"
+    name: "Latest Papers (30 Days)"
+    description: "Papers published in the last 30 days"
+    category: "Timeline"
+    cypher: "MATCH (p:Paper) WHERE datetime(p.published) > datetime() - duration('P30D') RETURN p LIMIT 100"
+    graph_options:
+      layout: "breadthfirst"
+      node_size_property: "published"
+      node_color_map:
+        "Paper": "#6495ED"
+        
+  - id: "author_papers_count"
+    name: "Top Authors by Paper Count"
+    description: "Authors with the most papers"
+    category: "Authors"
+    cypher: "MATCH (a:Author)-[:AUTHORED]->(p:Paper) WITH a, COUNT(p) AS papers_count WHERE papers_count > 3 RETURN a, papers_count ORDER BY papers_count DESC LIMIT 50"
+    graph_options:
+      layout: "concentric"
+      node_size_property: "papers_count"
+      node_color_map:
+        "Author": "#FF7F50"

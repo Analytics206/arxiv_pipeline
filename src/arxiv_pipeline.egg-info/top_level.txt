@@ -5,3 +5,4 @@ ingestion
 pipeline
 storage
 utils
+web-ui
