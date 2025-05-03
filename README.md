@@ -22,6 +22,8 @@ User Inferace: User friendly interface for explore datasets, knowledge graphs an
 
 Containerized: Fully Dockerized for isolated, repeatable setup.
 
+![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
+
 📦 System Components
 | Component             | Purpose                                      |
 | --------------------- | -------------------------------------------- |
