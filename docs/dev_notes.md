@@ -13,10 +13,107 @@ This document contains developer notes and reminders for ongoing work on the ArX
   - Implement within the `sync_qdrant_with_tracking()` function in `src/pipeline/sync_qdrant.py`
 
 ### System monitoring with Prometheus/Grafana
-  - Add docker container metrics to prometheus
-  - Add system metrics to prometheus
-  - Add grafana dashboard for docker container metrics
-  - Add grafana dashboard for system metrics
+
+The ArXiv pipeline project now includes a comprehensive monitoring solution using Prometheus and Grafana to track system and container metrics.
+
+#### Overview
+
+This monitoring stack consists of:
+- **Prometheus**: Time series database for metrics collection and storage
+- **Grafana**: Visualization platform for metrics dashboards
+- **cAdvisor**: Container metrics collector
+- **Node Exporter**: Host system metrics collector
+- **MongoDB Exporter**: MongoDB-specific metrics collector
+
+#### Setup Instructions
+
+1. **Configuration Files**
+   - Prometheus configuration: `config/prometheus/prometheus.yml`
+   - Grafana dashboards: `config/grafana/dashboards/`
+   - Grafana datasources: `config/grafana/datasources.yaml`
+   - Docker Compose file: `docker-compose.monitoring.yml`
+
+2. **Starting the Monitoring Stack**
+   ```bash
+   # Start the main ArXiv pipeline services
+   docker-compose up -d
+   
+   # Start the monitoring stack
+   docker-compose -f docker-compose.monitoring.yml up -d
+   ```
+
+3. **Accessing Dashboards**
+   - Prometheus UI: http://localhost:9090
+   - Grafana UI: http://localhost:3001
+     - Default credentials: admin/admin
+     - Preconfigured dashboards:
+       - Docker Containers: System-level view of container performance
+       - System Metrics: Host machine metrics (CPU, memory, disk, network)
+
+4. **Adding Custom Metrics**
+   
+   To expose custom metrics from the ArXiv pipeline application:
+   
+   ```python
+   from prometheus_client import Counter, Gauge, start_http_server
+
+   # Initialize metrics
+   PAPERS_PROCESSED = Counter('papers_processed_total', 'Number of papers processed')
+   VECTOR_PROCESSING_TIME = Gauge('vector_processing_seconds', 'Time taken to process vectors')
+   
+   # Start metrics server (typically in your app's main entry point)
+   start_http_server(8000)
+   
+   # Update metrics in your code
+   def process_paper(paper_id):
+       start_time = time.time()
+       # Processing logic
+       PAPERS_PROCESSED.inc()
+       VECTOR_PROCESSING_TIME.set(time.time() - start_time)
+   ```
+
+5. **Alert Configuration**
+   
+   To set up alerts for critical conditions:
+   
+   1. Create an alerting configuration in `config/prometheus/alerts.yml`
+   2. Update the Prometheus configuration to include alerts
+   3. Configure notification channels in Grafana (email, Slack, etc.)
+
+#### Monitoring Best Practices
+
+1. **Key Metrics to Monitor**
+   - Container resource usage (CPU, memory)
+   - Host system resources
+   - MongoDB performance metrics
+   - Application-specific metrics:
+     - Paper processing rate
+     - PDF download success/failure rate
+     - Vector embedding generation times
+     - Neo4j query performance
+
+2. **Dashboard Organization**
+   - System-level dashboards: Infrastructure health
+   - Application-level dashboards: Business logic and performance
+   - Service-specific dashboards: MongoDB, Neo4j, Qdrant
+
+3. **Performance Optimization**
+   - Use metrics to identify bottlenecks in the pipeline
+   - Monitor GPU utilization for vector processing tasks
+   - Track memory usage patterns for large embeddings operations
+
+#### Future Enhancements
+
+- Add specific metrics for Qdrant vector database performance
+- Implement custom notifications for failed pipeline steps
+- Create comprehensive dashboards for tracking end-to-end paper processing
+- Add business metrics dashboards for research paper trends
+
+#### Troubleshooting
+
+- If metrics aren't appearing, check Prometheus targets at http://localhost:9090/targets
+- For container metrics issues, ensure cAdvisor has proper access to Docker socket
+- Log metrics can be added using the Loki stack (consider adding in future updates)
 
 ### Documentation Updates
 - Update README.md with new features and instructions

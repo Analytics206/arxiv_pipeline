@@ -28,6 +28,8 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 | **User Interface**    | Web UI for interaction with graphs           |
 | **Logger**            | Tracks events, errors, and skipped entries   |
 | **Docker Compose**    | Brings it all together for local use         |
+| **Prometheus**        | Time series database for metrics collection  |
+| **Grafana**           | Visualization platform for metrics dashboards |
 
 
 A local, platform-independent pipeline for processing research papers from arXiv.org.
@@ -48,6 +50,7 @@ This project works on both Windows and Ubuntu/Linux environments.
 - [Ollama](https://ollama.ai/) (optional, for enhanced image analysis)
 - Docker and Docker Compose (for containerized deployment)
 - NVIDIA GPU with CUDA support (optional, for faster vector operations)
+- Prometheus and Grafana (included in docker-compose.monitoring.yml)
 
 ---
 ## High Level Overview
@@ -113,6 +116,28 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    ```bash
    docker compose down
    ```
+
+## Monitoring with Prometheus and Grafana
+
+1. **Start the monitoring stack** (after main services are running):
+   ```bash
+   docker compose -f docker-compose.monitoring.yml up -d
+   ```
+2. **Access monitoring dashboards**:
+   - Prometheus: http://localhost:9090
+   - Grafana: http://localhost:3001 (admin/admin)
+
+3. **Monitored Metrics**:
+   - Container CPU and memory usage
+   - Host system metrics (CPU, memory, disk, network)
+   - MongoDB performance
+   - Application-specific metrics
+
+4. **View preconfigured dashboards** in Grafana:
+   - Docker Containers
+   - System Metrics
+
+Refer to `docs/dev_notes.md` for more details on monitoring setup and customization.
 # 4. Run Pipelines: MongoDB, Download PDFs, Neo4j, and Qdrant Pipelines
 
    *pipelines do not have to run in order if you have previously run them or starting where you left off
@@ -563,7 +588,7 @@ The following features are 'planned' for future development to enhance the resea
   - [ ] Add support for other research paper repositories (e.g., PubMed, IEEE)
 
 - [ ] **Infrastructure Tasks**
-  - [ ] Add Prometheus/Grafana for monitoring
+  - [x] Add Prometheus/Grafana for monitoring
   - [ ] Implement automated testing
   - [ ] Set up CI/CD pipeline for continuous deployment
   - [ ] Optimize vector storage for large-scale collections

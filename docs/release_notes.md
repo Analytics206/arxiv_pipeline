@@ -1,6 +1,37 @@
-# ArXiv Pipeline Release Notes
+# ArXiv Deep Research Pipeline Release Notes
 
-## Version 0.2.0 (May 4, 2025)
+## Version 0.3.0 (May 4, 2025)
+
+### Major Features
+
+#### System Monitoring with Prometheus/Grafana
+- **Comprehensive Monitoring Stack** - Added Prometheus and Grafana for metrics collection and visualization
+- **Container Metrics** - Implemented container monitoring with cAdvisor for resource usage tracking
+- **System Metrics** - Added Node Exporter for host system metrics (CPU, memory, disk, network)
+- **Database Monitoring** - Integrated MongoDB Exporter for database performance metrics
+- **Custom Application Metrics** - Added framework for tracking application-specific metrics (paper processing, vector operations)
+- **Preconfigured Dashboards** - Created ready-to-use Grafana dashboards for Docker containers and system metrics
+- **Separate Deployment Stack** - Implemented as a separate docker-compose.monitoring.yml for independent deployment
+
+#### Documentation Updates
+- **Monitoring Documentation** - Added comprehensive documentation for the monitoring system in dev_notes.md
+- **System Design Updates** - Updated system_design.md with monitoring architecture details
+- **Requirement Traceability** - Updated business and product requirements documentation to include monitoring features
+
+### Configuration Enhancements
+- **Prometheus Configuration** - Added central configuration in config/prometheus/prometheus.yml
+- **Grafana Datasources** - Added auto-provisioned datasource for Prometheus
+- **Dashboard Provisioning** - Configured automatic dashboard loading for Grafana
+
+### Dependencies and Tools
+- **Prometheus** - Added as a containerized time series database for metrics
+- **Grafana** - Added as a visualization platform for monitoring dashboards
+- **cAdvisor** - Added for container metrics collection
+- **Node Exporter** - Added for host system metrics collection
+- **MongoDB Exporter** - Added for database-specific metrics
+- **Prometheus Client Library** - Added for custom application metrics instrumentation
+
+## Version 0.2.0 (May 3, 2025)
 
 ### Major Features
 
@@ -43,11 +74,39 @@
 
 ## Version 0.1.0 (April 26, 2025)
 
-Initial release with core functionality:
-- ArXiv paper ingestion from API
-- MongoDB storage for paper metadata
-- Neo4j graph database integration
-- PDF downloading and organization
-- Basic vector embedding with Qdrant
-- Docker containerization
-- Web UI for data exploration
+### Major Features
+
+#### Data Ingestion and Storage
+- **ArXiv API Integration** - Implemented paper ingestion from ArXiv Atom XML API
+- **MongoDB Storage** - Created document storage for paper metadata with appropriate indexing
+- **Neo4j Graph Database** - Established graph representation for papers, authors, and categories
+- **PDF Downloading** - Added functionality to download and organize research papers in PDF format
+- **Vector Embedding** - Implemented basic text vectorization using Hugging Face models
+- **Qdrant Integration** - Set up vector similarity search with Qdrant database
+
+#### Docker Containerization
+- **Multi-Container Setup** - Built initial Docker Compose configuration for all services
+- **Volume Persistence** - Implemented persistent storage for MongoDB and Neo4j data
+- **Network Configuration** - Established internal container communication and port mapping
+- **Service Orchestration** - Created coordinated startup/shutdown of all system components
+
+#### Web Interface
+- **Neo4j Visualization** - Created basic web interface for exploring the knowledge graph
+- **Browsing Interface** - Implemented paper browsing and navigation features
+- **Web UI Container** - Dockerized the web interface with appropriate connections to backend services
+
+### Configuration Enhancements
+- **YAML Configuration** - Created initial configuration file structure
+- **Environment Variables** - Implemented environment variable support for container configuration
+- **API Rate Limiting** - Added configurable rate limiting for ArXiv API access
+
+### Documentation
+- **Setup Instructions** - Created installation and setup documentation
+- **README** - Established initial project documentation with overview and features
+- **Configuration Guide** - Documented configuration options and their effects
+
+### Dependencies and Libraries
+- **MongoDB Python Driver** - Integrated PyMongo for database access
+- **Neo4j Python Driver** - Added Neo4j connectivity for graph operations
+- **Hugging Face Transformers** - Integrated for text embedding generation
+- **Docker and Docker Compose** - Established containerization foundation

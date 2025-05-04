@@ -46,6 +46,18 @@ Unlike the Business Requirements Document (BRD) and Product Requirements Documen
 | GPU Acceleration | Support for GPU-accelerated vector operations in Qdrant and embeddings | May 4, 2025 |
 | Multi-GPU Support | Configurable GPU device selection for performance optimization | May 4, 2025 |
 
+### System Monitoring
+
+| Feature | Description | Implementation Date |
+|---------|-------------|---------------------|
+| Prometheus Metrics | Time series database for metrics collection and storage | May 4, 2025 |
+| Grafana Dashboards | Visualization platform for metrics with preconfigured dashboards | May 4, 2025 |
+| Container Monitoring | Container metrics collection using cAdvisor | May 4, 2025 |
+| System Metrics | Host system metrics collection using Node Exporter | May 4, 2025 |
+| MongoDB Metrics | Database-specific monitoring using MongoDB Exporter | May 4, 2025 |
+| Custom Application Metrics | Python Prometheus client for application-specific metrics | May 4, 2025 |
+| Separate Docker Compose | Isolated monitoring stack via docker-compose.monitoring.yml | May 4, 2025 |
+
 ### Pipeline Components
 
 | Feature | Description | Implementation Date |
@@ -79,13 +91,37 @@ The system supports both direct script execution and module-based execution patt
 3. Local PDFs → Qdrant Vector DB (selective by category)
 4. MongoDB → Neo4j (graph relationships)
 
+## Monitoring Architecture
+
+The monitoring system follows a sidecar pattern with the following components:
+
+1. **Prometheus**: Central metrics collection service
+   - Scrapes metrics from all system components
+   - Stores time-series data with retention policies
+   - Configuration in `config/prometheus/prometheus.yml`
+
+2. **Grafana**: Visualization and dashboard platform
+   - Auto-provisioned dashboards in `config/grafana/dashboards/`
+   - Preconfigured Prometheus datasource
+   - Accessible on port 3001 to avoid conflict with Web UI
+
+3. **Exporters**: Purpose-built metrics collectors
+   - cAdvisor: Container resource usage metrics
+   - Node Exporter: Host system metrics
+   - MongoDB Exporter: Database performance metrics
+
+4. **Application Metrics**: Custom instrumentation points
+   - Papers processed counter
+   - Processing time measurements
+   - Success/failure rate tracking
+
 ## Future Design Considerations
 
 - Asynchronous processing pipeline
 - Event-driven architecture for better component decoupling
 - Improved error handling and retry mechanisms
-- Enhanced monitoring and logging
 - Performance optimization for large-scale paper collections
+- Automated alerts based on monitoring thresholds
 
 ---
 

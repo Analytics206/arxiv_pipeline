@@ -49,6 +49,12 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-LOG-02   | Log network and processing errors                        | BRD-06        | ✅     | Basic logging in place     |
 | FR-LOG-03   | Log reasons for skipped entries                          | BRD-06        | ✅     |                            |
 
+| FR-MON-01   | Collect container metrics with Prometheus                 | BRD-09        | ✅     | Implemented with cAdvisor  |
+| FR-MON-02   | Collect system metrics with Node Exporter                 | BRD-09        | ✅     | Implemented with Node Exporter |
+| FR-MON-03   | Monitor MongoDB performance                              | BRD-09        | ✅     | Implemented with MongoDB Exporter |
+| FR-MON-04   | Visualize metrics with Grafana dashboards                | BRD-09        | ✅     | Docker containers & system dashboards |
+| FR-MON-05   | Support custom application metrics                       | BRD-09        | 🔧     | Basic setup implemented |
+
 | FR-UI-01    | Local web dashboard                                      | BRD-07        | ⏳     | Web UI to explore graph/search      |
 
 | FR-PDF-01   | Optional PDF parsing                                     | BRD-07        | ⏳     | Optional/Nice-to-have      |

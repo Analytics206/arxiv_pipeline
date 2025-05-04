@@ -26,6 +26,18 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 - **UV Package Manager**: Fast Python dependency management
 - **Git**: Version control system
 
+### Monitoring & Observability
+- **Prometheus**: Time series database for metrics collection and storage
+  - Metrics: container performance, system resources, application metrics
+  - Targets: containers, host system, MongoDB, application services
+- **Grafana**: Visualization platform for metrics dashboards
+  - Preconfigured dashboards for Docker containers and system metrics
+  - Customizable alerts and notifications
+- **cAdvisor**: Container metrics collector
+- **Node Exporter**: Host system metrics collector
+- **MongoDB Exporter**: MongoDB-specific metrics collector
+- **Prometheus Client**: Python library for custom application metrics
+
 ### Ingestion Layer
 - **ArXiv API**: HTTP-based Atom XML API for research paper retrieval
 - **Requests**: HTTP client library
@@ -75,11 +87,55 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 - **Python Virtual Environment**: Isolated dependency management
 - **Docker Compose**: Local environment orchestration
 
+## Monitoring Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  Monitoring Environment                  │
+│                                                          │
+│   ┌─────────┐     ┌──────────┐     ┌────────────┐       │
+│   │Prometheus│────▶│ Grafana  │     │  cAdvisor  │       │
+│   │          │     │          │     │            │       │
+│   └─────────┘     └──────────┘     └────────────┘       │
+│        │                               │                 │
+│        │          ┌──────────┐         │                 │
+│        └──────────│Node      │─────────┘                 │
+│                   │Exporter  │                           │
+│                   └──────────┘                           │
+│                        │                                 │
+└────────────────────────│─────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│                   Docker Environment                     │
+│  (Application containers, databases, and services)       │
+└─────────────────────────────────────────────────────────┘
+```
+
 ## Deployment Architecture
 
-The system supports two deployment architectures:
+The system supports three deployment architectures:
 
-### 1. Full Docker Deployment
+### 1. Full Docker Deployment with Monitoring
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  Monitoring Environment                  │
+│                                                          │
+│   ┌─────────┐     ┌──────────┐     ┌────────────┐       │
+│   │Prometheus│────▶│ Grafana  │     │  cAdvisor  │       │
+│   │          │     │          │     │            │       │
+│   └─────────┘     └──────────┘     └────────────┘       │
+│        │                │              │                 │
+└────────│────────────────│──────────────│─────────────────┘
+         │                │              │
+         ▼                ▼              ▼
+┌─────────────────────────────────────────────────────────┐
+│                     Docker Environment                   │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2. Standard Docker Deployment
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                     Docker Environment                   │
@@ -98,7 +154,7 @@ The system supports two deployment architectures:
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 2. Hybrid Deployment with GPU Acceleration
+### 3. Hybrid Deployment with GPU Acceleration
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                     Docker Environment                   │
@@ -171,8 +227,10 @@ The system supports two deployment architectures:
 - Local-first architecture minimizes external dependencies
 - Docker isolation for service components
 - No exposed credentials in code
+- Grafana access protected by authentication
 
 ## Scaling Considerations
 - Container-based architecture supports horizontal scaling
 - Database services can be scaled independently
 - Modular components allow selective enhancement
+- Monitoring stack provides visibility into resource usage for capacity planning

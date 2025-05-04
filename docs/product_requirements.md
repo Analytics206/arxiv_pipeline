@@ -43,7 +43,14 @@
 - **FR-LOG-02**: Log network and processing errors
 - **FR-LOG-03**: Log reasons for skipped entries
 
-### 3.7 Web UI (FR-UI-01)
+### 3.7 System Monitoring (FR-MON)
+- **FR-MON-01**: Collect container metrics with Prometheus
+- **FR-MON-02**: Collect system metrics with Node Exporter
+- **FR-MON-03**: Monitor MongoDB performance with MongoDB Exporter
+- **FR-MON-04**: Visualize metrics with Grafana dashboards
+- **FR-MON-05**: Support custom application metrics for pipeline operations
+
+### 3.8 Web UI (FR-UI)
 - **FR-UI-01**: Web UI to explore neo4j graph/search
 - **FR-UI-02**: Extend to MongoDB
 - **FR-UI-03**: Extend to Qdrant
