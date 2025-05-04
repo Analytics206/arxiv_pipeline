@@ -126,6 +126,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
 2. **Access monitoring dashboards**:
    - Prometheus: http://localhost:9090
    - Grafana: http://localhost:3001 (admin/admin)
+   - Grafana with asked for password change(admin/password)
 
 3. **Monitored Metrics**:
    - Container CPU and memory usage

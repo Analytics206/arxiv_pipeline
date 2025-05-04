@@ -12,7 +12,7 @@ pillow>=10.0.0
 pymupdf>=1.23.0
 motor>=3.3.0
 transformers
-torch
+torch>=2.0.0
 ollama
 pypdf
 
