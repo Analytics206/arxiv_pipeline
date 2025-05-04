@@ -10,13 +10,24 @@
 - **System Metrics** - Added Node Exporter for host system metrics (CPU, memory, disk, network)
 - **Database Monitoring** - Integrated MongoDB Exporter for database performance metrics
 - **Custom Application Metrics** - Added framework for tracking application-specific metrics (paper processing, vector operations)
-- **Preconfigured Dashboards** - Created ready-to-use Grafana dashboards for Docker containers and system metrics
+- **Specialized Dashboards** - Created data science-focused dashboards for monitoring the research pipeline:
+  - **Data Science Dashboard** - Core metrics for paper processing and database performance
+  - **Advanced Analytics Dashboard** - System correlation metrics and resource optimization
+  - **Vector Embedding Dashboard** - Focused on vector database and embedding operations
+  - **Basic Test Dashboard** - Simple connectivity verification dashboard
 - **Separate Deployment Stack** - Implemented as a separate docker-compose.monitoring.yml for independent deployment
 
 #### Documentation Updates
 - **Monitoring Documentation** - Added comprehensive documentation for the monitoring system in dev_notes.md
 - **System Design Updates** - Updated system_design.md with monitoring architecture details
-- **Requirement Traceability** - Updated business and product requirements documentation to include monitoring features
+- **Prometheus Query Documentation** - Created reference documentation for Prometheus queries:
+  - **Basic Queries** - Simple queries for troubleshooting (prometheus_basic_queries.md)
+  - **General Purpose Queries** - Standard monitoring queries (prometheus_queries.md)
+  - **Custom Queries** - ArXiv pipeline specific metrics (prometheus_custom_queries.md)
+  - **Working Queries** - Verified working queries for dashboards (prometheus_working_queries.md)
+- **Container ID Reference** - Added container_id_reference.md for understanding container label formats
+- **Dashboard Guide** - Created grafana_dashboard_guide.md with dashboard customization instructions
+- **README Updates** - Enhanced README.md with detailed monitoring documentation
 
 ### Configuration Enhancements
 - **Prometheus Configuration** - Added central configuration in config/prometheus/prometheus.yml
@@ -30,6 +41,13 @@
 - **Node Exporter** - Added for host system metrics collection
 - **MongoDB Exporter** - Added for database-specific metrics
 - **Prometheus Client Library** - Added for custom application metrics instrumentation
+
+### Diagnostic Tools
+- **Metrics Analyzer** - Enhanced check_prometheus_metrics.py diagnostic script with:
+  - MongoDB metrics verification
+  - Dashboard query validation
+  - Data science recommendation features
+  - Comprehensive error handling
 
 ## Version 0.2.0 (May 3, 2025)
 
