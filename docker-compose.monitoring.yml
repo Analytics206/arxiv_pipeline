@@ -40,6 +40,12 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
+    command:
+      - '--docker_only=true'
+      - '--housekeeping_interval=10s'
+      - '--enable_load_reader=true'
+      - '--docker=unix:///var/run/docker.sock'
+      - '--storage_duration=2m'
 
   node-exporter:
     image: prom/node-exporter:latest
