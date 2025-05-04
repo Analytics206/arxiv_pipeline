@@ -1,6 +1,6 @@
 # ArXiv Pipeline Development Notes
 
-This document contains personal development notes and reminders for ongoing work on the ArXiv pipeline project.
+This document contains developer notes and reminders for ongoing work on the ArXiv pipeline project.
 
 ## To-Do Items
 
@@ -8,8 +8,8 @@ This document contains personal development notes and reminders for ongoing work
 
 - Add synchronization between Qdrant and MongoDB tracking:
   - This sync needs to run before the sync_qdrant pipeline inserts new papers into Qdrant but in same process
-  - If papers exist in Qdrant but not in `vector_processed_pdfs`, insert entries into MongoDB
-  - If papers exist in `vector_processed_pdfs` but not in Qdrant, remove the tracking entries
+  - If papers exist in Qdrant but not in MongoDB `vector_processed_pdfs`, insert entries into MongoDB
+  - If papers exist in MongoDB `vector_processed_pdfs` but not in Qdrant, remove the tracking entries
   - Implement within the `sync_qdrant_with_tracking()` function in `src/pipeline/sync_qdrant.py`
 
 ### System monitoring with Prometheus/Grafana
@@ -26,7 +26,7 @@ This document contains personal development notes and reminders for ongoing work
 
 ### Web UI Improvements
 - Add home page with navigation to graph(neo4j), search pages, mongodb, similarity search(qdrant)
-- Add pipeline status page connected to  
+- Add pipeline status page connected to mongodb tracking collection `vector_processed_pdfs`
 - Add a search bar to the web UI to search for papers by title, author, or category, and load pdf
 - Add a paper details page to the web UI to view paper metadata and vector embeddings
 - Add a paper comparison page to the web UI to compare paper metadata and vector embeddings
