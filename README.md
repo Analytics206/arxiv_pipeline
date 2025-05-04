@@ -1,26 +1,19 @@
-# ArXiv Research Pipeline
+# 🧠 ArXiv Deep Research Pipeline
+## Overview
+A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. This system enables offline graph-based and semantic search through an integrated architecture of MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker containers for easy, consistent local deployment.
 
-🧠 ArXiv Local AI Deep Research Pipeline
-A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. It allows offline graph-based and semantic search through MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker for easy, consistent local deployment.
-
-🚀 Key Features
-Local-first: Everything runs offline—no cloud dependencies but can deploy to cloud in containers. Fetching papers requires internet connection.
-
-ArXiv Ingestion: Fetch non-duplicate papers saved locally from the cs.AI category (configurable) see list bottom of document.
-
-MongoDB Storage: Stores structured and raw metadata.
-
-Graph Representation: Neo4j graph database captures relationships between papers, authors, and categories.
-
-LLM Category Summary: LLM reads papers to categories by subject, architecture and mathatical models.
-
-Semantic Embeddings: Embeds text using Hugging Face models, stored in Qdrant for similarity search.
-
-Configurable & Modular: Centralized settings let you switch categories, models, and components.
-
-User Inferace: User friendly interface for explore datasets, knowledge graphs and similarity search.
-
-Containerized: Fully Dockerized for isolated, repeatable setup with persistent Docker volumes for data storage.
+## 🚀 Key Features
+| Feature | Description |
+|---------|-------------|
+| 🏠 **Local-first** | Everything runs offline with no cloud dependencies. Can deploy to cloud in containers if desired. |
+| 💾 **ArXiv Ingestion** | Fetches non-duplicate papers from configurable categories (e.g., cs.AI) with smart date filtering. |
+| 🗒 **MongoDB Storage** | Stores structured metadata, paper information, and download statuses. |
+| 🔗 **Graph Representation** | Neo4j graph database captures relationships between papers, authors, and categories. |
+| 🤖 **LLM Category Summary** | Uses LLMs to categorize papers by subject, architecture, and mathematical models. |
+| 💡 **Semantic Embeddings** | Creates vector embeddings using Hugging Face models, stored in Qdrant for similarity search. |
+| 🔧 **Configurable & Modular** | Centralized settings allow switching categories, models, and components. |
+| 👀 **User Interface** | User-friendly interface for exploring datasets, knowledge graphs, and similarity search. |
+| 📦 **Containerized** | Fully Dockerized with persistent volumes for reliable data storage and consistent execution. |
 
 ![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
 
@@ -49,7 +42,7 @@ This project works on both Windows and Ubuntu/Linux environments.
 
 ---
 
-### Prerequisites
+## Prerequisites
 
 - Git
 - Python 3.9+ (Python 3.12-slim recommended)
@@ -57,7 +50,7 @@ This project works on both Windows and Ubuntu/Linux environments.
 - Docker and Docker Compose (for containerized deployment)
 
 ---
-### High Level Overview
+## High Level Overview
  - Fetch papers from arXiv.org using arXiv Atom XML API
  - Store raw and normalized metadata in MongoDB with pdf_url for pdf download
  - Download PDFs from arXiv.org and store in local directory
@@ -69,7 +62,7 @@ This project works on both Windows and Ubuntu/Linux environments.
 
 ### Installation (Local, Non-Docker)
 
-#### Linux/macOS/WSL:
+## Linux/macOS/WSL:
 ```bash
 # Make the setup script executable
 chmod +x scripts/setup_uv.sh
@@ -81,7 +74,7 @@ chmod +x scripts/setup_uv.sh
 source .venv/bin/activate
 ```
 
-#### Windows (PowerShell):
+## Windows (PowerShell):
 ```powershell
 # Run the setup script
 .\scripts\setup_uv.ps1
@@ -91,14 +84,14 @@ source .venv/bin/activate
 ```
 
 ---
-### Running the Pipeline Locally
+## Running the Pipeline Locally
 Not recommended better to run in docker and this option might be removed or unsupported.
 ```bash
 python -m src.pipeline.run_pipeline --config config/default.yaml
 ```
 
 ---
-### Dockerized Deployment - Docker Desktop Running
+## Dockerized Deployment - Docker Desktop Running
 0. Suggested run in venv from scripts above for your OS
 
 1. **Build and start all services:**
@@ -115,13 +108,13 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    docker compose up -d
    docker compose logs -f
    ```
-   When you want to shutdown docker env, need it up to explore data
+   When you want to shutdown docker env, need it up to explore data:
    ```bash
    docker compose down
    ```
-4. **Run Services: MongoDB, Neo4j, and Qdrant Pipelines**
+4. **Run Services: MongoDB, Download PDFs, Neo4j, and Qdrant Pipelines**
    ---
-   a. To run the pipeline to fetch papers from ArXiv API and store in MongoDB:
+   a. Run sync_mongodb pipeline to fetch papers from ArXiv API and store in MongoDB:
    ```bash
    echo $env:MONGO_URI
    $env:MONGO_URI="mongodb://localhost:27017/onfig"
@@ -132,7 +125,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    docker compose up --build sync-mongodb
    ```
 
-   b. To run sync-neo4j service for new pdf metadata inserted from MongoDB or 1st time run.
+   b. Run sync-neo4j pipeline for new pdf metadata inserted from MongoDB:
    ```bash
    docker compose up --build sync-neo4j
    ```
@@ -144,7 +137,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    python -m src.graph.sync_mongo_to_neo4j
    ```
    
-   c. To run pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
+   c. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
    ```bash
    echo $env:MONGO_URI
    $env:MONGO_URI="mongodb://localhost:27017/onfig"
@@ -152,7 +145,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    python -m src.utils.download_pdfs
    ```
    
-   d. To process downloaded PDFs and store as vector embeddings in Qdrant:
+   d. Run sync_qdrant pipeline to process downloaded PDFs and store as vector embeddings in Qdrant:
    ```bash
    python -m src.pipeline.sync_qdrant
    ```
@@ -170,7 +163,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
 
 5. **Web UI**
    ---
-   To restart Web UI docker service
+   To restart Web UI docker service, starts with docker-compose up above:
    ```bash
    docker-compose up -d web-ui
    ```
@@ -179,82 +172,91 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
 ### Configuration
 ![Image](https://github.com/user-attachments/assets/7d68b38e-b4a1-49d9-acf4-17b74fb05e22)
 
+
+## ArXiv Pipeline Configuration Settings
 The system is configured through `config/default.yaml`. Key configuration sections include:
+   ## sync_mongodb pipeline
+   - arxiv.categories: Research categories to fetch papers from api into mongodb
+   - arxiv.max_results: Number of papers to fetch per API call
+   - arxiv.rate_limit_seconds: Number of seconds to wait between API calls
+   - arxiv.max_iterations: Number of API calls per category
+   - arxiv.start_date: Only process papers published after this date
+   - arxiv.end_date: Only process papers published before this date
 
-#### arXiv Settings - Changing Here Doesn't Change System, Documented for Reference use `config/default.yaml`
-```yaml
-arxiv:
-  categories:              # Research categories to fetch papers from
-    - "cs.AI"             # Artificial Intelligence
-    - "cs.CV"             # Computer Vision
-    # Add or remove categories as needed
-  max_results: 200        # Number of papers to fetch per API call
-  max_iterations: 10      # Number of API calls per category
-  start_date: "2025-04-26" # Only process papers published after this date
-  end_date: "2025-05-03"  # Only process papers published before this date
-```
+   ## sync_neo4j pipeline
+   - arxiv.process_categories: Categories to prioritize for vector storage into qdrant
+   - arxiv.max_papers: Maximum number of papers to process
+   - arxiv.max_papers_per_category: Maximum number of papers to download per category
+   - arxiv.sort_by: Sort papers by this field
+   - arxiv.sort_order: Sort papers in this order
 
-#### PDF Storage Settings
-```yaml
-pdf_storage:
-  directory: "E:/AI Research" # Base directory where PDFs are stored
-  papers_per_category: 50     # Maximum number of new papers to download per category (0 = unlimited)
-```
+   ## sync_qdrant pipeline
+   - arxiv.max_papers: Maximum number of papers to process
+   - arxiv.max_papers_per_category: Maximum number of papers to download per category
+   - arxiv.sort_by: Sort papers by this field
+   - arxiv.sort_order: Sort papers in this order
 
-#### Vector Database Settings
-```yaml
-qdrant:
-  # ... connection settings ...
-  process_categories:     # Categories to prioritize for vector storage
-    - "cs.AI"
-    - "cs.CV"
-    - "cs.LG"
-```
-
-#### Database Connection Settings
-```yaml
-mongo:
-  connection_string: "mongodb://mongodb:27017/" # MongoDB connection URI
-  
-neo4j:
-  url: "bolt://neo4j:7687"  # Neo4j connection URL
-  # ... authentication settings ...
-```
+   ## download_pdfs pipeline
+   - arxiv.max_papers: Maximum number of papers to process
+   - arxiv.max_papers_per_category: Maximum number of papers to download per category
+   - arxiv.sort_by: Sort papers by this field
+   - arxiv.sort_order: Sort papers in this order
 
 Config changes take effect when services are restarted. See `docs/system_design.md` for detailed information about configuration impact on system behavior.
 
+## Database Connection Settings
+```yaml
+mongo:
+  connection_string: "mongodb://mongodb:27017/" # MongoDB connection URI
+  db_name: "arxiv_papers"
+neo4j:
+  url: "bolt://neo4j:7687"  # Neo4j connection URL
+  user: "neo4j"
+  password: "password"
+```
+
 ---
 
-### Notes
+## Notes
 
-- The default Python version for Docker is now `python:3.12-slim`.
-- All persistent data (MongoDB, Neo4j, Qdrant) is stored in Docker volumes.
-- For development, use the local virtual environment; for production or multi-service orchestration, use Docker Compose. OR ALWAYS use docker.
+- **Python Versions**: 
+  - Docker containers use `python:3.11-slim`
+  - Local development 'requires' Python ≥3.11 as specified in pyproject.toml
+  - All dependencies are managed through pyproject.toml for consistent environments
+
+- **Data Persistence**:
+  - All persistent data (MongoDB, Neo4j, Qdrant) is stored in Docker volumes
+  - PDF files are stored in the configured local directory
+
+- **Development Approach**:
+  - Either use the Python virtual environment with `python -m` commands
+  - Or use Docker Compose for containerized execution
+  - Both methods use the same configuration and produce consistent results
 
 ---
 
-### Troubleshooting
+## Troubleshooting
 
 - If you see `ModuleNotFoundError: No module named 'pymongo'`, ensure you have activated your virtual environment and installed dependencies.
 - For Docker issues, ensure Docker Desktop is running and you have sufficient permissions.
 
 ---
 
-### External Tools for Data Exploration
+## External Tools for Data Exploration
 
 The following tools are recommended for exploring the data outside the pipeline:
 
-#### MongoDB
+### MongoDB
 - **MongoDB Compass** - A GUI for MongoDB that allows you to explore databases, collections, and documents
 - Download: [https://www.mongodb.com/products/compass](https://www.mongodb.com/products/compass)
 - Connection string: `mongodb://localhost:27017/onfig` (when connecting to the Docker container)
 
-#### Neo4j
+### Neo4j
 - **Neo4j Desktop** - A complete development environment for Neo4j projects
 - Download: [https://neo4j.com/download/](https://neo4j.com/download/)
 - Or use the Neo4j Browser at: http://localhost:7474/ (default credentials: neo4j/password)
 
-#### Qdrant
+### Qdrant
 - **Qdrant Web UI** - A built-in web interface for exploring vector collections
 - Access at: http://localhost:6333/dashboard when Qdrant is running
 - Also consider **Qdrant Cloud Console** for more advanced features if you're using Qdrant Cloud
@@ -262,19 +264,17 @@ The following tools are recommended for exploring the data outside the pipeline:
 These tools provide graphical interfaces to explore, query, and visualize the data stored in each component of the pipeline.
 
 ---
-📊 Optional Enhancements
-These features are supported or planned:
-### Future Features
+## 📊 Optional Future Enhancements
 
-The following features are planned for future development to enhance the research pipeline:
+The following features are 'planned' for future development to enhance the research pipeline:
 
-#### Data Analysis and Visualization
+### Data Analysis and Visualization
 - **Jupyter Lab Integration**: Add a dedicated Jupyter service with pre-built notebooks for research analysis
 - **Example Notebooks for Research**: Create ready-to-use notebooks for common research tasks and analyses
 - **Topic Modeling**: Implement BERTopic or LDA for automatic discovery of research themes
 - **Time-Series Analysis**: Track the evolution of research topics over time
 
-#### Research Enhancement Tools
+### Research Enhancement Tools
 - **PDF Section Parsing**: Intelligently extract structured sections from research papers (abstract, methods, results, etc.)
 - **Citation Parsing**: Extract and normalize citations from paper references
 - **Mathematical Model Extraction**: Identify and extract mathematical formulas and models from papers
@@ -282,12 +282,12 @@ The following features are planned for future development to enhance the researc
 - **Researcher Networks**: Map collaboration networks among authors
 - **Multi-Modal Analysis**: Extract and analyze figures and tables from papers
 
-#### Infrastructure Improvements
+### Infrastructure Improvements
 - **LangChain-based Research Assistant**: Natural language interface to query the database
 - **Hybrid Search**: Combine keyword and semantic search for better results
 - **Export Tools**: Add BibTeX and PDF collection exports
 
-### To-Do List
+## To-Do List
 
 - [ ] **Short-term Tasks**
   - [ ] Optimize PDF download with parallel processing
@@ -319,27 +319,27 @@ The following features are planned for future development to enhance the researc
 
 ---
 
-### 💡 Use Cases
+## 💡 Use Cases
 
-#### Research & Knowledge Management
+### Research & Knowledge Management
 - **Build Personal Research Libraries**: Create customized collections of AI papers organized by category and relevance
 - **Offline Semantic Paper Search**: Find relevant papers without relying on online search engines
 - **Research Gap Identification**: Analyze research areas to identify unexplored topics and opportunities
 - **Literature Review Automation**: Quickly build comprehensive literature reviews for specific research questions
 
-#### Data Science & Analysis
+### Data Science & Analysis
 - **Research Trend Analysis**: Apply time-series analysis to identify emerging and declining research topics
 - **Citation Impact Visualization**: Build network graphs to identify the most influential papers and authors
 - **Cross-Domain Knowledge Transfer**: Discover applications of techniques across different research domains
 - **Research Benchmarking**: Track performance improvements in specific algorithms or methods over time
 
-#### AI-Assisted Research
+### AI-Assisted Research
 - **Paper Summarization**: Generate concise summaries of complex research papers
 - **Similar Papers Discovery**: Use vector similarity to find related work not linked by citations
 - **Research Idea Generation**: Use paper combinations with LLMs to explore novel research directions
 - **Algorithm Implementation Assistance**: Extract mathematical models for implementation in your own projects
 
-#### Education & Learning
+### Education & Learning
 - **Personalized Learning Paths**: Create sequential reading lists for specific AI topics
 - **Concept Visualization**: Extract and visualize key concepts across multiple papers
 - **Interactive Research Exploration**: Navigate research spaces through concept and citation graphs
@@ -351,40 +351,22 @@ http://export.arxiv.org/api/query
 
 List used is in config/defaults.yaml for reference, more categories available. 
 ---
-cs.AI - Artificial Intelligence
-
-cs.GT - Computer Science and Game Theory
-
-cs.CV - Computer Vision and Pattern Recognition
-
-cs.CL - Computation and Language
-
-cs.DS - Data Structures and Algorithms
-
-cs.LO - Logic in Computer Science
-
-cs.LG - Machine Learning
-
-cs.MA - Multiagent Systems
-
-cs.NE - Neural and Evolutionary Computing
-
-cs.NA - Numerical Analysis
-
-stat - Statistics
-
-stat.ML - Machine Learning
-
-stat.TH - Statistics Theory
-
-math.PR - Probability
-
-q-bio.NC - Neurons and Cognition
-
-physics.data-an - Data Analysis, Statistics and Probability
-
-cs.AI, cs.GT, cs.CV, cs.DS, cs.LO, cs.LG, cs.MA, cs.NE
-cs.NA, stat, stat.ML, math.PR, q-bio.NC, physics.data-an
+- cs.AI - Artificial Intelligence
+- cs.CL - Computation and Language
+- cs.CV - Computer Vision and Pattern Recognition
+- cs.DS - Data Structures and Algorithms
+- cs.GT - Computer Science and Game Theory
+- cs.LG - Machine Learning
+- cs.LO - Logic in Computer Science
+- cs.MA - Multiagent Systems
+- cs.NA - Numerical Analysis
+- cs.NE - Neural and Evolutionary Computing
+- math.PR - Probability
+- q-bio.NC - Neurons and Cognition
+- stat - Statistics
+- stat.ML - Machine Learning
+- stat.TH - Statistics Theory
+- physics.data-an - Data Analysis, Statistics and Probability
 
 ---
 For more details about project and status, see the `docs/` directory.

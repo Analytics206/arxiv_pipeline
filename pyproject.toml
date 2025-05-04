@@ -7,7 +7,7 @@ name = "arxiv_pipeline"
 version = "0.1.0"
 description = "Local pipeline for processing ArXiv papers with graph and vector representation"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 license = {text = "MIT"}
 dependencies = [
     "requests>=2.28.0",
