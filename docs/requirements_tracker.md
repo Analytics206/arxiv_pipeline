@@ -36,7 +36,7 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-GPH-04   | Author to paper relationship                             | BRD-03        | ✅    |                            |
 | FR-GPH-05   | Paper to category relationship                           | BRD-03        | ✅    |                            |
 
-| FR-VEC-01   | Use Hugging Face model for embedding                     | BRD-04        | ❌     | Implemented in docker compose up --build sync-neo4j                           |
+| FR-VEC-01   | Use Hugging Face model for embedding                     | BRD-04        | ✅     | Implemented in docker compose up --build sync-neo4j                           |
 | FR-VEC-02   | Embed title + abstract                                   | BRD-04        | ❌     |                            |
 | FR-VEC-03   | Store vectors in Qdrant                                  | BRD-04        | ❌     |                            |
 | FR-VEC-04   | Model switching via config                               | BRD-04        | ❌     |                            |
@@ -45,9 +45,9 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-CON-02   | Modular pipeline execution                               | BRD-05        | ✅     | Implemented in run_pipeline.py |
 | FR-CON-03   | Optional CLI/orchestrator                                | BRD-05        | ✅     | Implemented in run_pipeline.py |
 
-| FR-LOG-01   | Log processing steps                                     | BRD-06        | 🔧     | Basic logging in place     |
-| FR-LOG-02   | Log network and processing errors                        | BRD-06        | 🔧     | Basic logging in place     |
-| FR-LOG-03   | Log reasons for skipped entries                          | BRD-06        | ❌     |                            |
+| FR-LOG-01   | Log processing steps                                     | BRD-06        | ✅     | Basic logging in place     |
+| FR-LOG-02   | Log network and processing errors                        | BRD-06        | ✅     | Basic logging in place     |
+| FR-LOG-03   | Log reasons for skipped entries                          | BRD-06        | ✅     |                            |
 
 | FR-UI-01    | Local web dashboard                                      | BRD-07        | ⏳     | Web UI to explore graph/search      |
 
