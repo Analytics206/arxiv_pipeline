@@ -36,7 +36,7 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-GPH-04   | Author to paper relationship                             | BRD-03        | ✅    |                            |
 | FR-GPH-05   | Paper to category relationship                           | BRD-03        | ✅    |                            |
 
-| FR-VEC-01   | Use Hugging Face model for embedding                     | BRD-04        | ✅     | Implemented in docker compose up --build sync-neo4j                           |
+| FR-VEC-01   | Use Hugging Face model for embedding                     | BRD-04        | ✅     |                           |
 | FR-VEC-02   | Embed title + abstract                                   | BRD-04        | ❌     |                            |
 | FR-VEC-03   | Store vectors in Qdrant                                  | BRD-04        | ❌     |                            |
 | FR-VEC-04   | Model switching via config                               | BRD-04        | ❌     |                            |
