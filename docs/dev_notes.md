@@ -12,11 +12,24 @@ This document contains personal development notes and reminders for ongoing work
   - If papers exist in `vector_processed_pdfs` but not in Qdrant, remove the tracking entries
   - Implement within the `sync_qdrant_with_tracking()` function in `src/pipeline/sync_qdrant.py`
 
+### System monitoring with Prometheus/Grafana
+  - Add docker container metrics to prometheus
+  - Add system metrics to prometheus
+  - Add grafana dashboard for docker container metrics
+  - Add grafana dashboard for system metrics
+
 ### GPU Optimization
 
 - Test performance with different GPU devices and batch sizes
 - Consider adding a fallback mechanism for when GPU memory is insufficient
 - Benchmark and document performance improvements
+
+### Web UI Improvements
+- Add home page with navigation to graph(neo4j), search pages, mongodb, similarity search(qdrant)
+- Add pipeline status page connected to  
+- Add a search bar to the web UI to search for papers by title, author, or category, and load pdf
+- Add a paper details page to the web UI to view paper metadata and vector embeddings
+- Add a paper comparison page to the web UI to compare paper metadata and vector embeddings
 
 ### Deployment Improvements
 

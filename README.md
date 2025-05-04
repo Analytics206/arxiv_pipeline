@@ -13,17 +13,17 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 | 💡 **Semantic Embeddings** | Creates vector embeddings using Hugging Face models, stored in Qdrant for similarity search. |
 | 🔧 **Configurable & Modular** | Centralized settings allow switching categories, models, and components. |
 | 👀 **User Interface** | User-friendly interface for exploring datasets, knowledge graphs, and similarity search. |
-| 📦 **Containerized** | Fully Dockerized with persistent volumes for reliable data storage and consistent execution. |
+| 📦 **Containerized** | Mostly Dockerized with persistent volumes for reliable data storage and consistent execution. |
 
 ![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
 
 📦 System Components
 | Component             | Purpose                                      |
 | --------------------- | -------------------------------------------- |
-| **Ingestion Service** | Fetches papers using arXiv Atom XML API      |
-| **MongoDB**           | Stores raw and normalized metadata           |
+| **Ingestion Service** | Fetches papers(metadata) using arXiv Atom XML API      |
+| **MongoDB**           | Stores normalized paper metadata and paper processing tracking    |
 | **Neo4j**             | Stores the author-paper-category graph       |
-| **Qdrant**            | Stores vector embeddings for semantic search |
+| **Qdrant**            | Stores paper vector embeddings for semantic search |
 | **Config Manager**    | Central config for category, limits, model   |
 | **User Interface**    | Web UI for interaction with graphs           |
 | **Logger**            | Tracks events, errors, and skipped entries   |
@@ -34,9 +34,7 @@ A local, platform-independent pipeline for processing research papers from arXiv
 
 ## Setup Instructions
 
-pdf save directory is set to E:\AI Research\ in "src\utils\download_pdfs.py"
-
-PDF_DIR = r"E:\AI Research"
+pdf save directory is set to E:\AI Research\ in "config/default.yaml"
 
 This project works on both Windows and Ubuntu/Linux environments.
 
@@ -45,7 +43,7 @@ This project works on both Windows and Ubuntu/Linux environments.
 ## Prerequisites
 
 - Git
-- Python 3.9+ (Python 3.12-slim recommended)
+- Python 3.9+ (Python 3.11 recommended)
 - [UV](https://github.com/astral-sh/uv) (for fast Python dependency management)
 - [Ollama](https://ollama.ai/) (optional, for enhanced image analysis)
 - Docker and Docker Compose (for containerized deployment)
@@ -54,11 +52,12 @@ This project works on both Windows and Ubuntu/Linux environments.
 ---
 ## High Level Overview
  - Fetch papers from arXiv.org using arXiv Atom XML API
- - Store raw and normalized metadata in MongoDB with pdf_url for pdf download
+ - Store normalized metadata in MongoDB with pdf_url for pdf download
  - Download PDFs from arXiv.org and store in local directory
  - Store the author-paper-category graph in Neo4j
  - Store vector embeddings for semantic search in Qdrant
- - Central config for category, limits, model
+ - Manage paper processing tracking in MongoDB
+ - Dynamic configuration for paper category, paper limits, models, and pdf save directory
  - Web UI for interaction with graphs
  - Tracks events, errors, and skipped entries  
 
