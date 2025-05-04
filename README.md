@@ -153,7 +153,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    ```bash
    python -m src.pipeline.sync_qdrant
    ```
-   or
+   or *Need to uncomment docker-compose.yml sync-qdrant service????
    ```bash
    docker compose up --build sync-qdrant
    ```
