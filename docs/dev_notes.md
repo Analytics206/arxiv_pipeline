@@ -18,6 +18,15 @@ This document contains developer notes and reminders for ongoing work on the ArX
   - Add grafana dashboard for docker container metrics
   - Add grafana dashboard for system metrics
 
+### Documentation Updates
+- Update README.md with new features and instructions
+- Update business_requirements.md with new features and instructions
+- Update product_requirements.md with new features and instructions
+- Update system_design.md with new features and instructions
+- Update release_notes.md with new features and instructions
+- Update dev_notes.md with new features and instructions  
+- Update tracker.md with new features and instructions
+
 ### GPU Optimization
 
 - Test performance with different GPU devices and batch sizes
