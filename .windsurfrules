@@ -15,6 +15,7 @@
 - Update @release_notes.md when you make a new release or complete an new feature
 - Update @system_design.md when you make a new feature
 - Update @tech_stack.md when you use a new library or tool
+- Developer is always working from a venv environment
 
 # Naming Conventions
 - Follow PEP8 style guide for Python code

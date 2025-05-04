@@ -22,6 +22,12 @@ Requires-Dist: transformers
 Requires-Dist: torch>=2.0.0
 Requires-Dist: ollama
 Requires-Dist: pypdf
+Requires-Dist: jupyter>=1.0.0
+Requires-Dist: jupyterlab>=4.0.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: matplotlib>=3.7.0
+Requires-Dist: ipywidgets>=8.0.0
+Requires-Dist: python-dotenv>=1.0.0
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0.0; extra == "dev"
 Requires-Dist: black>=23.0.0; extra == "dev"
@@ -133,41 +139,57 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    docker compose up -d
    ```
 2. **(Optional) Rebuild the app service after code changes:**
-   ```bash
-   docker compose up -d --build
-   ```
-3. **Build the app service wth logs:**
-   run with logs
-   ```bash
-   docker compose up -d
-   docker compose logs -f
-   ```
-   When you want to shutdown docker env *need it up to explore data*:
-   ```bash
-   docker compose down
-   ```
 
-## Monitoring with Prometheus and Grafana
+2. **Access MongoDB** at http://localhost:27017
 
-1. **Start the monitoring stack** (after main services are running):
+3. **Access Neo4j Browser** at http://localhost:7474
+   - Default credentials: neo4j/password
+
+4. **Access Qdrant UI** at http://localhost:6333/dashboard
+
+## Monitoring Setup
+
+1. **Start the monitoring stack:**
    ```bash
    docker compose -f docker-compose.monitoring.yml up -d
    ```
-2. **Access monitoring dashboards**:
-   - Prometheus: http://localhost:9090
-   - Grafana: http://localhost:3001 (admin/admin)
 
-3. **Monitored Metrics**:
-   - Container CPU and memory usage
-   - Host system metrics (CPU, memory, disk, network)
+2. **Access monitoring services:**
+   - Prometheus: http://localhost:9090
+   - Grafana: http://localhost:3001 (default login: admin/admin)
+
+3. **Explore metrics** for:
+   - System resources
+   - Docker containers
    - MongoDB performance
    - Application-specific metrics
 
-4. **View preconfigured dashboards** in Grafana:
-   - Docker Containers
-   - System Metrics
+4. **Monitoring Dashboards**
+   Pre-configured Grafana dashboards are available in the repository:
+   - `config/grafana/dashboards/basic_test_dashboard.json` - Basic connectivity testing dashboard
+   - `config/grafana/dashboards/arxiv_data_science_dashboard.json` - Core monitoring for ArXiv pipeline
+   - `config/grafana/dashboards/arxiv_advanced_analytics_dashboard.json` - Advanced system correlation metrics
+   - `config/grafana/dashboards/arxiv_vector_embedding_dashboard.json` - Vector database performance metrics
 
-Refer to `docs/dev_notes.md` for more details on monitoring setup and customization.
+   These dashboards provide visualization for MongoDB operations, system resources, container performance, 
+   and vector embedding generation metrics critical for the research paper processing pipeline.
+
+5. **Prometheus Query Documentation**
+   Comprehensive documentation for Prometheus queries is available in:
+   - `docs/prometheus_basic_queries.md` - Simple queries for troubleshooting
+   - `docs/prometheus_queries.md` - General purpose monitoring queries
+   - `docs/prometheus_custom_queries.md` - ArXiv pipeline specific metrics
+   - `docs/prometheus_working_queries.md` - Verified working queries for dashboards
+
+6. **Monitoring Diagnostics**
+   Use the diagnostic script to verify your monitoring setup:
+   ```bash
+   python scripts/check_prometheus_metrics.py
+   ```
+   This script analyzes your Prometheus setup and verifies that critical metrics
+   for the ArXiv pipeline are available and functioning correctly.
+
+Refer to `docs/grafana_dashboard_guide.md` for details on customizing and extending these dashboards.
 # 4. Run Pipelines: MongoDB, Download PDFs, Neo4j, and Qdrant Pipelines
 
    *pipelines do not have to run in order if you have previously run them or starting where you left off

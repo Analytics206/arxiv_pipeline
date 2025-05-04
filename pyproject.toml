@@ -27,6 +27,12 @@ dependencies = [
     "torch>=2.0.0",                 # Base PyTorch package
     "ollama",                        # For local LLM support with Ollama
     "pypdf",                         # Required for PDF loading with LangChain
+    "jupyter>=1.0.0",               # Jupyter Notebook support
+    "jupyterlab>=4.0.0",            # JupyterLab interface
+    "pandas>=2.0.0",                # For data manipulation in notebooks
+    "matplotlib>=3.7.0",            # For visualization in notebooks
+    "ipywidgets>=8.0.0",            # Interactive widgets for notebooks
+    "python-dotenv>=1.0.0",         # Environment variable support
     # "openai>=1.0.0",               # <-- Commented out, not needed for local-only
 ]
 

@@ -26,4 +26,5 @@ A modular, offline-capable pipeline that fetches and stores research papers from
 | BRD-07     | Enable future expansion (PDFs, citations, UI) | FR-UI-01, FR-PDF-01, FR-REF-01, FR-CRON-01, FR-REP-01 |
 | BRD-08     | Web UI to explore graph/search | FR-UI-01 |
 | BRD-09     | System monitoring with Prometheus/Grafana | FR-MON-01 to FR-MON-05 |
+| BRD-10     | Interactive database exploration and testing via Jupyter notebooks | FR-REP-01, FR-REP-02 |
 

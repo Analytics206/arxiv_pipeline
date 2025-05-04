@@ -162,7 +162,7 @@ Refer to `docs/grafana_dashboard_guide.md` for details on customizing and extend
    ## a. Run sync_mongodb pipeline to fetch papers from ArXiv API and store in MongoDB:
    ```bash
    echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/onfig"
+   $env:MONGO_URI="mongodb://localhost:27017/config"
    python -m src.pipeline.sync_mongodb --config config/default.yaml
    ```
    or
@@ -177,7 +177,7 @@ Refer to `docs/grafana_dashboard_guide.md` for details on customizing and extend
    or
    ```bash
    echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/onfig"
+   $env:MONGO_URI="mongodb://localhost:27017/config"
    echo $env:MONGO_URI
    python -m src.graph.sync_mongo_to_neo4j
    ```
@@ -185,7 +185,7 @@ Refer to `docs/grafana_dashboard_guide.md` for details on customizing and extend
    ## c. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
    ```bash
    echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/onfig"
+   $env:MONGO_URI="mongodb://localhost:27017/config"
    echo $env:MONGO_URI
    python -m src.utils.download_pdfs
    ```

@@ -55,9 +55,14 @@
 - **FR-UI-02**: Extend to MongoDB
 - **FR-UI-03**: Extend to Qdrant
 
+### 3.9 Jupyter Notebooks (FR-REP)
+- **FR-REP-01**: Provide sample notebooks for general usage and exploration
+- **FR-REP-02**: Create connectivity testing notebooks for all databases (MongoDB, Neo4j, Qdrant)
+- **FR-REP-03**: Include data visualization capabilities in notebooks
+- **FR-REP-04**: Document notebook usage and setup instructions
+
 ### Optional/Nice-to-Have Features
 - **FR-PDF-01**: Optional PDF downloading/section parsing
 - **FR-REF-01**: Parse citation relationships
 - **FR-CRON-01**: Schedule periodic updates
-- **FR-REP-01**: Provide sample notebooks for usage
 

@@ -4,6 +4,12 @@
 
 ### Major Features
 
+#### Interactive Database Testing with Jupyter Notebooks
+- **Database Connectivity Testing** - Added Jupyter notebook for testing connections to MongoDB, Neo4j, and Qdrant
+- **Connection Status Visualization** - Implemented visual dashboard for database connectivity status
+- **Database Schema Exploration** - Created interactive tools for exploring database schemas and contents
+- **Environment Variable Support** - Added support for configuration via environment variables and .env files
+
 #### System Monitoring with Prometheus/Grafana
 - **Comprehensive Monitoring Stack** - Added Prometheus and Grafana for metrics collection and visualization
 - **Container Metrics** - Implemented container monitoring with cAdvisor for resource usage tracking
@@ -49,6 +55,7 @@
   - Data science recommendation features
   - Comprehensive error handling
 
+---
 ## Version 0.2.0 (May 3, 2025)
 
 ### Major Features
@@ -89,6 +96,8 @@
 ### Dependencies and Libraries
 - **PyTorch with CUDA** - Updated PyTorch requirements to include CUDA support
 - **Neo4j JavaScript Driver** - Added documentation for the JS driver required for the web UI
+
+---
 
 ## Version 0.1.0 (April 26, 2025)
 

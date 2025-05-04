@@ -68,6 +68,15 @@ Unlike the Business Requirements Document (BRD) and Product Requirements Documen
 | Neo4j Synchronizer | Synchronizes MongoDB data to Neo4j graph | Initial |
 | Web UI | Browser-based interface for exploring data | Initial |
 
+### Jupyter Notebooks
+
+| Feature | Description | Implementation Date |
+|---------|-------------|---------------------|
+| Database Connectivity Testing | Notebook for testing connections to MongoDB, Neo4j, and Qdrant | May 4, 2025 |
+| Connection Status Visualization | Visual reporting of database connectivity status | May 4, 2025 |
+| Database Schema Exploration | Interactive exploration of database schemas and contents | May 4, 2025 |
+| Environment Variable Configuration | Support for environment variables and .env file for connection settings | May 4, 2025 |
+
 ## Design Decisions
 
 ### Module-Based Execution

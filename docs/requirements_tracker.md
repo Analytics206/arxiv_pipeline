@@ -63,4 +63,7 @@ This file tracks the implementation status of all PRD requirements, linking them
 
 | FR-CRON-01  | Schedule periodic updates                                | BRD-07        | ⏳     | Optional/Nice-to-have      |
 
-| FR-REP-01   | Provide usage notebooks                                  | BRD-07        | ⏳     | Optional/Nice-to-have      |
+| FR-REP-01   | Provide sample notebooks for usage                      | BRD-10        | 🔧     | Now prioritized as required |  
+| FR-REP-02   | Create connectivity testing notebooks                   | BRD-10        | 🔧     | In progress                 |  
+| FR-REP-03   | Include data visualization capabilities               | BRD-10        | ⏳     | Planned after connectivity  |  
+| FR-REP-04   | Document notebook usage and setup                     | BRD-10        | ⏳     | To be created               |  
