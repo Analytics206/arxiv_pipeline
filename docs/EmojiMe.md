@@ -71,3 +71,26 @@ Use this emoji guide to annotate project plans, system designs, and code documen
 | 🌐     | Internet / external service    |
 | 🔗     | Link / integration             |
 | 🪐     | Cloud / distributed system     |
+| 🐙     | Octopus — multi-functional tool, flexible system, open source |
+| 🦑     | Squid — proxy services, networking layers, deep-dive configs |
+| 🤖🐙   | AI agent with many capabilities                     |
+| 🧠🦑   | Deep AI logic / obscure internal reasoning          |
+| 🧭🦑   | Direction / strategy              |
+| 🧵🦑   | Thread / flow                   |
+| ➡️     | Next step                      |
+| 🔙     | Previous step                  |
+| 🪝     | Hook / event handler           |
+| 🧰     | DevOps / admin tools           |
+| 🖥️     | Local environment              |
+| 🛰️     | Remote / production            |
+| 🧿     | Monitoring / observability     |
+| 🪛     | Maintenance / tuning           |
+| 📊     | Metrics / analytics            |
+| 🧬     | Data transformation / training |
+| 📚     | Dataset / documentation        |
+| 🧮     | Computation / algorithm        |
+| 📖     | Reference / docs               |
+| 🔥     | Error / issue                  |
+| ⚠️     | Warning / caution              |
+| ⚠️     | Warning / caution              |
+## 🐙 Cephalopod Emoji Legend

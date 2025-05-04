@@ -12,8 +12,9 @@ src/graph/neo4j_sync.py
 src/graph/sync_mongo_to_neo4j.py
 src/graph/test_neo4j.py
 src/ingestion/fetch.py
-src/pipeline/process_pdf.py
 src/pipeline/run_pipeline.py
+src/pipeline/sync_mongodb.py
+src/pipeline/sync_qdrant.py
 src/storage/mongo.py
 src/utils/download_pdfs.py
 src/utils/logger.py

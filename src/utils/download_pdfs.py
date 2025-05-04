@@ -18,6 +18,7 @@ DB_NAME = config['mongo']['db_name']
 COLLECTION_NAME = "papers"
 PDF_DIR = config['pdf_storage']['directory']
 PAPERS_PER_CATEGORY = config['pdf_storage'].get('papers_per_category', 0)  # 0 means unlimited
+PROCESS_CATEGORIES = config['pdf_storage'].get('process_categories', [])  # Categories to process
 
 # Get date filter settings
 DATE_FILTER_ENABLED = config['pdf_storage'].get('download_date_filter', {}).get('enabled', False)
@@ -28,6 +29,10 @@ SORT_BY_DATE = config['pdf_storage'].get('download_date_filter', {}).get('sort_b
 print("MONGO_URI:", MONGO_URI)
 print("PDF_DIR:", PDF_DIR)
 print("PAPERS_PER_CATEGORY:", "Unlimited" if PAPERS_PER_CATEGORY == 0 else PAPERS_PER_CATEGORY)
+if PROCESS_CATEGORIES:
+    print(f"PROCESS CATEGORIES: {', '.join(PROCESS_CATEGORIES)}")
+else:
+    print("PROCESS CATEGORIES: All categories")
 if DATE_FILTER_ENABLED:
     print(f"DATE FILTER: {START_DATE} to {END_DATE}")
 else:
@@ -111,6 +116,10 @@ def main():
     
     # Query MongoDB for papers with PDF URLs
     query = {"pdf_url": {"$exists": True, "$ne": ""}}
+    
+    # Add category filter if process_categories is specified
+    if PROCESS_CATEGORIES:
+        query["categories"] = {"$in": PROCESS_CATEGORIES}
     sort_order = None
     
     # Handle date sorting if enabled

@@ -24,7 +24,7 @@ dependencies = [
     "pymupdf>=1.23.0",
     "motor>=3.3.0",
     "transformers",
-    "torch",
+    "torch>=2.0.0",                 # Base PyTorch package
     "ollama",                        # For local LLM support with Ollama
     "pypdf",                         # Required for PDF loading with LangChain
     # "openai>=1.0.0",               # <-- Commented out, not needed for local-only

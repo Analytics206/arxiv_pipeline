@@ -17,17 +17,26 @@ qdrant:
   collection_name: "arxiv_papers"
   vector_size: 768  # For sentence-transformers models
   # Categories to prioritize for vector storage - these will be processed into Qdrant
-  process_categories: # used in process_pdf.py
+  process_categories: # used in sync_qdrant.py
     - "cs.AI"
     - "cs.CV"
     - "cs.LG"
+  papers_per_category: 6 # Maximum number of papers to process into vectors per category (0 for unlimited)
+  default_pdf_path: "E:/AI Research" # Base directory where PDFs are loaded from for vector processing
+  gpu_enabled: true # Enable GPU for vector operations
+  gpu_device: 1 # Use the second GPU (index 1)
+  # Tracking settings for processed PDFs
+  tracking:
+    enabled: true # Whether to track processed PDFs
+    collection_name: "vector_processed_pdfs" # MongoDB collection to store tracking information
+    sync_with_qdrant: true # Whether to sync tracking with actual Qdrant contents
 
 # ArXiv API settings 
 arxiv:
-  categories: # used in download_pdfs.py and docker compose logs -f pipeline, 
+  categories: # used in sync_mongodb.py
     - "cs.AI"
-    - "cs.CV"
     - "cs.CL"
+    - "cs.CV"
     - "cs.DS"
     - "cs.GT" 
     - "cs.LG"  
@@ -57,8 +66,25 @@ embedding:
 # PDF storage settings
 pdf_storage:
   directory: "E:/AI Research" # where papers are downloaded @download_pdfs.py subdirectory is auto created by category
-  default_pdf_path: "E:/AI Research" # where papers are loaded into qdrant @Process_pdf.py
   papers_per_category: 500 # Maximum number of papers to download per category (0 for unlimited)
+  # Categories to prioritize for PDF downloads - if empty, all papers in MongoDB will be considered
+  process_categories: # used in download_pdfs.py - comment out categories you don't want to download
+    - "cs.AI"
+    - "cs.CL"
+    - "cs.CV"
+    - "cs.DS"
+    - "cs.GT"
+    - "cs.LG"
+    - "cs.LO"
+    - "cs.MA"
+    - "cs.NA"
+    - "cs.NE"
+    - "math.PR"
+    - "physics.data-an"
+    - "q-bio.NC"
+    - "stat"
+    - "stat.ML"
+    - "stat.TH"
   # Date filters for downloading PDFs
   download_date_filter:
     enabled: true         # Set to false to disable date filtering

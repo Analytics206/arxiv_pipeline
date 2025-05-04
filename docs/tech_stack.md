@@ -47,10 +47,14 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 
 ### Vector Embeddings
 - **Hugging Face Transformers**: Machine learning models for text embeddings
+- **PyTorch with CUDA**: GPU-accelerated embeddings generation
 - **Qdrant**: Vector database for similarity search
   - Collections: paper_embeddings
   - Storage of metadata with vectors
+  - Optional GPU acceleration for vector operations
+  - Supports both Docker and standalone deployment
 - **Embedding models**: Sentence transformers for semantic representation
+- **MongoDB Tracking**: Prevents duplicate PDF processing
 
 ### PDF Processing
 - **PDF Download**: Direct file retrieval from ArXiv
@@ -72,6 +76,10 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 - **Docker Compose**: Local environment orchestration
 
 ## Deployment Architecture
+
+The system supports two deployment architectures:
+
+### 1. Full Docker Deployment
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                     Docker Environment                   │
@@ -90,6 +98,40 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 └─────────────────────────────────────────────────────────┘
 ```
 
+### 2. Hybrid Deployment with GPU Acceleration
+```
+┌─────────────────────────────────────────────────────────┐
+│                     Docker Environment                   │
+│                                                          │
+│   ┌─────────┐     ┌──────────┐     ┌────────────┐       │
+│   │  app    │────▶│ mongodb  │────▶│ sync-neo4j │       │
+│   │         │     │          │     │            │       │
+│   └─────────┘     └──────────┘     └────────────┘       │
+│        │                │                 │              │
+│        ▼                ▼                 ▼              │
+│                   ┌──────────┐     ┌────────────┐       │
+│                   │  neo4j   │◀────│web-interface│       │
+│                   │          │     │            │       │
+│                   └──────────┘     └────────────┘       │
+└─────────────────────│──────────────────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────────────┐
+│                 Host Environment                      │
+│                                                       │
+│ ┌─────────┐                                           │
+│ │ Qdrant  │ GPU-accelerated vector storage            │
+│ │         │ and similarity search                     │
+│ └─────────┘                                           │
+│      ▲                                                │
+│      │                                                │
+│ ┌────┴────┐                                           │
+│ │PyTorch   │ GPU-accelerated                          │
+│ │Embeddings│ vector generation                        │
+│ └─────────┘                                           │
+└──────────────────────────────────────────────────────┘
+```
+
 ## Database Schema
 
 ### MongoDB Collections
@@ -102,6 +144,13 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
   - published: Publication date
   - pdf_url: URL to PDF file
   - vector_id: Reference to vector embedding (if processed)
+- **vector_processed_pdfs**: PDF processing tracking for Qdrant vector storage
+  - file_id: Unique identifier for the PDF file
+  - file_path: Full path to the PDF file
+  - category: Research category of the paper
+  - file_hash: SHA-256 hash of the file content
+  - chunk_count: Number of text chunks created for vector storage
+  - processed_date: Timestamp of processing
 
 ### Neo4j Graph Model
 - **Nodes**:

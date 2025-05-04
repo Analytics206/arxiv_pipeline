@@ -41,6 +41,10 @@ Unlike the Business Requirements Document (BRD) and Product Requirements Documen
 | Neo4j Graph Database | Paper relationships represented in Neo4j | Initial |
 | Qdrant Vector Database | Paper content vectorized and stored in Qdrant | Initial |
 | Selective Vector Processing | Only specific categories are processed into vector database | May 3, 2025 |
+| Vector PDF Processing Tracking | MongoDB-based tracking in vector_processed_pdfs collection to prevent duplicate vector processing | May 4, 2025 |
+| Qdrant-MongoDB Sync | Synchronization between Qdrant contents and MongoDB tracking | May 4, 2025 |
+| GPU Acceleration | Support for GPU-accelerated vector operations in Qdrant and embeddings | May 4, 2025 |
+| Multi-GPU Support | Configurable GPU device selection for performance optimization | May 4, 2025 |
 
 ### Pipeline Components
 
