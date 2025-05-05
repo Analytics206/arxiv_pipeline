@@ -36,10 +36,13 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-GPH-04   | Author to paper relationship                             | BRD-03        | ✅    |                            |
 | FR-GPH-05   | Paper to category relationship                           | BRD-03        | ✅    |                            |
 
-| FR-VEC-01   | Use Hugging Face model for embedding                     | BRD-04        | ✅     |                           |
-| FR-VEC-02   | Embed title + abstract                                   | BRD-04        | ❌     |                            |
-| FR-VEC-03   | Store vectors in Qdrant                                  | BRD-04        | ❌     |                            |
-| FR-VEC-04   | Model switching via config                               | BRD-04        | ❌     |                            |
+| FR-VEC-01   | Use Hugging Face model for embedding                     | BRD-04        | ✅     |                            |
+| FR-VEC-02   | Embed title + abstract                                   | BRD-04        | ✅     |                            |
+| FR-VEC-03   | Store vectors in Qdrant                                  | BRD-04        | ✅     |                            |
+| FR-VEC-04   | Model switching via config                               | BRD-04        | ✅     |                            |
+| FR-VEC-05   | Support GPU acceleration for vector operations           | BRD-11        | ✅     | Implemented with CUDA       |
+| FR-VEC-06   | Enable deployment on remote dedicated hardware           | BRD-11        | ✅     | WSL2-based implementation   |
+| FR-VEC-07   | Optimized configuration for research paper embeddings    | BRD-11        | ✅     | 768-dimensional vectors     |
 
 | FR-CON-01   | Centralized settings file                                | BRD-05        | ✅     | Implemented (default.yaml) |
 | FR-CON-02   | Modular pipeline execution                               | BRD-05        | ✅     | Implemented in run_pipeline.py |

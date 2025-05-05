@@ -198,7 +198,61 @@ Refer to `docs/grafana_dashboard_guide.md` for details on customizing and extend
    ```bash
    docker compose up --build sync-qdrant
    ```
-   
+
+## Optional: GPU-Accelerated Qdrant Setup on Remote Windows Machine
+
+For enhanced vector search performance, you can set up Qdrant with GPU acceleration on a separate Windows machine within the same network. This configuration is beneficial for:
+
+- Processing large volumes of papers with faster embedding searches
+- Leveraging dedicated GPU resources for vector operations
+- Scaling the vector database independently from other components
+
+### Quick Overview
+
+1. **Hardware Requirements**:
+   - Windows 11 with WSL2 enabled
+   - NVIDIA GPU with CUDA 12.x support (8GB VRAM minimum)
+   - 16GB RAM (32GB recommended)
+   - Static IP address on your local network
+
+2. **Setup Approach**:
+   - Install WSL2 with Ubuntu
+   - Configure CUDA in WSL2
+   - Build Qdrant from source with GPU support
+   - Configure for optimal performance with research paper embeddings
+
+3. **Integration with ArXiv Pipeline**:
+   - After setup, update the Qdrant connection settings in your config/default.yaml
+   - Run the pipeline as usual, with vector operations now GPU-accelerated
+
+### Detailed Instructions
+
+Complete step-by-step instructions are available in the `qdrant_setup` directory:
+
+```bash
+# View the detailed setup guide
+cat qdrant_setup/README.md
+```
+
+The guide includes:
+- Full installation procedures
+- Configuration optimized for 768-dimensional embeddings (typical for research papers)
+- Testing and benchmarking tools
+- Maintenance and backup procedures
+- Security recommendations
+
+### Updating Configuration
+
+After setting up GPU-accelerated Qdrant, update your configuration:
+
+```yaml
+# In config/default.yaml
+qdrant:
+  host: "192.168.1.x"  # Replace with your Qdrant server's IP
+  port: 6333
+  collection_name: "arxiv_papers"
+```
+
    **New Feature:** The sync_qdrant pipeline now includes **MongoDB tracking** to prevent duplicate processing of PDFs. Each processed PDF is recorded in the `processed_pdfs` collection with metadata including file hash, processing date, and chunk count.
    
    Note: set "MONGO_URI" env var to "mongodb://mongodb:27017/" for docker pipelines

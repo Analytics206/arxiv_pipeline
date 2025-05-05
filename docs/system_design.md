@@ -45,6 +45,8 @@ Unlike the Business Requirements Document (BRD) and Product Requirements Documen
 | Qdrant-MongoDB Sync | Synchronization between Qdrant contents and MongoDB tracking | May 4, 2025 |
 | GPU Acceleration | Support for GPU-accelerated vector operations in Qdrant and embeddings | May 4, 2025 |
 | Multi-GPU Support | Configurable GPU device selection for performance optimization | May 4, 2025 |
+| Remote Qdrant with GPU | WSL2-based GPU-accelerated Qdrant on separate Windows machine | May 4, 2025 |
+| Native Rust Compilation | Optimized Qdrant performance through direct CUDA-enabled compilation | May 4, 2025 |
 
 ### System Monitoring
 

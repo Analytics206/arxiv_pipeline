@@ -63,8 +63,12 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 - **Qdrant**: Vector database for similarity search
   - Collections: paper_embeddings
   - Storage of metadata with vectors
-  - Optional GPU acceleration for vector operations
-  - Supports both Docker and standalone deployment
+  - Deployment options:
+    - Docker container: Standard deployment
+    - Standalone with GPU: Direct installation with CUDA support
+    - Remote WSL2 with GPU: Dedicated vector server on separate machine
+  - Vector optimization: Native GPU acceleration through Rust with CUDA
+  - Benchmarking tools for performance testing
 - **Embedding models**: Sentence transformers for semantic representation
 - **MongoDB Tracking**: Prevents duplicate PDF processing
 

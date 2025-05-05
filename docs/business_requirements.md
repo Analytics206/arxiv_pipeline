@@ -27,4 +27,5 @@ A modular, offline-capable pipeline that fetches and stores research papers from
 | BRD-08     | Web UI to explore graph/search | FR-UI-01 |
 | BRD-09     | System monitoring with Prometheus/Grafana | FR-MON-01 to FR-MON-05 |
 | BRD-10     | Interactive database exploration and testing via Jupyter notebooks | FR-REP-01, FR-REP-02 |
+| BRD-11     | GPU-accelerated vector search with dedicated remote setup | FR-VEC-05, FR-VEC-06, FR-VEC-07 |
 

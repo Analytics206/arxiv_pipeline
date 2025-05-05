@@ -32,6 +32,9 @@
 - **FR-VEC-02**: Embed title + abstract as text input
 - **FR-VEC-03**: Store vectors and metadata in Qdrant
 - **FR-VEC-04**: Allow embedding model switching via config
+- **FR-VEC-05**: Support GPU acceleration for vector operations
+- **FR-VEC-06**: Enable deployment on remote dedicated hardware
+- **FR-VEC-07**: Provide optimized configuration for research paper embeddings
 
 ### 3.5 Configuration & Modularity (FR-CON)
 - **FR-CON-01**: Centralized settings file
