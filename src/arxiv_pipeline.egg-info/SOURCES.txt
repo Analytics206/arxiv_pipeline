@@ -18,5 +18,6 @@ src/pipeline/sync_qdrant.py
 src/storage/mongo.py
 src/utils/download_pdfs.py
 src/utils/logger.py
+src/web-ui/node_modules/flatted/python/flatted.py
 tests/test_ingestion.py
 tests/test_storage.py

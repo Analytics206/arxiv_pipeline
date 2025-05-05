@@ -19,9 +19,9 @@ qdrant:
   # Categories to prioritize for vector storage - these will be processed into Qdrant
   process_categories: # used in sync_qdrant.py
     - "cs.AI"
-    - "cs.CV" 
-    - "cs.LG"
-  papers_per_category: 12 # Maximum number of papers to process into vectors per category (0 for unlimited)
+    # - "cs.CV" 
+    # - "cs.LG"
+  papers_per_category: 6 # Maximum number of papers to process into vectors per category (0 for unlimited)
   default_pdf_path: "E:/AI Research" # Base directory where PDFs are loaded from for vector processing
   gpu_enabled: true # Enable GPU for vector operations
   gpu_device: 1 # Use the second GPU (index 1)
@@ -50,13 +50,13 @@ arxiv:
     - "stat"
     - "stat.ML"
     - "stat.TH"
-  max_results: 200 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
+  max_results: 100 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
   sort_by: "submittedDate"
   sort_order: "descending"
   max_iterations: 10 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 3
   start_date: "2025-04-01" # start_date is used in arxiv api call and save pdfs filters
-  end_date: "2025-05-03" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
+  end_date: "2025-05-05" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
 
 # Embedding model settings
 embedding:
@@ -66,7 +66,7 @@ embedding:
 # PDF storage settings
 pdf_storage:
   directory: "E:/AI Research" # where papers are downloaded @download_pdfs.py subdirectory is auto created by category
-  papers_per_category: 500 # Maximum number of papers to download per category (0 for unlimited)
+  papers_per_category: 100 # Maximum number of papers to download per category (0 for unlimited)
   # Categories to prioritize for PDF downloads - if empty, all papers in MongoDB will be considered
   process_categories: # used in download_pdfs.py - comment out categories you don't want to download
     - "cs.AI"
@@ -89,7 +89,7 @@ pdf_storage:
   download_date_filter:
     enabled: true         # Set to false to disable date filtering
     start_date: "2025-04-01" # Download papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2025-05-03"   # Download papers published on or before this date (format: YYYY-MM-DD)
+    end_date: "2025-05-05"   # Download papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
 
 # Logging settings

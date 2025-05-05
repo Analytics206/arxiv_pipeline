@@ -15,7 +15,13 @@
 - Update @release_notes.md when you make a new release or complete an new feature
 - Update @system_design.md when you make a new feature
 - Update @tech_stack.md when you use a new library or tool
-- Developer is always working from a venv environment
+- Developer is always working from a venv environment powershell command license
+- Do not delete or remove features unless specified by the user
+- IF you break a feature, roll back change and fix it
+- Do not create fake database connection strings or fake api connections
+- IF you break a connections string to databse, roll back change and fix it
+- Do not create fake api responses
+
 
 # Naming Conventions
 - Follow PEP8 style guide for Python code

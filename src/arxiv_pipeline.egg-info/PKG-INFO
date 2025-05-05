@@ -41,7 +41,7 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 ## 🚀 Key Features
 | Feature | Description |
 |---------|-------------|
-| 🏠 **Local-first** | Everything runs offline with no cloud dependencies. Can deploy to cloud in containers if desired. |
+| 🏠 **Local-first** | Everything runs offline with no cloud dependencies on local network with multi machine support. |
 | 💾 **ArXiv Ingestion** | Fetches non-duplicate papers from configurable categories (e.g., cs.AI) with smart date filtering. |
 | 🗒 **MongoDB Storage** | Stores structured metadata, paper information, and download statuses. |
 | 🐙 **Graph Representation** | Neo4j graph database captures relationships between papers, authors, and categories. |
@@ -51,9 +51,12 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 | 👀 **User Interface** | User-friendly interface for exploring datasets, knowledge graphs, and similarity search. |
 | 📦 **Containerized** | Mostly Dockerized with persistent volumes for reliable data storage and consistent execution. |
 
+---
 ![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
 
-📦 System Components
+---
+
+# 📦 System Components
 | Component             | Purpose                                      |
 | --------------------- | -------------------------------------------- |
 | **Ingestion Service** | Fetches papers(metadata) using arXiv Atom XML API      |
@@ -64,17 +67,60 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 | **User Interface**    | Web UI for interaction with graphs           |
 | **Logger**            | Tracks events, errors, and skipped entries   |
 | **Docker Compose**    | Brings it all together for local use         |
-| **Prometheus**        | Time series database for metrics collection  |
-| **Grafana**           | Visualization platform for metrics dashboards |
+| **Prometheus**        | Time series database for system metrics collection  |
+| **Grafana**           | Visualization platform for system metrics dashboards |
 
+---
+## High Level Overview
+ - Fetch metadata of papers from arXiv.org using arXiv Atom XML API
+ - Store normalized metadata in MongoDB with pdf_url for pdf download
+ - Download PDFs from arXiv.org and store in local directory
+ - Store the author-paper-category graph in Neo4j
+ - Store vector embeddings for semantic search in Qdrant
+ - Manage paper processing tracking in MongoDB
+ - Dynamic configuration for paper category, paper limits, models, and pdf save directory
+ - Web UI for interaction with graphs
+ - Jupyter notebook for interactive analysis
+ - Tracks events, errors, and skipped entries  
 
-A local, platform-independent pipeline for processing research papers from arXiv.org.
+For more deep dive into project and status, see the `docs/` directory.
+
+---
+
+## 💡 Use Cases
+
+### Research & Knowledge Management
+- **Build Personal Research Libraries**: Create customized collections of AI papers organized by category and relevance
+- **Offline Semantic Paper Search**: Find relevant papers without relying on online search engines
+- **Research Gap Identification**: Analyze research areas to identify unexplored topics and opportunities
+- **Literature Review Automation**: Quickly build comprehensive literature reviews for specific research questions
+
+### Data Science & Analysis
+- **Research Trend Analysis**: Apply time-series analysis to identify emerging and declining research topics
+- **Citation Impact Visualization**: Build network graphs to identify the most influential papers and authors
+- **Cross-Domain Knowledge Transfer**: Discover applications of techniques across different research domains
+- **Research Benchmarking**: Track performance improvements in specific algorithms or methods over time
+
+### AI-Assisted Research
+- **Paper Summarization**: Generate concise summaries of complex research papers
+- **Similar Papers Discovery**: Use vector similarity to find related work not linked by citations
+- **Research Idea Generation**: Use paper combinations with LLMs to explore novel research directions
+- **Algorithm Implementation Assistance**: Extract mathematical models for implementation in your own projects
+- **Research Agent**: Add specific research agents for specific use cases
+- **Fine-tuning**: Fine-tune pipelines for specific use cases
+
+### Education & Learning
+- **Personalized Learning Paths**: Create sequential reading lists for specific AI topics
+- **Concept Visualization**: Extract and visualize key concepts across multiple papers
+- **Interactive Research Exploration**: Navigate research spaces through concept and citation graphs
+- **Teaching Material Preparation**: Curate papers and extract examples for courses and tutorials
+---
 
 ## Setup Instructions
 
-pdf save directory is set to E:\AI Research\ in "config/default.yaml"
-
-This project works on both Windows and Ubuntu/Linux environments.
+* pdf save directory is set to E:\AI Research\ in "config/default.yaml"
+* edit config/default.yaml before running the pipelines
+* Project works on both Windows and Ubuntu/Linux environments.
 
 ---
 
@@ -89,16 +135,6 @@ This project works on both Windows and Ubuntu/Linux environments.
 - Prometheus and Grafana (included in docker-compose.monitoring.yml)
 
 ---
-## High Level Overview
- - Fetch papers from arXiv.org using arXiv Atom XML API
- - Store normalized metadata in MongoDB with pdf_url for pdf download
- - Download PDFs from arXiv.org and store in local directory
- - Store the author-paper-category graph in Neo4j
- - Store vector embeddings for semantic search in Qdrant
- - Manage paper processing tracking in MongoDB
- - Dynamic configuration for paper category, paper limits, models, and pdf save directory
- - Web UI for interaction with graphs
- - Tracks events, errors, and skipped entries  
 
 ### Installation (Local, Non-Docker)
 
@@ -125,14 +161,14 @@ source .venv/bin/activate
 
 ---
 ## Running the Pipeline Locally
-Not recommended better to run in docker and this option might be removed or unsupported.
+??????????need text???????????
 ```bash
 python -m src.pipeline.run_pipeline --config config/default.yaml
 ```
 
 ---
 ## Dockerized Deployment - Docker Desktop Running
-0. Suggested run in venv from scripts above for your OS
+0. Suggested run in venv from scripts above for your operating system
 
 1. **Build and start all services:**
    ```bash
@@ -147,7 +183,115 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
 
 4. **Access Qdrant UI** at http://localhost:6333/dashboard
 
-## Monitoring Setup
+## Managing Individual Docker Containers
+
+For more fine-grained control over system components, you can start, stop, restart, and inspect specific containers:
+
+### 1. Starting Individual Containers
+
+```bash
+# Start MongoDB
+docker compose start mongodb
+
+# Start Neo4j
+docker compose start neo4j
+
+# Start Qdrant
+docker compose start qdrant
+
+# Start Web UI
+docker compose start web-ui
+```
+
+### 2. Stopping Individual Containers
+
+```bash
+# Stop MongoDB
+docker compose stop mongodb
+
+# Stop Neo4j
+docker compose stop neo4j
+
+# Stop Qdrant
+docker compose stop qdrant
+
+# Stop Web UI
+docker compose stop web-ui
+```
+
+### 3. Restarting Individual Containers
+
+```bash
+# Restart MongoDB
+docker compose restart mongodb
+
+# Restart Neo4j
+docker compose restart neo4j
+
+# Restart Qdrant
+docker compose restart qdrant
+
+# Restart Web UI
+docker compose restart web-ui
+```
+
+### 4. Viewing Container Logs
+
+```bash
+# View MongoDB logs
+docker compose logs mongodb
+
+# View Neo4j logs
+docker compose logs neo4j
+
+# View Qdrant logs
+docker compose logs qdrant
+
+# View Web UI logs
+docker compose logs web-ui
+
+# Follow logs (real-time updates)
+docker compose logs --follow mongodb
+```
+
+### 5. Inspecting Container Status
+
+```bash
+# Check status of all containers
+docker compose ps
+
+# Detailed information about a specific container
+docker inspect arxiv_pipeline-mongodb-1
+```
+
+### 6. Managing Pipeline Service Containers
+
+```bash
+# Run the sync-mongodb pipeline container (builds if needed)
+docker compose up --build sync-mongodb
+
+# Run the sync-neo4j pipeline container (builds if needed)
+docker compose up --build sync-neo4j
+
+# Run the sync-qdrant pipeline container (builds if needed)
+docker compose up --build sync-qdrant
+```
+
+### 7. Managing Monitoring Containers
+For monitoring containers, use the monitoring compose file:
+
+```bash
+# Start Prometheus
+docker compose -f docker-compose.monitoring.yml start prometheus
+
+# Start Grafana
+docker compose -f docker-compose.monitoring.yml start grafana
+
+# View Grafana logs
+docker compose -f docker-compose.monitoring.yml logs grafana
+```
+
+## Monitoring Setup(optional) *Does not start with docker compose up -d* *above
 
 1. **Start the monitoring stack:**
    ```bash
@@ -190,6 +334,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
    for the ArXiv pipeline are available and functioning correctly.
 
 Refer to `docs/grafana_dashboard_guide.md` for details on customizing and extending these dashboards.
+
 # 4. Run Pipelines: MongoDB, Download PDFs, Neo4j, and Qdrant Pipelines
 
    *pipelines do not have to run in order if you have previously run them or starting where you left off
@@ -289,7 +434,7 @@ qdrant:
   collection_name: "arxiv_papers"
 ```
 
-   **New Feature:** The sync_qdrant pipeline now includes **MongoDB tracking** to prevent duplicate processing of PDFs. Each processed PDF is recorded in the `processed_pdfs` collection with metadata including file hash, processing date, and chunk count.
+   **New Feature:** The sync_qdrant pipeline now includes **MongoDB tracking** to prevent duplicate processing of PDFs. Each processed PDF is recorded in the `vector_processed_pdfs` collection with metadata including file hash, processing date, and chunk count.
    
    Note: set "MONGO_URI" env var to "mongodb://mongodb:27017/" for docker pipelines
    ```bash
@@ -348,7 +493,7 @@ qdrant:
   # ... other settings ...
   tracking:
     enabled: true # Whether to track processed PDFs
-    collection_name: "processed_pdfs" # MongoDB collection to store tracking information
+    collection_name: "vector_processed_pdfs" # MongoDB collection to store tracking information
     sync_with_qdrant: true # Whether to sync tracking with actual Qdrant contents
 ```
 
@@ -382,25 +527,20 @@ To change where PDFs are stored, edit the pdf_storage.directory in the config:
 pdf_storage:
   directory: E:/AI Research
 ```
-
-The `sync_qdrant` pipeline uses [Ollama](https://ollama.ai/) for analyzing images extracted from PDFs if available:
+---
+### Ollama Integration (Optional)
+---
+The `sync_qdrant` pipeline uses [Ollama](https://ollama.ai/) app for analyzing images extracted from PDFs if available:
 
 - **What Ollama does**: Enhances the vector database by adding AI-generated descriptions of diagrams and figures in papers
-- **Installation**: Download and install Ollama from [ollama.ai](https://ollama.ai/)
+- **Installation Options**:
+  - **Desktop App**: Download and install Ollama from [ollama.ai](https://ollama.ai/)
+  - **Docker Container**: Run Ollama in a Docker container for easier integration with the ArXiv pipeline (see `docs/ollama_docker.md` for detailed instructions)
 - **Required model**: Run `ollama pull llama3` to download the required model
 - **Without Ollama**: The pipeline still functions normally without Ollama, but image descriptions will be placeholders
 
 ## ArXiv Pipeline Configuration Settings
 The system is configured through `config/default.yaml`. Key configuration sections include:
-
-### Ollama Integration (Optional)
-
-The `sync_qdrant` pipeline uses [Ollama](https://ollama.ai/) for analyzing images extracted from PDFs if available:
-
-- **What Ollama does**: Enhances the vector database by adding AI-generated descriptions of diagrams and figures in papers
-- **Installation**: Download and install Ollama from [ollama.ai](https://ollama.ai/)
-- **Required model**: Run `ollama pull llama3` to download the required model
-- **Without Ollama**: The pipeline still functions normally without Ollama, but image descriptions will be placeholders
 
 ### Important Note About PDF Paths in Docker
 
@@ -559,6 +699,7 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
 #### Option 1: With Docker (recommended)
 The Docker setup includes Neo4j, so no additional installation is needed if using Docker Compose.
 
+Neo4j Desktop is recommended for local development and data exploration.
 #### Option 2: Standalone Neo4j Installation
 1. **Download Neo4j Desktop**: [https://neo4j.com/download/](https://neo4j.com/download/)
 2. **Create a new database** with password 'password' to match configuration
@@ -607,13 +748,14 @@ qdrant:
   - All dependencies are managed through pyproject.toml for consistent environments
 
 - **Data Persistence**:
-  - All persistent data (MongoDB, Neo4j, Qdrant) is stored in Docker volumes
+  - All persistent data (MongoDB, Neo4j, Qdrant) is stored in Docker volumes or local directories
   - PDF files are stored in the configured local directory
 
 - **Development Approach**:
   - Either use the Python virtual environment with `python -m` commands
   - Or use Docker Compose for containerized execution
   - Both methods use the same configuration and produce consistent results
+  - Deveoper commonly uses both methods running in python env and docker compose
 
 ---
 
@@ -642,7 +784,7 @@ The following tools are recommended for exploring the data outside the pipeline:
 - **Qdrant Web UI** - A built-in web interface for exploring vector collections
 - Access at: http://localhost:6333/dashboard when Qdrant is running
 - Also consider **Qdrant Cloud Console** for more advanced features if you're using Qdrant Cloud
-
+- Check Jupyter notebooks for more advanced features
 These tools provide graphical interfaces to explore, query, and visualize the data stored in each component of the pipeline.
 
 ---
@@ -651,8 +793,6 @@ These tools provide graphical interfaces to explore, query, and visualize the da
 The following features are 'planned' for future development to enhance the research pipeline:
 
 ### Data Analysis and Visualization
-- **Jupyter Lab Integration**: Add a dedicated Jupyter service with pre-built notebooks for research analysis
-- **Example Notebooks for Research**: Create ready-to-use notebooks for common research tasks and analyses
 - **Topic Modeling**: Implement BERTopic or LDA for automatic discovery of research themes
 - **Time-Series Analysis**: Track the evolution of research topics over time
 
@@ -663,11 +803,14 @@ The following features are 'planned' for future development to enhance the resea
 - **Citation Graph Analysis**: Build a graph of paper citations to identify seminal works
 - **Researcher Networks**: Map collaboration networks among authors
 - **Multi-Modal Analysis**: Extract and analyze figures and tables from papers
+- **Fine-tuning Pipelines**: Fine-tune pipelines for specific use cases
+- **Research Agents**: Add specific research agents for specific use cases
 
 ### Infrastructure Improvements
 - **LangChain-based Research Assistant**: Natural language interface to query the database
 - **Hybrid Search**: Combine keyword and semantic search for better results
 - **Export Tools**: Add BibTeX and PDF collection exports
+- **Web Admin Interface**: Add web admin interface for configuration and running pipelines
 
 ## To-Do List
 
@@ -677,12 +820,15 @@ The following features are 'planned' for future development to enhance the resea
   - [ ] Implement paper similarity metrics
   - [ ] Create basic analytics dashboard
   - [ ] Develop basic PDF section parser to extract abstracts and conclusions
+  - [ ] Add web admin interface for configuration and running pipelines
 
 - [ ] **Medium-term Tasks**
+  - [ ] Fine-tuning pipelines for specific use cases
+  - [ ] Add research agent for specific use cases
   - [ ] Extend Neo4j schema to include citations between papers
   - [ ] Add full-text search capabilities
   - [ ] Implement comprehensive citation parsing system
-  - [ ] Create example Jupyter notebooks for research workflows
+  - [x] Create example Jupyter notebooks for research workflows
   - [ ] Develop mathematical formula extraction and indexing
   - [ ] Implement automated paper summarization
   - [ ] Set up scheduled runs for continuous updates
@@ -699,33 +845,6 @@ The following features are 'planned' for future development to enhance the resea
   - [ ] Set up CI/CD pipeline for continuous deployment
   - [ ] Optimize vector storage for large-scale collections
 
----
-
-## 💡 Use Cases
-
-### Research & Knowledge Management
-- **Build Personal Research Libraries**: Create customized collections of AI papers organized by category and relevance
-- **Offline Semantic Paper Search**: Find relevant papers without relying on online search engines
-- **Research Gap Identification**: Analyze research areas to identify unexplored topics and opportunities
-- **Literature Review Automation**: Quickly build comprehensive literature reviews for specific research questions
-
-### Data Science & Analysis
-- **Research Trend Analysis**: Apply time-series analysis to identify emerging and declining research topics
-- **Citation Impact Visualization**: Build network graphs to identify the most influential papers and authors
-- **Cross-Domain Knowledge Transfer**: Discover applications of techniques across different research domains
-- **Research Benchmarking**: Track performance improvements in specific algorithms or methods over time
-
-### AI-Assisted Research
-- **Paper Summarization**: Generate concise summaries of complex research papers
-- **Similar Papers Discovery**: Use vector similarity to find related work not linked by citations
-- **Research Idea Generation**: Use paper combinations with LLMs to explore novel research directions
-- **Algorithm Implementation Assistance**: Extract mathematical models for implementation in your own projects
-
-### Education & Learning
-- **Personalized Learning Paths**: Create sequential reading lists for specific AI topics
-- **Concept Visualization**: Extract and visualize key concepts across multiple papers
-- **Interactive Research Exploration**: Navigate research spaces through concept and citation graphs
-- **Teaching Material Preparation**: Curate papers and extract examples for courses and tutorials
 ---
 
 ## ArXiv API Address to fetch papers metadata
