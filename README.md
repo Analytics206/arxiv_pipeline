@@ -49,8 +49,6 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 
 For more deep dive into project and status, see the `docs/` directory.
 
-A local, platform-independent pipeline for processing research papers from arXiv.org and beyond.
-
 ---
 
 ## 💡 Use Cases
