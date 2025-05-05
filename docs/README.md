@@ -23,6 +23,7 @@ This directory contains comprehensive documentation for the ArXiv Pipeline proje
 | [grafana_dashboard_guide.md](./grafana_dashboard_guide.md) | Instructions for customizing and managing Grafana dashboards for system monitoring. |
 | [container_id_reference.md](./container_id_reference.md) | Reference guide for understanding container label formats and identification patterns. |
 | [prometheus_id_format.md](./prometheus_id_format.md) | Documents the standardized format for Prometheus metric IDs and naming conventions. |
+| [ollama_docker.md](./ollama_docker.md) | Instructions for running Ollama in a Docker container to enhance the ArXiv pipeline with image analysis capabilities. |
 
 ## Project Management & Analysis
 

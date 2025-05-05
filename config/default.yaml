@@ -19,9 +19,9 @@ qdrant:
   # Categories to prioritize for vector storage - these will be processed into Qdrant
   process_categories: # used in sync_qdrant.py
     - "cs.AI"
-    # - "cs.CV" 
-    # - "cs.LG"
-  papers_per_category: 5 # Maximum number of papers to process into vectors per category (0 for unlimited)
+    - "cs.CV" 
+    - "cs.LG"
+  papers_per_category: 12 # Maximum number of papers to process into vectors per category (0 for unlimited)
   default_pdf_path: "E:/AI Research" # Base directory where PDFs are loaded from for vector processing
   gpu_enabled: true # Enable GPU for vector operations
   gpu_device: 1 # Use the second GPU (index 1)

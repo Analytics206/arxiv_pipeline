@@ -191,7 +191,7 @@ def process_pdf(pdf_path, qdrant_url=QDRANT_URL, qdrant_collection=QDRANT_COLLEC
     if gpu_enabled and cuda_available:
         try:
             # Validate that the requested GPU exists
-            device = f"cuda:{gpu_device}" if gpu_device < torch.cuda.device_count() else "cuda:0"
+            device = f"cuda:{gpu_device}" if gpu_device < torch.cuda.device_count() else "cuda:1"
             print(f"Using GPU for embeddings: {device}")
         except:
             device = "cpu"
