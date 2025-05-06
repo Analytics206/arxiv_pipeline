@@ -92,5 +92,4 @@ Use this emoji guide to annotate project plans, system designs, and code documen
 | 📖     | Reference / docs               |
 | 🔥     | Error / issue                  |
 | ⚠️     | Warning / caution              |
-| ⚠️     | Warning / caution              |
 ## 🐙 Cephalopod Emoji Legend

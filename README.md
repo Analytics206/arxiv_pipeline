@@ -135,7 +135,7 @@ source .venv/bin/activate
 
 ## 1. **Build and start all basic required services:**
    ```bash
-   docker compose up -d
+    docker compose up -d
    ```
  - ✔ Network arxiv_pipeline_default         Started     
  - ✔ Container arxiv_pipeline-neo4j-1       Started     
