@@ -1,5 +1,6 @@
 import neo4j from 'neo4j-driver';
 import config from '../config';
+import apiConfig from '../config/api-config';
 
 // Neo4j metrics queries
 const PAPERS_COUNT_QUERY = 'MATCH (p:Paper) RETURN count(p) as count';
@@ -74,11 +75,20 @@ export const getNeo4jMetrics = async () => {
   }
 };
 
-// Check MongoDB connection
+// Check MongoDB connection and get metrics from FastAPI
 export const checkMongoDBConnection = async () => {
-  // This would be implemented with actual MongoDB connection check
-  // Currently returning mock disconnected status
-  return { connected: false };
+  try {
+    const response = await fetch(`${apiConfig.API_BASE_URL}/metrics/mongodb/test-connection`);
+    if (!response.ok) throw new Error('MongoDB API not reachable');
+    const data = await response.json();
+    return {
+      connected: data.status === 'success',
+      databases: data.databases || [],
+    };
+  } catch (error) {
+    console.error('MongoDB connection check failed:', error);
+    return { connected: false, databases: [] };
+  }
 };
 
 // Check Qdrant connection
@@ -95,7 +105,26 @@ export const getAllDatabaseMetrics = async () => {
   const qdrantConnection = await checkQdrantConnection();
 
   const neo4jMetrics = neo4jConnection.connected ? await getNeo4jMetrics() : { papers: 0, authors: 0, categories: 0 };
-  
+
+  // For MongoDB: count documents in the arxiv_papers.papers collection if connected
+  let mongoMetrics = { papers: 0, authors: 0, categories: 0 };
+  if (mongoDBConnection.connected && mongoDBConnection.databases.includes('arxiv_papers')) {
+    try {
+      // Fetch papers count from a new API endpoint (to be implemented)
+      const response = await fetch(`${apiConfig.API_BASE_URL}/metrics/mongodb/paper-stats`);
+      if (response.ok) {
+        const stats = await response.json();
+        mongoMetrics = {
+          papers: stats.papers || 0,
+          authors: stats.authors || 0,
+          categories: stats.categories || 0,
+        };
+      }
+    } catch (err) {
+      console.error('Failed to fetch MongoDB metrics:', err);
+    }
+  }
+
   return {
     neo4j: {
       connected: neo4jConnection.connected,
@@ -103,7 +132,7 @@ export const getAllDatabaseMetrics = async () => {
     },
     mongodb: {
       connected: mongoDBConnection.connected,
-      metrics: { papers: 0, authors: 0, categories: 0 }
+      metrics: mongoMetrics
     },
     qdrant: {
       connected: qdrantConnection.connected,

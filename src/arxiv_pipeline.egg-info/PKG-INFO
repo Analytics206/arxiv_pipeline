@@ -50,8 +50,9 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 | 🔧 **Configurable & Modular** | Centralized settings allow switching categories, models, and components. |
 | 👀 **User Interface** | User-friendly interface for exploring datasets, knowledge graphs, and similarity search. |
 | 📦 **Containerized** | Mostly Dockerized with persistent volumes for reliable data storage and consistent execution. |
-
 ---
+
+
 ![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
 
 ---
@@ -117,10 +118,16 @@ For more deep dive into project and status, see the `docs/` directory.
 ---
 
 ## Setup Instructions
-
-* pdf save directory is set to E:\AI Research\ in "config/default.yaml"
-* edit config/default.yaml before running the pipelines
-* Project works on both Windows and Ubuntu/Linux environments.
+  ### This system runs on a single machine but recommend a multiple machine setup.*
+  - System minimum requirements: 16GB RAM, 8GB GPU, 512GB SSD
+  - Developer runs on laptop with 16GB RAM, 16GB GPU, 1TB SSD *Not recommended!
+  - Most components run in docker containers that can be move to own/shared docker machines
+  - Qdrant recommend setup on a separate machine with nvidia GPU for faster vector operations
+  - Default Qdrant running locally with out docker *see below Qdrant Setup*
+  - External storage for PDFs recommended *see below PDF Storage*
+  * pdf save directory is set to E:\AI Research\ in "config/default.yaml"
+  * edit config/default.yaml before running the pipelines
+  * Project works on both Windows and Ubuntu/Linux environments.
 
 ---
 
@@ -170,7 +177,7 @@ python -m src.pipeline.run_pipeline --config config/default.yaml
 ## Dockerized Deployment - Docker Desktop Running
 0. Suggested run in venv from scripts above for your operating system
 
-1. **Build and start all services:**
+1. **Build and start all basic required services:**
    ```bash
    docker compose up -d
    ```
@@ -364,6 +371,7 @@ Refer to `docs/grafana_dashboard_guide.md` for details on customizing and extend
    ```
    
    ## c. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
+   # pdf download does not have a docker container
    ```bash
    echo $env:MONGO_URI
    $env:MONGO_URI="mongodb://localhost:27017/config"
