@@ -14,3 +14,6 @@ app.add_middleware(
 )
 
 app.include_router(mongodb_router, prefix="/metrics/mongodb", tags=["mongodb"])
+
+from routes.qdrant import router as qdrant_router
+app.include_router(qdrant_router, prefix="/metrics/qdrant", tags=["qdrant"])
