@@ -13,3 +13,8 @@
 - Works *neo4j-sync docker container 
 - python execution, docker to docker sync might need names instead of localhost or vise-versa
 - python -m src.pipeline.sync_qdrant - Adjusted MongoDB connection for local execution: mongodb://localhost:27017/
+- cd src\web-ui; npm install react-router-dom
+
+cd src\web-ui
+$env:PORT=3001
+npm start

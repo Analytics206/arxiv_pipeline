@@ -1,0 +1,42 @@
+.placeholder-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .placeholder-container h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+  }
+  
+  .placeholder-subtitle {
+    font-size: 1.25rem;
+    color: #7f8c8d;
+    margin-bottom: 3rem;
+  }
+  
+  .placeholder-content {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: left;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .placeholder-content p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  
+  .placeholder-content ul {
+    padding-left: 1.5rem;
+  }
+  
+  .placeholder-content li {
+    margin-bottom: 0.75rem;
+    color: #34495e;
+  }
+  

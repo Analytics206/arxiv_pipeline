@@ -1,0 +1,113 @@
+import neo4j from 'neo4j-driver';
+import config from '../config';
+
+// Neo4j metrics queries
+const PAPERS_COUNT_QUERY = 'MATCH (p:Paper) RETURN count(p) as count';
+const AUTHORS_COUNT_QUERY = 'MATCH (a:Author) RETURN count(a) as count';
+const CATEGORIES_COUNT_QUERY = 'MATCH (c:Category) RETURN count(c) as count';
+
+// Initialize driver with connection settings from config
+let neo4jDriver = null;
+
+// Function to initialize Neo4j driver
+const initNeo4jDriver = () => {
+  try {
+    if (!neo4jDriver) {
+      neo4jDriver = neo4j.driver(
+        config.neo4j.uri,
+        neo4j.auth.basic(config.neo4j.user, config.neo4j.password),
+        { encrypted: false }
+      );
+      console.log('Neo4j driver initialized with URI:', config.neo4j.uri);
+    }
+    return neo4jDriver;
+  } catch (error) {
+    console.error('Failed to initialize Neo4j driver:', error);
+    return null;
+  }
+};
+
+// Check Neo4j connection
+export const checkNeo4jConnection = async () => {
+  try {
+    const driver = initNeo4jDriver();
+    if (!driver) return { connected: false };
+
+    const session = driver.session();
+    await session.run('RETURN 1');
+    await session.close();
+    return { connected: true };
+  } catch (error) {
+    console.error('Neo4j connection check failed:', error);
+    return { connected: false };
+  }
+};
+
+// Get Neo4j metrics
+export const getNeo4jMetrics = async () => {
+  try {
+    const connection = await checkNeo4jConnection();
+    if (!connection.connected) {
+      return { papers: 0, authors: 0, categories: 0 };
+    }
+
+    const driver = neo4jDriver;
+    const session = driver.session();
+
+    // Fetch paper count
+    const papersResult = await session.run(PAPERS_COUNT_QUERY);
+    const papers = papersResult.records[0]?.get('count').toNumber() || 0;
+
+    // Fetch author count
+    const authorsResult = await session.run(AUTHORS_COUNT_QUERY);
+    const authors = authorsResult.records[0]?.get('count').toNumber() || 0;
+
+    // Fetch category count
+    const categoriesResult = await session.run(CATEGORIES_COUNT_QUERY);
+    const categories = categoriesResult.records[0]?.get('count').toNumber() || 0;
+
+    await session.close();
+    return { papers, authors, categories };
+  } catch (error) {
+    console.error('Failed to get Neo4j metrics:', error);
+    return { papers: 0, authors: 0, categories: 0 };
+  }
+};
+
+// Check MongoDB connection
+export const checkMongoDBConnection = async () => {
+  // This would be implemented with actual MongoDB connection check
+  // Currently returning mock disconnected status
+  return { connected: false };
+};
+
+// Check Qdrant connection
+export const checkQdrantConnection = async () => {
+  // This would be implemented with actual Qdrant connection check
+  // Currently returning mock disconnected status
+  return { connected: false };
+};
+
+// Get all database metrics
+export const getAllDatabaseMetrics = async () => {
+  const neo4jConnection = await checkNeo4jConnection();
+  const mongoDBConnection = await checkMongoDBConnection();
+  const qdrantConnection = await checkQdrantConnection();
+
+  const neo4jMetrics = neo4jConnection.connected ? await getNeo4jMetrics() : { papers: 0, authors: 0, categories: 0 };
+  
+  return {
+    neo4j: {
+      connected: neo4jConnection.connected,
+      metrics: neo4jMetrics
+    },
+    mongodb: {
+      connected: mongoDBConnection.connected,
+      metrics: { papers: 0, authors: 0, categories: 0 }
+    },
+    qdrant: {
+      connected: qdrantConnection.connected,
+      metrics: { papers: 0, authors: 0, categories: 0 }
+    }
+  };
+};

@@ -1,0 +1,116 @@
+.neo4j-explorer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .neo4j-explorer-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .neo4j-explorer-header h1 {
+    font-size: 2.2rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+  
+  .neo4j-explorer-header p {
+    color: #7f8c8d;
+  }
+  
+  .neo4j-explorer-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    font-size: 1.2rem;
+    color: #7f8c8d;
+  }
+  
+  .query-selector {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .query-selector h2 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  
+  .query-selector select {
+    padding: 0.5rem;
+    margin-right: 1rem;
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .run-query-button {
+    padding: 0.5rem 1.5rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .run-query-button:hover {
+    background-color: #2980b9;
+  }
+  
+  .run-query-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+  }
+  
+  .error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+  }
+  
+  .query-description {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cypher-query {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-family: monospace;
+  }
+  
+  .visualization-container {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .visualization-container h2 {
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+  }
+  
+  .empty-graph {
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    color: #7f8c8d;
+  }
+  

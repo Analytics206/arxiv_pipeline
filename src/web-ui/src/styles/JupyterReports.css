@@ -1,0 +1,183 @@
+.jupyter-reports-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.jupyter-reports-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.jupyter-reports-header h1 {
+  color: #2c3e50;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.jupyter-reports-header p {
+  color: #7f8c8d;
+  font-size: 1.2rem;
+}
+
+.category-filter {
+  margin-bottom: 2rem;
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.category-filter h2 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.filter-buttons button {
+  background-color: #ecf0f1;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #34495e;
+  transition: all 0.3s ease;
+}
+
+.filter-buttons button:hover {
+  background-color: #d6e0e4;
+}
+
+.filter-buttons button.active {
+  background-color: #3498db;
+  color: white;
+}
+
+.notebooks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.notebook-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.notebook-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.notebook-icon {
+  height: 120px;
+  background-color: #f5f7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.notebook-icon-jupyter {
+  width: 64px;
+  height: 64px;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NCIgaGVpZ2h0PSI1MSIgdmlld0JveD0iMCAwIDQ0IDUxIj48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtOCAtMikiPjxwYXRoIGZpbGw9IiNGMzc3MjYiIGQ9Ik0zMiAyNS4zODhjMCAxLjEwNC0uODk2IDEuOTk3LTEuOTk4IDEuOTk3LTEuMTA1IDAtMi0uODkzLTItMS45OTcgMC0xLjEwNS44OTUtMS45OTcgMi0xLjk5NyAxLjEwMiAwIDEuOTk4Ljg5MiAxLjk5OCAxLjk5N3ptMTQuOTk2IDEuOTk3QzQ2Ljk5NiAzNS40MzYgMzguNDUgNDMuOTgzIDMwLjA5OCA0NCBjLTIuNDAyLjAwNS00LjcxNy0uNi02Ljc0Ni0xLjYwMy0yLjI2LTEuMTA3LTQuMDczLTIuNzYzLTUuNDgtNC45NTMtMS40NC0yLjI1LTIuMjc1LTQuODgtMi4zNjYtNy42NDguMDQzLTMuMTA4IDEuMDItNi4xMDUgMi44NS04LjU3IDEuODc0LTIuNTMyIDQuNTgtNC4xMTYgNy41ODgtNC41MzN2MmMtMi40MjMuNTQtNC41MjcgMS45LTUuOTU1IDMuODEzLTEuNTc4IDIuMTItMi40ODMgNC43MTUtMi40ODUgNy4zOTUuMTA0IDIuMTk1LjczOCA0LjI2IDEuODU1IDYuMDIgMS4yIDEuODc1IDIuNzYgMy4yNSA0LjU3NCA0LjA4MiAxLjczIDEgMy42NiAxLjUwMiA1LjU5OCAxLjQ5NyA3LjIgMCAxNC40LTcuMiAxNC40LTE0LjR2LTEuOTk3aC0ydjEuOTk3ek0yNy4zNSA0LjA1M3YtMmM3LjIgMCAxNC40IDcuMiAxNC40IDE0LjR2MS45OThoMnYtMS45OThDNDMuNzUgOC41NjIgMzUuMjA1IDAgMjYuODUyIDBjLTIuNCAwLTQuNzE3LjYwNS02Ljc0NiAxLjYwMy0yLjI2IDEuMTA3LTQuMDcyIDIuNzYzLTUuNDggNC45NTMtMS40NCAyLjI1LTIuMjc0IDQuODgtMi4zNjUgNy42NDguMDQzIDMuMTA4IDEuMDIgNi4xMDQgMi44NSA4LjU3IDEuODc1IDIuNTMgNC41OCA0LjExNiA3LjU5IDQuNTMzdi0yYy0yLjQyNi0uNTQtNC41My0xLjktNS45NTctMy44MTMtMS41OC0yLjEyLTIuNDg0LTQuNzE1LTIuNDg2LTcuMzk1LjEwNS0yLjE5NS43NC00LjI2IDEuODU2LTYuMDIgMS4yMDItMS44NzUgMi43Ni0zLjI1IDQuNTc1LTQuMDgyIDEuNzMtMSAzLjY2LTEuNTAyIDUuNTk4LTEuNDk3IDcuMiAwIDE0LjQgNy4yIDE0LjQgMTQuNGgtMmMwLTEuMTA1LS44OTUtMS45OTgtMi0xLjk5OHMtMiAuODkzLTIgMS45OThjMCAxLjEwNC44OTUgMS45OTcgMiAxLjk5N3YyYy0xLjEwMiAwLTEuOTk4LS44OTMtMS45OTgtMS45OTcgMC0xLjEwNS44OTYtMS45OTggMS45OTgtMS45OThoMmMwLTYuMjUtNS42MDUtMTIuMzk4LTExLjk5OC0xMi42SDI3LjM1eiIvPjwvZz48L3N2Zz4=');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.notebook-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+
+.notebook-content h3 {
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+  font-size: 1.3rem;
+}
+
+.notebook-content p {
+  color: #7f8c8d;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.notebook-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #95a5a6;
+}
+
+.notebook-category {
+  text-transform: capitalize;
+  background-color: #ebf5fb;
+  color: #3498db;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.notebook-actions {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #e9ecef;
+}
+
+.view-button, 
+.download-button {
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.view-button {
+  background-color: #3498db;
+  color: white;
+}
+
+.view-button:hover {
+  background-color: #2980b9;
+}
+
+.download-button {
+  background-color: #ecf0f1;
+  color: #34495e;
+}
+
+.download-button:hover {
+  background-color: #bdc3c7;
+}
+
+@media (max-width: 768px) {
+  .notebooks-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .filter-buttons button {
+    width: 100%;
+  }
+}

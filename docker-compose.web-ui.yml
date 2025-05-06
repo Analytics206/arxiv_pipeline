@@ -1,0 +1,26 @@
+services:
+  web-ui:
+    build:
+      context: ./src/web-ui
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000"
+    environment:
+      - REACT_APP_NEO4J_URI=bolt://neo4j:7687
+      - REACT_APP_NEO4J_USER=neo4j
+      - REACT_APP_NEO4J_PASSWORD=password
+      - REACT_APP_MONGODB_URI=mongodb://mongodb:27017
+      - REACT_APP_MONGODB_DB=arxiv
+      - REACT_APP_QDRANT_URL=http://qdrant:6333
+      - REACT_APP_QDRANT_COLLECTION=papers
+      - REACT_APP_DEFAULT_CONFIG_PATH=./config/default.yaml
+      - REACT_APP_PIPELINE_API_URL=http://api:5000/api
+    networks:
+      - arxiv-pipeline
+    volumes:
+      - ./config:/app/config
+
+networks:
+  arxiv-pipeline:
+    name: arxiv-pipeline
+    external: true

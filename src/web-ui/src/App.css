@@ -1,161 +1,58 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f8fa;
+  color: #333;
+}
+
 .App {
-  text-align: center;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-.App-header {
-  background-color: #282c34;
-  padding: 2rem;
-  color: white;
-}
-
-.App-header h1 {
-  margin-bottom: 0.5rem;
-}
-
-main {
+.content {
   flex: 1;
-  padding: 2rem;
-  background-color: #f5f5f5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Make sure query sections don't take up too much room */
-.query-selector, .query-description {
-  margin-bottom: 2rem;
-}
-
-.query-selector {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-}
-
-.query-selector h2 {
-  margin-bottom: 1rem;
-  color: #282c34;
-}
-
-.query-selector select {
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-}
-
-.run-query-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-.run-query-button:hover {
-  background-color: #45a049;
-}
-
-.run-query-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.error-message {
-  background-color: #ffdddd;
-  border: 1px solid #ff8888;
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 1rem 0;
-  width: 100%;
-  max-width: 1200px;
-  text-align: left;
-}
-
-.query-description {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 1200px;
-  text-align: left;
-}
-
-.cypher-query {
-  background-color: #f5f5f5;
-  padding: 1rem;
-  border-radius: 4px;
-  font-family: monospace;
-  overflow-x: auto;
-  white-space: pre-wrap;
-  border: 1px solid #ddd;
-}
-
-/* Visualization container styles */
-.visualization-container {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100% !important;
-  max-width: 1200px !important;
-  text-align: center;
-  display: block !important;
-}
-
-/* Header in visualization container */
-.visualization-container h2 {
-  margin-bottom: 1rem;
-  color: #282c34;
-  text-align: center;
-}
-
-/* Graph container - the main styling for the cytoscape container */
-.graph-container {
-  width: 100% !important;
-  height: 800px !important;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  display: block !important;
-  position: relative !important;
-  margin: 0 auto !important;
-}
-
-.empty-graph {
-  height: 800px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  border: 1px dashed #ccc;
-  color: #666;
-}
-
-.error {
-  color: red;
-  padding: 2rem;
-  text-align: center;
+  padding-bottom: 2rem;
 }
 
 .App-footer {
-  background-color: #282c34;
+  padding: 1.5rem;
+  background-color: #2c3e50;
   color: white;
-  padding: 1rem;
-  margin-top: auto;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content > div {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .content {
+    padding: 1rem;
+  }
 }
