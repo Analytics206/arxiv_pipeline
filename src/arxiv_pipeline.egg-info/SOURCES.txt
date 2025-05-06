@@ -2,6 +2,9 @@ README.md
 pyproject.toml
 setup.py
 src/__init__.py
+src/api/main.py
+src/api/routes/mongodb.py
+src/api/routes/qdrant.py
 src/arxiv_pipeline.egg-info/PKG-INFO
 src/arxiv_pipeline.egg-info/SOURCES.txt
 src/arxiv_pipeline.egg-info/dependency_links.txt

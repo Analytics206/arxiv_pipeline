@@ -1,5 +1,30 @@
 # ArXiv Deep Research Pipeline Release Notes
 
+## Version 0.4.0 (May 6, 2025)
+
+### Major Features
+
+#### Web UI Enhancements
+- **Home Page Implementation** - Added new home page to the web UI with centralized navigation
+- **Integration Links** - Added links to Neo4j Explorer from previous web UI release
+- **Placeholder Pages** - Created landing pages for MongoDB Reports, QDrant Search, Jupyter Notebooks, Config Editor, and Pipeline Management
+
+#### Database Status Dashboard
+- **Connection Status Indicators** - Added real-time status indicators for Neo4j, MongoDB, and Qdrant connections
+- **Database Statistics** - Implemented counters for Papers, Authors, and Categories across all data stores
+- **MongoDB Integration** - Added direct connection to MongoDB for accurate document counts
+
+#### Infrastructure Improvements
+- **Docker Environment Cleanup** - Optimized Docker container configuration and removed redundancies
+- **Resource Utilization** - Improved memory and CPU usage across containerized services
+
+### Documentation
+- **User Interface Guide** - Added documentation for navigating the enhanced web UI
+- **Database Status Documentation** - Created guide for interpreting database status indicators
+- **Updated Setup Instructions** - Refreshed installation and configuration documentation
+
+---
+
 ## Version 0.3.0 (May 4, 2025)
 
 ### Major Features

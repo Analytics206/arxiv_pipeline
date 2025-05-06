@@ -71,6 +71,8 @@ services:
       - ./data:/app/data
       
   sync-mongodb:
+    profiles:
+      - manual
     build: .
     command: python -m src.pipeline.sync_mongodb --config /app/config/default.yaml
     depends_on:
@@ -82,6 +84,8 @@ services:
       - ./data:/app/data
       
   sync-neo4j:
+    profiles:
+      - manual
     build: .
     command: python -m src.graph.sync_mongo_to_neo4j
     depends_on:
@@ -97,6 +101,8 @@ services:
       - ./data:/app/data
       
   sync-qdrant:
+    profiles:
+      - manual
     build: .
     command: python -m src.pipeline.sync_qdrant
     # Removed Qdrant container dependency
@@ -124,16 +130,16 @@ services:
     volumes:
       - ./src/web-ui/src/config:/app/public/config
 
-  # Simple test service to verify Docker volume mounting
-  test-mount:
-    build: .
-    command: python /app/test_docker_mount.py
-    volumes:
-      - ./config:/app/config
-      - ./data:/app/data
-      # Map your Windows PDF directory to /app/data/pdfs in the container
-      - E:/AI Research:/app/data/pdfs
-      - ./test_docker_mount.py:/app/test_docker_mount.py
+  # # Simple test service to verify Docker volume mounting
+  # test-mount:
+  #   build: .
+  #   command: python /app/test_docker_mount.py
+  #   volumes:
+  #     - ./config:/app/config
+  #     - ./data:/app/data
+  #     # Map your Windows PDF directory to /app/data/pdfs in the container
+  #     - E:/AI Research:/app/data/pdfs
+  #     - ./test_docker_mount.py:/app/test_docker_mount.py
 
 volumes:
   mongo_data:
