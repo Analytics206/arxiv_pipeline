@@ -16,6 +16,9 @@
 - cd src\web-ui; npm install react-router-dom
 -  jupyter/scipy docker container
 - docker-compose --profile manual up jupyter-scipy
+- http://localhost:8000/docs# api documentation
+- http://localhost:3000/docs# web ui documentation (blank)
+- Jupyter notebook docker runs last to more easily rind key, restart Jupyter docker might needed to find key again
 
 cd src\web-ui
 $env:PORT=3001

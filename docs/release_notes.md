@@ -8,6 +8,8 @@
 - **Home Page Implementation** - Added new home page to the web UI with centralized navigation
 - **Integration Links** - Added links to Neo4j Explorer from previous web UI release
 - **Placeholder Pages** - Created landing pages for MongoDB Reports, QDrant Search, Jupyter Notebooks, Config Editor, and Pipeline Management
+- **API Integration** - Implemented web UI connection to FastAPI backend for live data ingestion from MongoDB
+- **Pipeline API Access** - Added direct link to Pipeline API Swagger documentation in the navigation bar
 
 #### Database Status Dashboard
 - **Connection Status Indicators** - Added real-time status indicators for Neo4j, MongoDB, and Qdrant connections
@@ -17,6 +19,8 @@
 #### Infrastructure Improvements
 - **Docker Environment Cleanup** - Optimized Docker container configuration and removed redundancies
 - **Resource Utilization** - Improved memory and CPU usage across containerized services
+- **FastAPI Backend** - Added new FastAPI docker container with MongoDB connection for data ingestion (Qdrant and Neo4j planned next release)
+- **API Documentation** - Implemented automatic Swagger documentation for the API endpoints
 
 ### Documentation
 - **User Interface Guide** - Added documentation for navigating the enhanced web UI

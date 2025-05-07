@@ -16,6 +16,7 @@ function NavBar() {
         <Link to="/jupyter" className="nav-link">Jupyter Reports</Link>
         <Link to="/config" className="nav-link">Config Editor</Link>
         <Link to="/pipelines" className="nav-link">Pipeline Management</Link>
+        <a href="http://localhost:8000/docs#" className="nav-link" target="_blank" rel="noopener noreferrer">Pipeline API</a>
       </div>
     </nav>
   );
