@@ -129,17 +129,28 @@ services:
       - REACT_APP_NEO4J_PASSWORD=password
     volumes:
       - ./src/web-ui/src/config:/app/public/config
-
-  # # Simple test service to verify Docker volume mounting
-  # test-mount:
-  #   build: .
-  #   command: python /app/test_docker_mount.py
-  #   volumes:
-  #     - ./config:/app/config
-  #     - ./data:/app/data
-  #     # Map your Windows PDF directory to /app/data/pdfs in the container
-  #     - E:/AI Research:/app/data/pdfs
-  #     - ./test_docker_mount.py:/app/test_docker_mount.py
+      
+  jupyter-scipy:
+    profiles:
+      - manual
+    image: jupyter/scipy-notebook:latest
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./config:/home/jovyan/work/config
+      - ./data:/home/jovyan/work/data
+      - ./src:/home/jovyan/work/src
+      - E:/AI Research:/home/jovyan/work/pdfs
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - MONGO_CONNECTION_STRING=mongodb://mongodb:27017/
+      - NEO4J_URL=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=password
+      - QDRANT_URL=http://host.docker.internal:6333
+    depends_on:
+      - mongodb
+      - neo4j
 
 volumes:
   mongo_data:

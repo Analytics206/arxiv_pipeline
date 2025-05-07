@@ -1,0 +1,71 @@
+services:
+  agent-base:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile.agent-base
+    image: research-ai-agent-base:latest
+    volumes:
+      - ../:/app
+      - ../config:/app/config
+      - ../logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+    networks:
+      - agent-network
+
+  code-doc-agent:
+    image: research-ai-agent-base:latest
+    command: python -m cli.main agent start code_documentation
+    volumes:
+      - ../:/app
+      - ../config:/app/config
+      - ../logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+    networks:
+      - agent-network
+    depends_on:
+      - ollama
+
+  research-agent:
+    image: research-ai-agent-base:latest
+    command: python -m cli.main agent start research_analysis
+    volumes:
+      - ../:/app
+      - ../config:/app/config
+      - ../logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+    networks:
+      - agent-network
+    depends_on:
+      - ollama
+      - mongodb
+      - neo4j
+      - qdrant
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - agent-network
+
+networks:
+  agent-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+    driver: local
+  # mongodb_data:
+  #   driver: local
+  # neo4j_data:
+  #   driver: local
+  # qdrant_data:
+  #   driver: local

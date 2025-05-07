@@ -1,0 +1,70 @@
+system:
+  log_level: INFO
+  log_dir: ./logs
+  agent_storage_dir: ./agent_data
+
+models:
+  default: ollama
+  providers:
+    ollama:
+      base_url: http://localhost:11434
+      models:
+        - name: llama3
+          parameters:
+            temperature: 0.7
+            max_tokens: 4096
+        - name: codellama
+          parameters: 
+            temperature: 0.2
+            max_tokens: 8192
+    huggingface:
+      enabled: false
+      device: cuda
+      models:
+        - repo_id: mistralai/Mistral-7B-Instruct-v0.2
+        - repo_id: bigcode/starcoder2-15b
+    claude:
+      enabled: false
+      api_key: ${CLAUDE_API_KEY}
+      models:
+        - name: claude-3-haiku
+
+agents:
+  code_documentation:
+    enabled: true
+    model: codellama
+    watch_paths:
+      - ./src
+      - ./notebooks
+    ignore_patterns:
+      - "*.pyc"
+      - "__pycache__"
+    commit_analysis: true
+    output_format: markdown
+    update_frequency: "on_change"
+    
+  research_analysis:
+    enabled: false
+    model: llama3
+    data_sources:
+      - type: mongodb
+        connection: mongodb://localhost:27017
+        database: arxiv_papers
+        collection: papers
+      - type: neo4j
+        url: bolt://localhost:7687
+        user: neo4j
+        password: ${NEO4J_PASSWORD}
+        query: "MATCH (p:Paper) WHERE p.category = 'cs.AI' RETURN p"
+    vector_store:
+      type: qdrant
+      url: http://localhost:6333
+      collection: paper_embeddings
+    tasks:
+      - name: summarize
+        description: "Generate summaries of research papers"
+        prompt_template: "templates/summarize.txt"
+      - name: concept_mapping
+        description: "Extract and map concepts between papers"
+        prompt_template: "templates/concept_mapping.txt"
+    

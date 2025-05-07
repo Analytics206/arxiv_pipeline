@@ -1,0 +1,17 @@
+Please extract and map the key concepts from the following research paper:
+
+Title: {title}
+Authors: {authors}
+Categories: {categories}
+
+Abstract:
+{abstract}
+
+Paper excerpt:
+{content}
+
+Your response should include:
+1. A list of key concepts/terms and their definitions
+2. Relationships between these concepts
+3. How these concepts connect to the broader field
+4. Novel combinations or applications of these concepts

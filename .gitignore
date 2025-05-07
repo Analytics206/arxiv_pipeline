@@ -5,13 +5,12 @@ __pycache__/
 *.pyd
 .venv/
 venv/
-myenv/
-.myenv/
 
 # Environment
 .env
 .myenv
-.venv
+ENV/
+.env
 
 # Data
 data/
@@ -23,3 +22,42 @@ data/
 # VS Code
 .vscode/
 node_modules
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+# Logs
+logs/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Agent data
+agent_data/
+
+# Docker volumes
+.docker/
+
+# Ollama models
+.ollama/

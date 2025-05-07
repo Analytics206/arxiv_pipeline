@@ -72,7 +72,7 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 | **Grafana**           | Visualization platform for system metrics dashboards |
 
 ---
-## High Level Overview
+## 🧵 High Level Overview
  - Fetch metadata of papers from arXiv.org using arXiv Atom XML API
  - Store normalized metadata in MongoDB with pdf_url for pdf download
  - Download PDFs from arXiv.org and store in local directory
@@ -88,7 +88,7 @@ For more deep dive into project and status, see the `docs/` directory.
 
 ---
 
-## 💡 Use Cases
+# 💡 Use Cases
 
 ### Research & Knowledge Management
 - **Build Personal Research Libraries**: Create customized collections of AI papers organized by category and relevance
@@ -117,7 +117,7 @@ For more deep dive into project and status, see the `docs/` directory.
 - **Teaching Material Preparation**: Curate papers and extract examples for courses and tutorials
 ---
 
-## Setup Instructions
+# 🛠️ Setup Instructions
   ### This system runs on a single machine but recommend a multiple machine setup.*
   - System minimum requirements: 16GB RAM, 8GB GPU, 512GB SSD
   - Developer runs on laptop with 16GB RAM, 16GB GPU, 1TB SSD *Not recommended!
@@ -131,7 +131,7 @@ For more deep dive into project and status, see the `docs/` directory.
 
 ---
 
-## Prerequisites
+# ⚠️ Prerequisites
 
 - Git
 - Python 3.9+ (Python 3.11 recommended)
@@ -143,8 +143,8 @@ For more deep dive into project and status, see the `docs/` directory.
 
 ---
 
-### Installation (Local, Non-Docker)
-
+### Installation (Local)
+* Note: installs all dependencies in a virtual environment 
 ## Linux/macOS/WSL:
 ```bash
 # Make the setup script executable
@@ -166,35 +166,162 @@ source .venv/bin/activate
 .venv\Scripts\Activate.ps1
 ```
 
----
-## Running the Pipeline Locally
-??????????need text???????????
-```bash
-python -m src.pipeline.run_pipeline --config config/default.yaml
-```
+# Dockerized Deployment - Docker Desktop Running
+## 0. Suggested run in venv from scripts above for your operating system
 
----
-## Dockerized Deployment - Docker Desktop Running
-0. Suggested run in venv from scripts above for your operating system
-
-1. **Build and start all basic required services:**
+## 1. **Build and start all basic required services:**
    ```bash
-   docker compose up -d
+    docker compose up -d
    ```
-2. **(Optional) Rebuild the app service after code changes:**
+ - ✔ Network arxiv_pipeline_default         Started     
+ - ✔ Container arxiv_pipeline-neo4j-1       Started     
+ - ✔ Container arxiv_pipeline-mongodb-1     Started 
+ - ✔ Container arxiv_pipeline-web-ui-1      Started   
+ - ✔ Container arxiv_pipeline-api-1         Started   
+ - ✔ Container arxiv_pipeline-app-1         Started 
 
-2. **Access MongoDB** at http://localhost:27017
+## 2. Managing Pipeline Service Containers
+   * pipelines do not have to run in order if you have previously run them or starting where you left off
+   * recommended to run them in order for processing new papers
+  ### a. Run sync_mongodb pipeline to fetch papers from ArXiv API and store in MongoDB:
+  ```bash
+  # Run the sync-mongodb pipeline container
+  docker compose up --build sync-mongodb
+  or
+   echo $env:MONGO_URI
+   $env:MONGO_URI="mongodb://localhost:27017/config"
+   python -m src.pipeline.sync_mongodb --config config/default.yaml
+  ```
 
-3. **Access Neo4j Browser** at http://localhost:7474
-   - Default credentials: neo4j/password
+  ### b. Run sync-neo4j pipeline for new pdf metadata inserted from MongoDB:
+  ```bash
+   docker compose up --build sync-neo4j
+   or
+   echo $env:MONGO_URI
+   $env:MONGO_URI="mongodb://localhost:27017/config"
+   echo $env:MONGO_URI
+   python -m src.graph.sync_mongo_to_neo4j
+  ```
 
-4. **Access Qdrant UI** at http://localhost:6333/dashboard
+   ### c. Run sync_qdrant pipeline to process downloaded PDFs and store as vector embeddings in Qdrant:
+   ```bash
+   docker compose up --build sync-qdrant
+   or *Need to uncomment docker-compose.yml sync-qdrant service????
+   python -m src.pipeline.sync_qdrant
+   ```
 
-## Managing Individual Docker Containers
+   ### d. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
+  * pdf download does not have a docker container
+   ```bash
+   echo $env:MONGO_URI
+   $env:MONGO_URI="mongodb://localhost:27017/config"
+   echo $env:MONGO_URI
+   python -m src.utils.download_pdfs
+   ```
+## 3. (optional) Managing Monitoring Containers with Prometheus & Grafana
+a. **Start the monitoring stack:**
+   ```bash
+   docker compose -f docker-compose.monitoring.yml up -d
+   ```
+  or
+  **For monitoring containers, use the monitoring compose file:**
+  ```bash
+  # Start Prometheus
+  docker compose -f docker-compose.monitoring.yml start prometheus
 
-For more fine-grained control over system components, you can start, stop, restart, and inspect specific containers:
+  # Start Grafana
+  docker compose -f docker-compose.monitoring.yml start grafana
 
-### 1. Starting Individual Containers
+  # View Grafana logs
+  docker compose -f docker-compose.monitoring.yml logs grafana
+  ```
+b. **Access monitoring services:**
+   - Prometheus: http://localhost:9090
+   - Grafana: http://localhost:3001 (default login: admin/admin)
+
+c. **Explore metrics** for:
+   - System resources
+   - Docker containers
+   - MongoDB performance
+   - Application-specific metrics
+
+d. **Monitoring Dashboards**
+   Pre-configured Grafana dashboards are available in the repository:
+   - `config/grafana/dashboards/basic_test_dashboard.json` - Basic connectivity testing dashboard
+   - `config/grafana/dashboards/arxiv_data_science_dashboard.json` - Core monitoring for ArXiv pipeline
+   - `config/grafana/dashboards/arxiv_advanced_analytics_dashboard.json` - Advanced system correlation metrics
+   - `config/grafana/dashboards/arxiv_vector_embedding_dashboard.json` - Vector database performance metrics
+
+   * These dashboards provide visualization for MongoDB operations, system resources, container performance, 
+   and vector embedding generation metrics critical for the research paper processing pipeline.
+
+e. **Prometheus Query Documentation**
+   Comprehensive documentation for Prometheus queries is available in:
+   - `docs/prometheus_basic_queries.md` - Simple queries for troubleshooting
+   - `docs/prometheus_queries.md` - General purpose monitoring queries
+   - `docs/prometheus_custom_queries.md` - ArXiv pipeline specific metrics
+   - `docs/prometheus_working_queries.md` - Verified working queries for dashboards
+
+f. **Monitoring Diagnostics**
+   Use the diagnostic script to verify your monitoring setup:
+   ```bash
+   python scripts/check_prometheus_metrics.py
+   ```
+   * This script analyzes your Prometheus setup and verifies that critical metrics
+   for the ArXiv pipeline are available and functioning correctly.
+
+* Refer to `docs/grafana_dashboard_guide.md` for details on customizing and extending these dashboards.**
+
+## 4. Database Connection Settings
+```yaml
+mongo:
+  connection_string: "mongodb://mongodb:27017/" # or http://localhost:27017
+  db_name: "arxiv_papers"
+  
+neo4j:
+  url: "bolt://neo4j:7687"  # or http://localhost:7474
+  user: "neo4j"
+  password: "password"
+
+qdrant:
+  url: "http://localhost:6333" #Access Qdrant UI http://localhost:6333/dashboard
+  collection_name: "arxiv_papers"
+  vector_size: 768  # For all-MiniLM-L6-v2 model
+```
+## 5. Web UI
+* To restart Web UI docker service, starts with docker-compose up above:
+   ```bash
+   docker-compose up -d web-ui
+   ```
+* Access the web interface at: http://localhost:3000
+
+### Web UI Development Setup
+
+* The web interface uses React with the Neo4j JavaScript driver. If you want to develop the web UI locally:
+
+a. **Navigate to the web-ui directory**:
+   ```bash
+   cd src/web-ui
+   ```
+
+b. **Install dependencies including Neo4j JavaScript driver**:
+   ```bash
+   npm install
+   # Or to install Neo4j driver specifically:
+   npm install neo4j-driver@5.13.0
+   ```
+
+c. **Start the development server**:
+   ```bash
+   npm start
+   ```
+
+* The web UI connects to Neo4j using environment variables defined in the docker-compose.yml file.
+
+## 6. Managing Individual Docker Containers
+* For more fine-grained control over system components, you can start, stop, restart, and inspect specific containers:
+
+### a. Starting Individual Required Containers
 
 ```bash
 # Start MongoDB
@@ -208,25 +335,15 @@ docker compose start qdrant
 
 # Start Web UI
 docker compose start web-ui
+
+# Start API
+docker compose start api
+
+# Start APP
+docker compose start app
 ```
 
-### 2. Stopping Individual Containers
-
-```bash
-# Stop MongoDB
-docker compose stop mongodb
-
-# Stop Neo4j
-docker compose stop neo4j
-
-# Stop Qdrant
-docker compose stop qdrant
-
-# Stop Web UI
-docker compose stop web-ui
-```
-
-### 3. Restarting Individual Containers
+### b. Restarting Individual Containers
 
 ```bash
 # Restart MongoDB
@@ -242,7 +359,7 @@ docker compose restart qdrant
 docker compose restart web-ui
 ```
 
-### 4. Viewing Container Logs
+### c. Viewing Container Logs
 
 ```bash
 # View MongoDB logs
@@ -261,7 +378,7 @@ docker compose logs web-ui
 docker compose logs --follow mongodb
 ```
 
-### 5. Inspecting Container Status
+### d. Inspecting Container Status
 
 ```bash
 # Check status of all containers
@@ -271,126 +388,9 @@ docker compose ps
 docker inspect arxiv_pipeline-mongodb-1
 ```
 
-### 6. Managing Pipeline Service Containers
+## 6. Optional: GPU-Accelerated Qdrant Setup on Remote Windows Machine
 
-```bash
-# Run the sync-mongodb pipeline container (builds if needed)
-docker compose up --build sync-mongodb
-
-# Run the sync-neo4j pipeline container (builds if needed)
-docker compose up --build sync-neo4j
-
-# Run the sync-qdrant pipeline container (builds if needed)
-docker compose up --build sync-qdrant
-```
-
-### 7. Managing Monitoring Containers
-For monitoring containers, use the monitoring compose file:
-
-```bash
-# Start Prometheus
-docker compose -f docker-compose.monitoring.yml start prometheus
-
-# Start Grafana
-docker compose -f docker-compose.monitoring.yml start grafana
-
-# View Grafana logs
-docker compose -f docker-compose.monitoring.yml logs grafana
-```
-
-## Monitoring Setup(optional) *Does not start with docker compose up -d* *above
-
-1. **Start the monitoring stack:**
-   ```bash
-   docker compose -f docker-compose.monitoring.yml up -d
-   ```
-
-2. **Access monitoring services:**
-   - Prometheus: http://localhost:9090
-   - Grafana: http://localhost:3001 (default login: admin/admin)
-
-3. **Explore metrics** for:
-   - System resources
-   - Docker containers
-   - MongoDB performance
-   - Application-specific metrics
-
-4. **Monitoring Dashboards**
-   Pre-configured Grafana dashboards are available in the repository:
-   - `config/grafana/dashboards/basic_test_dashboard.json` - Basic connectivity testing dashboard
-   - `config/grafana/dashboards/arxiv_data_science_dashboard.json` - Core monitoring for ArXiv pipeline
-   - `config/grafana/dashboards/arxiv_advanced_analytics_dashboard.json` - Advanced system correlation metrics
-   - `config/grafana/dashboards/arxiv_vector_embedding_dashboard.json` - Vector database performance metrics
-
-   These dashboards provide visualization for MongoDB operations, system resources, container performance, 
-   and vector embedding generation metrics critical for the research paper processing pipeline.
-
-5. **Prometheus Query Documentation**
-   Comprehensive documentation for Prometheus queries is available in:
-   - `docs/prometheus_basic_queries.md` - Simple queries for troubleshooting
-   - `docs/prometheus_queries.md` - General purpose monitoring queries
-   - `docs/prometheus_custom_queries.md` - ArXiv pipeline specific metrics
-   - `docs/prometheus_working_queries.md` - Verified working queries for dashboards
-
-6. **Monitoring Diagnostics**
-   Use the diagnostic script to verify your monitoring setup:
-   ```bash
-   python scripts/check_prometheus_metrics.py
-   ```
-   This script analyzes your Prometheus setup and verifies that critical metrics
-   for the ArXiv pipeline are available and functioning correctly.
-
-Refer to `docs/grafana_dashboard_guide.md` for details on customizing and extending these dashboards.
-
-# 4. Run Pipelines: MongoDB, Download PDFs, Neo4j, and Qdrant Pipelines
-
-   *pipelines do not have to run in order if you have previously run them or starting where you left off
-
-   *recommended to run them in order for processing new papers
-   ## a. Run sync_mongodb pipeline to fetch papers from ArXiv API and store in MongoDB:
-   ```bash
-   echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/config"
-   python -m src.pipeline.sync_mongodb --config config/default.yaml
-   ```
-   or
-   ```bash
-   docker compose up --build sync-mongodb
-   ```
-
-   ## b. Run sync-neo4j pipeline for new pdf metadata inserted from MongoDB:
-   ```bash
-   docker compose up --build sync-neo4j
-   ```
-   or
-   ```bash
-   echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/config"
-   echo $env:MONGO_URI
-   python -m src.graph.sync_mongo_to_neo4j
-   ```
-   
-   ## c. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
-   # pdf download does not have a docker container
-   ```bash
-   echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/config"
-   echo $env:MONGO_URI
-   python -m src.utils.download_pdfs
-   ```
-   
-   ## d. Run sync_qdrant pipeline to process downloaded PDFs and store as vector embeddings in Qdrant:
-   ```bash
-   python -m src.pipeline.sync_qdrant
-   ```
-   or *Need to uncomment docker-compose.yml sync-qdrant service????
-   ```bash
-   docker compose up --build sync-qdrant
-   ```
-
-## Optional: GPU-Accelerated Qdrant Setup on Remote Windows Machine
-
-For enhanced vector search performance, you can set up Qdrant with GPU acceleration on a separate Windows machine within the same network. This configuration is beneficial for:
+* For enhanced vector search performance, you can set up Qdrant with GPU acceleration on a separate Windows machine within the same network. This configuration is beneficial for:
 
 - Processing large volumes of papers with faster embedding searches
 - Leveraging dedicated GPU resources for vector operations
@@ -398,41 +398,41 @@ For enhanced vector search performance, you can set up Qdrant with GPU accelerat
 
 ### Quick Overview
 
-1. **Hardware Requirements**:
+a. **Hardware Requirements**:
    - Windows 11 with WSL2 enabled
    - NVIDIA GPU with CUDA 12.x support (8GB VRAM minimum)
    - 16GB RAM (32GB recommended)
-   - Static IP address on your local network
+   - IP address on your local network
 
-2. **Setup Approach**:
+b. **Setup Approach**:
    - Install WSL2 with Ubuntu
    - Configure CUDA in WSL2
    - Build Qdrant from source with GPU support
    - Configure for optimal performance with research paper embeddings
 
-3. **Integration with ArXiv Pipeline**:
+c. **Integration with ArXiv Pipeline**:
    - After setup, update the Qdrant connection settings in your config/default.yaml
    - Run the pipeline as usual, with vector operations now GPU-accelerated
 
 ### Detailed Instructions
 
-Complete step-by-step instructions are available in the `qdrant_setup` directory:
+* Complete step-by-step instructions are available in the `qdrant_setup` directory:
 
 ```bash
 # View the detailed setup guide
 cat qdrant_setup/README.md
 ```
 
-The guide includes:
+#### The guide includes:
 - Full installation procedures
 - Configuration optimized for 768-dimensional embeddings (typical for research papers)
 - Testing and benchmarking tools
 - Maintenance and backup procedures
 - Security recommendations
 
-### Updating Configuration
+## Updating Configuration
 
-After setting up GPU-accelerated Qdrant, update your configuration:
+* After setting up GPU-accelerated Qdrant, update your configuration:
 
 ```yaml
 # In config/default.yaml
@@ -442,44 +442,7 @@ qdrant:
   collection_name: "arxiv_papers"
 ```
 
-   **New Feature:** The sync_qdrant pipeline now includes **MongoDB tracking** to prevent duplicate processing of PDFs. Each processed PDF is recorded in the `vector_processed_pdfs` collection with metadata including file hash, processing date, and chunk count.
-   
-   Note: set "MONGO_URI" env var to "mongodb://mongodb:27017/" for docker pipelines
-   ```bash
-   echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://mongodb:27017/"
-   echo $env:MONGO_URI
-   ```
-
-## 5. Web UI
-   To restart Web UI docker service, starts with docker-compose up above:
-   ```bash
-   docker-compose up -d web-ui
-   ```
-   Access the web interface at: http://localhost:3000
-
-### Web UI Development Setup
-
-The web interface uses React with the Neo4j JavaScript driver. If you want to develop the web UI locally:
-
-1. **Navigate to the web-ui directory**:
-   ```bash
-   cd src/web-ui
-   ```
-
-2. **Install dependencies including Neo4j JavaScript driver**:
-   ```bash
-   npm install
-   # Or to install Neo4j driver specifically:
-   npm install neo4j-driver@5.13.0
-   ```
-
-3. **Start the development server**:
-   ```bash
-   npm start
-   ```
-
-The web UI connects to Neo4j using environment variables defined in the docker-compose.yml file. For local development, you can create a `.env.local` file in the src/web-ui directory with the appropriate Neo4j connection details.
+* **New Feature:** The sync_qdrant pipeline now includes **MongoDB tracking** to prevent duplicate processing of PDFs. Each processed PDF is recorded in the `vector_processed_pdfs` collection with metadata including file hash, processing date, and chunk count.
 
 ---
 ### Configuration
@@ -493,7 +456,7 @@ Key configuration options:
 
 ### 1. MongoDB Tracking for Qdrant Vector Processing
 
-The sync_qdrant pipeline now includes a tracking system to prevent duplicate processing and provide synchronization with Qdrant:
+* The sync_qdrant pipeline now includes a tracking system to prevent duplicate processing and provide synchronization with Qdrant:
 
 ```yaml
 # In config/default.yaml
@@ -505,7 +468,7 @@ qdrant:
     sync_with_qdrant: true # Whether to sync tracking with actual Qdrant contents
 ```
 
-This system:
+### This system:
 - Tracks each processed PDF in a MongoDB collection
 - Prevents duplicate processing of the same document
 - Stores metadata including file hash, processing date, and chunk count
@@ -527,17 +490,9 @@ qdrant:
 #### B. Standalone Qdrant with GPU
 For better performance with large vector collections, you can run Qdrant as a standalone application with GPU support as documented in the "Qdrant Deployment Options" section.
 
-## PDF Storage Location
-To change where PDFs are stored, edit the pdf_storage.directory in the config:
+---
+## Ollama Integration (Optional)
 
-```yaml
-# In config/default.yaml
-pdf_storage:
-  directory: E:/AI Research
-```
----
-### Ollama Integration (Optional)
----
 The `sync_qdrant` pipeline uses [Ollama](https://ollama.ai/) app for analyzing images extracted from PDFs if available:
 
 - **What Ollama does**: Enhances the vector database by adding AI-generated descriptions of diagrams and figures in papers
@@ -658,13 +613,13 @@ app:
 
 ## GPU Support for Embeddings Generation
 
-The pipeline can use GPU acceleration for generating embeddings in the `sync_qdrant.py` script:
+* The pipeline can use GPU acceleration for generating embeddings in the `sync_qdrant.py` script:
 
 1. **Install PyTorch with CUDA support**:
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
-Choose the appropriate CUDA version (cu118, cu121, etc.) based on your system. Check with `nvidia-smi`.
+* Choose the appropriate CUDA version (cu118, cu121, etc.) based on your system. Check with `nvidia-smi`.
 
 2. **Enable GPU in configuration**:
 ```yaml
@@ -705,9 +660,9 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
 ### Neo4j Installation
 
 #### Option 1: With Docker (recommended)
-The Docker setup includes Neo4j, so no additional installation is needed if using Docker Compose.
+* The Docker setup includes Neo4j, so no additional installation is needed if using Docker Compose.
 
-Neo4j Desktop is recommended for local development and data exploration.
+* Neo4j Desktop is recommended for local development and data exploration.
 #### Option 2: Standalone Neo4j Installation
 1. **Download Neo4j Desktop**: [https://neo4j.com/download/](https://neo4j.com/download/)
 2. **Create a new database** with password 'password' to match configuration
@@ -730,22 +685,6 @@ Neo4j Desktop is recommended for local development and data exploration.
    driver.close()
    ```
 
-### Database Connection Settings
-```yaml
-mongo:
-  connection_string: "mongodb://mongodb:27017/"
-  db_name: "arxiv_papers"
-  
-neo4j:
-  url: "bolt://neo4j:7687"  # Neo4j connection URL
-  user: "neo4j"
-  password: "password"
-qdrant:
-  url: "http://localhost:6333"
-  collection_name: "arxiv_papers"
-  vector_size: 768  # For all-MiniLM-L6-v2 model
-```
-
 ---
 
 ## Notes
@@ -763,7 +702,7 @@ qdrant:
   - Either use the Python virtual environment with `python -m` commands
   - Or use Docker Compose for containerized execution
   - Both methods use the same configuration and produce consistent results
-  - Deveoper commonly uses both methods running in python env and docker compose
+  - Deveoper commonly uses both methods running in python env, docker compose and standalone databases
 
 ---
 
@@ -776,7 +715,7 @@ qdrant:
 
 ## External Tools for Data Exploration
 
-The following tools are recommended for exploring the data outside the pipeline:
+* The following tools are recommended for exploring the data outside the pipeline:
 
 ### MongoDB
 - **MongoDB Compass** - A GUI for MongoDB that allows you to explore databases, collections, and documents

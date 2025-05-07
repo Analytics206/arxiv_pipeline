@@ -12,14 +12,14 @@
 - You are an expert in creating applications using machine learning models
 - Do not give me code snippets, only the final full code
 - Always use best practices for code quality and maintainability
-- Update @release_notes.md when you make a new release or complete an new feature
-- Update @system_design.md when you make a new feature
+- Update @release_notes.md when you complete a new release or complete an new feature
+- Update @system_design.md when you complete a new feature
 - Update @tech_stack.md when you use a new library or tool
-- Developer is always working from a venv environment powershell command license
+- Developer is always working from a venv environment with powershell commands
 - Do not delete or remove features unless specified by the user
 - IF you break a feature, roll back change and fix it
 - Do not create fake database connection strings or fake api connections
-- IF you break a connections string to databse, roll back change and fix it
+- IF you break a database connection string to database, roll back change and fix it
 - Do not create fake api responses
 
 

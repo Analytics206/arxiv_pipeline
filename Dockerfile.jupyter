@@ -1,0 +1,29 @@
+FROM jupyter/scipy-notebook:latest
+
+USER root
+
+# Install system dependencies if needed
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Switch back to the jovyan user
+USER jovyan
+
+# Install Python dependencies to align with your main application
+COPY --chown=jovyan:users pyproject.toml setup.py ./
+RUN pip install --no-cache-dir uv && \
+    uv pip install --system -e .
+
+# Install additional data science packages
+RUN pip install --no-cache-dir \
+    matplotlib \
+    seaborn \
+    scikit-learn \
+    plotly \
+    ipywidgets
+
+# Set working directory
+WORKDIR /home/jovyan/work
+
+# The default CMD from the base image will start Jupyter

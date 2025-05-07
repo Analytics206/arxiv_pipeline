@@ -14,6 +14,8 @@
 - python execution, docker to docker sync might need names instead of localhost or vise-versa
 - python -m src.pipeline.sync_qdrant - Adjusted MongoDB connection for local execution: mongodb://localhost:27017/
 - cd src\web-ui; npm install react-router-dom
+-  jupyter/scipy docker container
+- docker-compose --profile manual up jupyter-scipy
 
 cd src\web-ui
 $env:PORT=3001

@@ -1,0 +1,18 @@
+Please provide a comprehensive summary of the following research paper:
+
+Title: {title}
+Authors: {authors}
+Categories: {categories}
+
+Abstract:
+{abstract}
+
+Paper excerpt:
+{content}
+
+Your summary should include:
+1. The main research question or problem
+2. Key methodologies used
+3. Major findings and results
+4. Limitations and future work
+5. Potential applications and impact

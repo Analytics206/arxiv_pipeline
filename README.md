@@ -498,13 +498,13 @@ If you change your PDF storage location, make sure to update both:
    ## sync_neo4j pipeline
    - arxiv.process_categories: Categories to prioritize for vector storage into qdrant
    - arxiv.max_papers: Maximum number of papers to process
-   - arxiv.max_papers_per_category: Maximum number of papers to download per category
+   - arxiv.max_papers_per_category: Maximum number of papers to insert per category
    - arxiv.sort_by: Sort papers by this field
    - arxiv.sort_order: Sort papers in this order
 
    ## sync_qdrant pipeline
    - arxiv.max_papers: Maximum number of papers to process
-   - arxiv.max_papers_per_category: Maximum number of papers to download per category
+   - arxiv.max_papers_per_category: Maximum number of papers to insert per category
    - arxiv.sort_by: Sort papers by this field
    - arxiv.sort_order: Sort papers in this order
 

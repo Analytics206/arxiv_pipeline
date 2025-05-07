@@ -55,14 +55,19 @@
 
 ### 3.8 Web UI (FR-UI)
 - **FR-UI-01**: Web UI to explore neo4j graph/search
-- **FR-UI-02**: Extend to MongoDB
-- **FR-UI-03**: Extend to Qdrant
+- **FR-UI-02**: Web UI to start/stop pipelines, view logs, and monitor database status
+- **FR-UI-03**: Web UI to manage configurations for pipelines
+- **FR-UI-04**: Extend to MongoDB
+- **FR-UI-05**: Extend to Qdrant
 
 ### 3.9 Jupyter Notebooks (FR-REP)
 - **FR-REP-01**: Provide sample notebooks for general usage and exploration
 - **FR-REP-02**: Create connectivity testing notebooks for all databases (MongoDB, Neo4j, Qdrant)
 - **FR-REP-03**: Include data visualization capabilities in notebooks
 - **FR-REP-04**: Document notebook usage and setup instructions
+
+### 3.10 AI Agent Platform (FR-AGT)
+- **FR-AGT-01**: Configurable AI Agent platform for research paper analysis and exploration
 
 ### Optional/Nice-to-Have Features
 - **FR-PDF-01**: Optional PDF downloading/section parsing

@@ -59,8 +59,14 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-MON-05   | Support custom application metrics                       | BRD-09        | 🔧     | Basic setup implemented |
 
 | FR-UI-01    | Local web dashboard                                      | BRD-07        | ⏳     | Web UI to explore graph/search      |
+| FR-UI-02    | Web UI to start/stop pipelines, view logs, database status | BRD-14        | ❌     | Not started yet            |
+| FR-UI-03    | Web UI to manage configurations for pipelines             | BRD-15        | ❌     | Not started yet            |
+| FR-UI-04    | Extend to MongoDB                                        | BRD-08        | ⏳     | Planned after base UI      |
+| FR-UI-05    | Extend to Qdrant                                         | BRD-08        | ⏳     | Planned after MongoDB UI    |
 
-| FR-PDF-01   | Optional PDF parsing                                     | BRD-07        | ⏳     | Optional/Nice-to-have      |
+| FR-AGT-01   | Configurable AI Agent platform                          | BRD-13        | ❌     | Not started yet            |
+
+| FR-PDF-01   | Optional PDF download and storage                        | BRD-12        | ⏳     | Basic script implemented    |
 
 | FR-REF-01   | Citation relationship parsing                            | BRD-07        | ⏳     | Optional/Nice-to-have      |
 
