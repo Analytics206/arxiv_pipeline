@@ -286,7 +286,7 @@ c. **Start the development server**:
 * For more fine-grained control over system components, you can start, stop, restart, and inspect specific containers:
 
 ### a. Starting Individual Required Containers
-
+* Services: 
 ```bash
 # Start MongoDB
 docker compose start mongodb
