@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  mongodb:
+    build: .
+    container_name: mongodb-server
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    environment:
+      # Comment out for no authentication
+      # - MONGO_INITDB_ROOT_USERNAME=admin
+      # - MONGO_INITDB_ROOT_PASSWORD=password
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+  mongodb_config:

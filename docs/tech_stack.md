@@ -22,7 +22,7 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 ### Infrastructure & Containerization
 - **Docker**: All services containerized for isolation and portability
 - **Docker Compose**: Multi-container orchestration for local development
-- **Python 3.12**: Core programming language (slim container variant)
+- **Python 3.11**: Core programming language (slim container variant)
 - **UV Package Manager**: Fast Python dependency management
 - **Git**: Version control system
 

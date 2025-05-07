@@ -1,15 +1,15 @@
-# Qdrant GPU Setup for ArXiv Pipeline
+# 🔍 External Qdrant GPU Server Setup (Local Network)
 
-This guide provides instructions for setting up Qdrant with GPU support on a separate machine within the same network as the ArXiv Pipeline system. This setup enhances vector search performance using GPU acceleration through WSL2 and direct Rust compilation.
+This guide provides instructions for setting up Qdrant with GPU support on a separate machine within the same network. This standalone configuration enhances vector search performance using GPU acceleration through WSL2 and Docker, optimized for high-performance vector similarity search.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Integration with ArXiv Pipeline](#integration-with-arxiv-pipeline)
-- [Testing](#testing)
+- [WSL2 GPU Setup](#wsl2-gpu-setup)
+- [Docker GPU Setup](#docker-gpu-setup)
+- [Qdrant Configuration](#qdrant-configuration)
+- [Connecting to Qdrant](#connecting-to-qdrant)
+- [Performance Tuning](#performance-tuning)
 - [Maintenance](#maintenance)
-- [Security](#security)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -17,79 +17,245 @@ This guide provides instructions for setting up Qdrant with GPU support on a sep
 ## Prerequisites
 
 - **Windows 11** with:
-  - [WSL2 enabled](https://learn.microsoft.com/en-us/windows/wsl/install)
-  - NVIDIA GPU driver for WSL2 ([Download](https://developer.nvidia.com/cuda/wsl))
+  - NVIDIA GPU (RTX series recommended for best performance)
+  - NVIDIA display drivers installed ([Download Latest](https://www.nvidia.com/download/index.aspx))
+  - Administrator access
 - **Minimum Hardware**:
   - 16GB RAM (32GB recommended)
-  - NVIDIA GPU with CUDA 12.x support (8GB VRAM minimum)
-  - SSD storage (at least 100GB free space)
+  - NVIDIA GPU with CUDA support (8GB VRAM minimum)
+  - SSD storage with 100GB+ free space
 - **Network**:
-  - Static IP on the local network
-  - Open ports 6333, 6334 for Qdrant communication
-- **Required Software**:
-  - Rust and Cargo
-  - Python 3.8+ with pip
+  - Static IP address on the local network
+  - Ability to open ports 6333 and 6334
 
 ---
 
-## Installation
+## WSL2 GPU Setup
 
-### 1. Set Up WSL2
+### 1. Install and Configure WSL2
+
 ```powershell
-# In PowerShell (Admin):
+# In PowerShell with Administrator privileges
+
+# Install WSL2 with Ubuntu
 wsl --install -d Ubuntu
+
+# Ensure you're using WSL2
+wsl --set-default-version 2
 wsl --set-version Ubuntu 2
+
+# Verify WSL2 installation
+wsl -l -v
 ```
 
-### 2. Install CUDA in WSL2
+### 2. Configure WSL2 Memory Allocation
+
+Create or edit the WSL2 configuration file to optimize memory allocation for GPU operations:
+
+```powershell
+# Create/edit .wslconfig in your Windows user profile directory
+notepad "$env:USERPROFILE\.wslconfig"
+```
+
+Add the following content to the file:
+
+```
+[wsl2]
+memory=16GB
+processors=4
+swap=8GB
+localhostForwarding=true
+```
+
+### 3. Install NVIDIA CUDA Driver for WSL2
+
+1. Download the NVIDIA CUDA Driver for WSL2: [NVIDIA CUDA on WSL](https://developer.nvidia.com/cuda/wsl)
+2. Run the installer and follow the prompts
+3. Restart your computer after installation
+
+### 4. Verify GPU Access in WSL2
+
 ```bash
-# Inside Ubuntu WSL:
-wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
-sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
-sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/3bf863cc.pub
-sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/ /"
+# Inside Ubuntu WSL2
+
+# Update package information
 sudo apt update
-sudo apt -y install cuda
+
+# Install NVIDIA utilities
+sudo apt install -y nvidia-cuda-toolkit
+
+# Verify NVIDIA driver is accessible
+nvidia-smi
 ```
 
-### 3. Install Rust and Build Tools
+You should see output showing your GPU information and driver version. If not, verify your NVIDIA drivers are properly installed.
+
+## Docker GPU Setup
+
+### 1. Install Docker in WSL2
+
 ```bash
+# Inside Ubuntu WSL2
+
+# Remove any existing Docker installations
+sudo apt-get remove docker docker-engine docker.io containerd runc
+
+# Set up Docker repository
+sudo apt-get update
+sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+
+# Add Docker's official GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Set up stable repository
+echo \
+  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker Engine
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# Add your user to the docker group to run Docker without sudo
+sudo usermod -aG docker $USER
+
+# Apply the changes
+newgrp docker
+```
+
+### 2. Install NVIDIA Container Toolkit
+
+```bash
+# Inside Ubuntu WSL2
+
+# Add NVIDIA package repositories
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+
+# Install NVIDIA Container Toolkit
+sudo apt-get update
+sudo apt-get install -y nvidia-docker2
+
+# Restart Docker daemon
+sudo systemctl restart docker
+
+# Verify NVIDIA Container Toolkit installation
+docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
+```
+
+You should see the same GPU information that you saw when running `nvidia-smi` directly in WSL2.
+## Qdrant Configuration
+
+### 1. Download the Deployment Files
+
+First, create a working directory for your Qdrant deployment:
+
+```bash
+# Inside Ubuntu WSL2
+mkdir -p ~/qdrant-gpu-server
+cd ~/qdrant-gpu-server
+```
+
+Create the necessary files for deployment (or download them from your source repository):
+
+### 2. Create Docker Compose Configuration
+
+Create a file named `docker-compose.yml` with the following content:
+
+```yaml
+version: '3.8'
+
+services:
+  qdrant:
+    build: .
+    container_name: qdrant-server
+    ports:
+      - "6333:6333"  # HTTP
+      - "6334:6334"  # gRPC
+    volumes:
+      - qdrant_storage:/qdrant/storage
+      - ./config:/qdrant/config
+    environment:
+      - QDRANT_LOG_LEVEL=INFO
+      - RUST_LOG=info
+      - CUDA_VISIBLE_DEVICES=0  # Specify which GPU to use (0 is first GPU)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  qdrant_storage:
+```
+
+### 3. Create Dockerfile
+
+Create a file named `Dockerfile` with the following content:
+
+```dockerfile
+# Start from the CUDA base image
+FROM nvidia/cuda:12.0.1-devel-ubuntu22.04 AS builder
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source $HOME/.cargo/env
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
 
-# Install build essentials
-sudo apt update
-sudo apt install -y build-essential pkg-config libssl-dev clang
-```
-
-### 4. Build Qdrant with GPU Support
-```bash
 # Clone Qdrant repository
-git clone https://github.com/qdrant/qdrant.git
-cd qdrant
+WORKDIR /qdrant
+RUN git clone https://github.com/qdrant/qdrant.git .
 
-# Build with CUDA support
-CUDA=1 cargo build --release --bin qdrant
+# Build with GPU support
+ENV CUDA=1
+RUN cargo build --release --bin qdrant
 
-# Verify the build completed successfully
-ls -la target/release/qdrant
+# Final image
+FROM nvidia/cuda:12.0.1-runtime-ubuntu22.04
+
+# Copy the built Qdrant binary
+COPY --from=builder /qdrant/target/release/qdrant /qdrant/qdrant
+WORKDIR /qdrant
+
+# Default ports
+EXPOSE 6333 6334
+
+# Starting Qdrant
+CMD ["./qdrant"]
 ```
 
-## Configuration
+### 4. Create Qdrant Configuration
 
-### 1. Create Qdrant Configuration
+Create a configuration directory and file:
+
 ```bash
-# Create directory for configuration
-mkdir -p ~/qdrant/config
-mkdir -p ~/qdrant/storage
+# Create config directory
+mkdir -p ~/qdrant-gpu-server/config
 
 # Create configuration file
-cat << EOF > ~/qdrant/config/config.yaml
+cat > ~/qdrant-gpu-server/config/config.yaml << EOF
 log_level: INFO
 
 storage:
-  storage_path: /home/$(whoami)/qdrant/storage
+  storage_path: /qdrant/storage
 
 service:
   host: 0.0.0.0
@@ -117,46 +283,67 @@ optimizers:
 EOF
 ```
 
-### 2. Create Systemd Service
-Create a systemd service file to run Qdrant as a background service:
+### 5. Deploy Qdrant with Docker Compose
 
 ```bash
-sudo tee /etc/systemd/system/qdrant.service > /dev/null << EOF
-[Unit]
-Description=Qdrant Vector Search Engine with GPU Support
-After=network.target
-
-[Service]
-ExecStart=/home/$(whoami)/qdrant/target/release/qdrant --config /home/$(whoami)/qdrant/config/config.yaml
-Restart=always
-User=$(whoami)
-Environment="RUST_LOG=info"
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable and start the service
-sudo systemctl daemon-reload
-sudo systemctl enable qdrant
-sudo systemctl start qdrant
-
-# Check service status
-sudo systemctl status qdrant
+# From the ~/qdrant-gpu-server directory
+docker-compose up --build -d
 ```
 
-### 3. Open Firewall Ports
+This will:
+1. Build the Qdrant image with GPU support
+2. Start the container with GPU acceleration enabled
+3. Mount the configuration and storage volumes
+4. Expose the HTTP and gRPC ports
+
+### 6. Verify Deployment
+
+```bash
+# Check that the container is running
+docker ps
+
+# Check logs for any errors
+docker logs qdrant-server
+
+# Test the HTTP API
+curl http://localhost:6333/healthz
+```
+
+### 7. Open Firewall Ports
+
 ```powershell
 # In PowerShell (Admin) on Windows:
 New-NetFirewallRule -DisplayName "Qdrant HTTP API" -Direction Inbound -LocalPort 6333 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "Qdrant gRPC API" -Direction Inbound -LocalPort 6334 -Protocol TCP -Action Allow
 ```
+New-NetFirewallRule -DisplayName "Qdrant gRPC API" -Direction Inbound -LocalPort 6334 -Protocol TCP -Action Allow
+```
 
-## Integration with ArXiv Pipeline
+## Connecting to Qdrant
 
-### 1. Install Python Client
+### 1. Find Your Server's IP Address
+
+You'll need to know the IP address of your Qdrant server to connect to it from other machines on the network:
+
 ```bash
-# In your ArXiv Pipeline Python environment
+# In WSL2:
+ip addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'
+```
+
+Or in Windows:
+
+```powershell
+ipconfig
+```
+
+Note the IPv4 address for your network interface.
+
+### 2. Install Python Client
+
+On the machine that will connect to Qdrant (your main application server), install the Qdrant client:
+
+```bash
+# In your Python environment
 pip install qdrant-client
 ```
 
@@ -183,13 +370,16 @@ if __name__ == "__main__":
 ```
 
 ### 3. Create Paper Embeddings Collection
+
+Create a Python script to set up your vector collection:
+
 ```python
 # create_collection.py
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 
-# Replace with your Qdrant server's IP address
-QDRANT_HOST = "192.168.1.x"
+# Replace with your Qdrant server's IP address from step 1
+QDRANT_HOST = "192.168.1.x"  # Change to your server's actual IP
 QDRANT_PORT = 6333
 
 def create_arxiv_collection():
@@ -239,7 +429,7 @@ qdrant:
   collection_name: "arxiv_papers"
 ```
 
-## Testing
+## Performance Tuning
 
 ### 1. Verify Installation
 ```bash

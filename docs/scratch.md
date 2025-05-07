@@ -19,9 +19,16 @@
 - http://localhost:8000/docs# api documentation
 - http://localhost:3000/docs# web ui documentation (blank)
 - Jupyter notebook docker runs last to more easily rind key, restart Jupyter docker might needed to find key again
-- docker-compose --profile manual up zookeeper kafka
 - docker-compose --profile manual up zookeeper kafka kafka-ui *http://localhost:8080*
 - check readme.md for possible deletion database connections information
+- setup ollama docker for use on external machine and local machine
+- setup qdrant docker for use on external machine and local machine
+- setup mongodb docker for use on external machine and local machine
+- setup neo4j docker for use on external machine and local machine
+- setup zookeeper docker for use on external machine and local machine
+- setup kafka docker for use on external machine and local machine
+- setup kafka-ui docker for use on external machine and local machine
+- ollama api check http://localhost:11434/
 
 cd src\web-ui
 $env:PORT=3001

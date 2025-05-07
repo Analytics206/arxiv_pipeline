@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  qdrant:
+    build: .
+    container_name: qdrant-server
+    ports:
+      - "6333:6333"  # HTTP
+      - "6334:6334"  # gRPC
+    volumes:
+      - qdrant_storage:/qdrant/storage
+      - ./config:/qdrant/config
+    environment:
+      - QDRANT_LOG_LEVEL=INFO
+      - RUST_LOG=info
+      - CUDA_VISIBLE_DEVICES=0  # Specify which GPU to use (0 is first GPU)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  qdrant_storage:
