@@ -7,6 +7,9 @@
 - **FR-DCK-01**: System shall provide Dockerfiles for each service (ingestion, db, embedding, etc.)
 - **FR-DCK-02**: System shall include a `docker-compose.yml` file to orchestrate local setup
 - **FR-DCK-03**: Docker containers shall support volume mounting for persistent local data
+- **FR-DCK-04**: System shall provide standalone Docker configurations for external deployment of key services
+- **FR-DCK-05**: External Docker configurations shall be independent of the main pipeline and require no other components
+- **FR-DCK-06**: External Docker configurations shall include detailed setup documentation
 
 ### 3.1 Ingestion (FR-ING)
 - **FR-ING-01**: Support fetching metadata from arXiv Atom XML API

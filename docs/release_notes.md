@@ -4,12 +4,14 @@
 
 ### Major Features
 
-#### Messaging System Integration
-- **Kafka Integration** - Added Apache Kafka for distributed messaging and event streaming
-- **Event-Driven Architecture** - Established foundation for event-driven data processing
-- **Producer/Consumer Framework** - Created infrastructure for asynchronous data flow between components
-- **Confluent Platform** - Implemented industry-standard Kafka ecosystem components
-- **Kafka UI** - Added modern web interface for Kafka management and monitoring
+#### External Service Deployment Options
+- **External Docker Environments** - Added standalone Docker configurations for running key services on separate machines
+- **Ollama External Setup** - Created dedicated Docker setup for running Ollama on a separate machine with detailed model management instructions
+- **MongoDB External Setup** - Implemented standalone MongoDB Docker configuration with security and performance optimizations
+- **Neo4j External Setup** - Created external Neo4j deployment with persistent storage and optimized configuration
+- **Qdrant GPU Setup** - Enhanced existing GPU-accelerated Qdrant setup with updated Docker configuration
+- **Network Integration** - Streamlined connectivity between externally deployed services and the main pipeline
+- **Configuration Independence** - Ensured each service can be deployed independently without dependencies on the main project
 
 ## Version 0.4.0 (May 6, 2025)
 
@@ -36,6 +38,13 @@
 - **Resource Utilization** - Improved memory and CPU usage across containerized services
 - **FastAPI Backend** - Added new FastAPI docker container with MongoDB connection for data ingestion (Qdrant and Neo4j planned next release)
 - **API Documentation** - Implemented automatic Swagger documentation for the API endpoints
+
+#### Messaging System Integration
+- **Kafka Integration** - Added Apache Kafka for distributed messaging and event streaming
+- **Event-Driven Architecture** - Established foundation for event-driven data processing
+- **Producer/Consumer Framework** - Created infrastructure for asynchronous data flow between components
+- **Confluent Platform** - Implemented industry-standard Kafka ecosystem components
+- **Kafka UI** - Added modern web interface for Kafka management and monitoring
 
 ### Documentation
 - **User Interface Guide** - Added documentation for navigating the enhanced web UI

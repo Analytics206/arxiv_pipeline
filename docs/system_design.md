@@ -47,6 +47,10 @@ Unlike the Business Requirements Document (BRD) and Product Requirements Documen
 | Multi-GPU Support | Configurable GPU device selection for performance optimization | May 4, 2025 |
 | Remote Qdrant with GPU | WSL2-based GPU-accelerated Qdrant on separate Windows machine | May 4, 2025 |
 | Native Rust Compilation | Optimized Qdrant performance through direct CUDA-enabled compilation | May 4, 2025 |
+| External Ollama Deployment | Standalone Docker setup for Ollama on separate machines | May 7, 2025 |
+| External MongoDB Deployment | Standalone Docker setup for MongoDB with persistent storage | May 7, 2025 |
+| External Neo4j Deployment | Standalone Docker setup for Neo4j graph database | May 7, 2025 |
+| Enhanced Qdrant GPU Setup | Updated Docker configuration for GPU-accelerated Qdrant | May 7, 2025 |
 
 ### System Monitoring
 

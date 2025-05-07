@@ -55,6 +55,9 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 - **MongoDB**: NoSQL document database for paper metadata storage
   - Collections: papers, authors, categories
   - Indexes for efficient querying
+  - Deployment options:
+    - Docker container: Standard deployment within main pipeline
+    - External Docker: Standalone deployment on separate machine with persistent storage
 - **Docker volumes**: Persistent storage for database contents
 
 ### Graph Representation
@@ -62,16 +65,26 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
   - Nodes: Papers, Authors, Categories 
   - Relationships: AUTHORED, BELONGS_TO
   - Cypher query language
+  - Deployment options:
+    - Docker container: Standard deployment within main pipeline
+    - External Docker: Standalone deployment on separate machine with persistent storage
 - **Neo4j Python Driver**: Interface for graph operations
 
 ### Vector Embeddings
 - **Hugging Face Transformers**: Machine learning models for text embeddings
 - **PyTorch with CUDA**: GPU-accelerated embeddings generation
+- **Ollama**: Local LLM server for text analysis and embedding generation
+  - Deployment options:
+    - Local instance: Run directly on the host machine
+    - Docker container: Standard deployment within main pipeline
+    - External Docker: Standalone deployment on separate machine with model management
 - **Qdrant**: Vector database for similarity search
   - Collections: paper_embeddings
   - Storage of metadata with vectors
   - Deployment options:
     - Docker container: Standard deployment
+    - External Docker: Standalone deployment on separate machine
+    - WSL2 GPU-accelerated: Enhanced performance with CUDA support
     - Standalone with GPU: Direct installation with CUDA support
     - Remote WSL2 with GPU: Dedicated vector server on separate machine
   - Vector optimization: Native GPU acceleration through Rust with CUDA
@@ -125,7 +138,7 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 
 ## Deployment Architecture
 
-The system supports three deployment architectures:
+The system supports four deployment architectures:
 
 ### 1. Full Docker Deployment with Monitoring
 
@@ -197,6 +210,29 @@ The system supports three deployment architectures:
 │ │Embeddings│ vector generation                        │
 │ └─────────┘                                           │
 └──────────────────────────────────────────────────────┘
+```
+
+### 4. Distributed Services Deployment
+```
+┌────────────────────────────────────────────┐     ┌────────────────────────────────────────────┐
+│          Machine 1 (Main Pipeline)         │     │          Machine 2 (MongoDB)               │
+│                                            │     │                                            │
+│ ┌─────────┐     ┌──────────┐     ┌──────┐ │     │ ┌──────────┐                               │
+│ │  app    │────▶│sync-neo4j│────▶│web-ui│ │     │ │ mongodb  │◀─────────────────────────────┤
+│ │         │     │          │     │      │ │     │ │          │                               │
+│ └─────────┘     └──────────┘     └──────┘ │     │ └──────────┘                               │
+└────────────────────────────────────────────┘     └────────────────────────────────────────────┘
+                       ▲
+                       │
+                       ▼
+┌────────────────────────────────────────────┐     ┌────────────────────────────────────────────┐
+│          Machine 3 (Neo4j)                 │     │          Machine 4 (Qdrant GPU)            │
+│                                            │     │                                            │
+│ ┌──────────┐                               │     │ ┌─────────┐                                │
+│ │  neo4j   │◀─────────────────────────────┤     │ │ qdrant  │◀─────────────────────────────┤
+│ │          │                               │     │ │ (GPU)   │                                │
+│ └──────────┘                               │     │ └─────────┘                                │
+└────────────────────────────────────────────┘     └────────────────────────────────────────────┘
 ```
 
 ## Database Schema
