@@ -27,7 +27,7 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 | **Ingestion Service** | Fetches papers(metadata) using arXiv Atom XML API      |
 | **MongoDB**           | Stores normalized paper metadata and paper processing tracking    |
 | **Neo4j**             | Stores the author-paper-category graph       |
-| **Qdrant**            | Stores paper vector embeddings for semantic search |
+| **Qdrant**            | Stores paper vector embeddings for semantic search with metrics tracking |
 | **Config Manager**    | Central config for category, limits, model   |
 | **User Interface**    | Web UI for interaction with graphs           |
 | **Logger**            | Tracks events, errors, and skipped entries   |
@@ -289,6 +289,12 @@ neo4j:
 qdrant:
   url: "http://localhost:6333" #Access Qdrant UI http://localhost:6333/dashboard
   collection_name: "arxiv_papers"
+
+# Qdrant API Metrics
+# The database dashboard displays the following Qdrant metrics:
+# - Papers: Number of vector embeddings stored in Qdrant (paper count)
+# - Authors: Vector dimensions (typically 768 for research paper embeddings)
+# - Categories: Number of collections in Qdrant
   vector_size: 768  # For all-MiniLM-L6-v2 model
 ```
 ## 6. Web UI

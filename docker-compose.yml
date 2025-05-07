@@ -24,8 +24,15 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000
     depends_on:
       - mongodb
+      - qdrant
     environment:
       - MONGO_CONNECTION_STRING=mongodb://mongodb:27017/
+      - MONGO_DB=arxiv_papers
+      - MONGO_COLLECTION=papers
+      - MONGO_TRACKING_COLLECTION=vector_processed_pdfs
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - QDRANT_COLLECTION=arxiv_papers
     volumes:
       - ./src/api:/app
     ports:

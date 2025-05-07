@@ -19,13 +19,17 @@
 - **Home Page Implementation** - Added new home page to the web UI with centralized navigation
 - **Integration Links** - Added links to Neo4j Explorer from previous web UI release
 - **Placeholder Pages** - Created landing pages for MongoDB Reports, QDrant Search, Jupyter Notebooks, Config Editor, and Pipeline Management
-- **API Integration** - Implemented web UI connection to FastAPI backend for live data ingestion from MongoDB
+- **API Integration** - Implemented web UI connection to FastAPI backend for live data ingestion from MongoDB and Qdrant
 - **Pipeline API Access** - Added direct link to Pipeline API Swagger documentation in the navigation bar
+- **Qdrant Connection** - Established API connectivity between web-ui and Qdrant through FastAPI backend
 
 #### Database Status Dashboard
 - **Connection Status Indicators** - Added real-time status indicators for Neo4j, MongoDB, and Qdrant connections
 - **Database Statistics** - Implemented counters for Papers, Authors, and Categories across all data stores
 - **MongoDB Integration** - Added direct connection to MongoDB for accurate document counts
+- **Qdrant Integration** - Implemented Qdrant connection and metrics retrieval through API endpoints
+- **Enhanced Qdrant Metrics** - Added reliable paper counts, vector dimensions, and collection metrics for Qdrant in the database dashboard
+- **Fallback Mechanism** - Implemented robust fallback to known good values when API connections experience issues
 
 #### Infrastructure Improvements
 - **Docker Environment Cleanup** - Optimized Docker container configuration and removed redundancies

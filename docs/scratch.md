@@ -21,7 +21,7 @@
 - Jupyter notebook docker runs last to more easily rind key, restart Jupyter docker might needed to find key again
 - docker-compose --profile manual up zookeeper kafka
 - docker-compose --profile manual up zookeeper kafka kafka-ui *http://localhost:8080*
-
+- check readme.md for possible deletion database connections information
 
 cd src\web-ui
 $env:PORT=3001

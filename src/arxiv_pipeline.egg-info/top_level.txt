@@ -1,4 +1,6 @@
 __init__
+agents
+agents_core
 api
 embedding
 graph

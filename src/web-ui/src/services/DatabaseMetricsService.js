@@ -93,9 +93,59 @@ export const checkMongoDBConnection = async () => {
 
 // Check Qdrant connection
 export const checkQdrantConnection = async () => {
-  // This would be implemented with actual Qdrant connection check
-  // Currently returning mock disconnected status
-  return { connected: false };
+  try {
+    console.log(`Attempting to connect to Qdrant API at: ${apiConfig.API_BASE_URL}/metrics/qdrant/test-connection`);
+    const response = await fetch(`${apiConfig.API_BASE_URL}/metrics/qdrant/test-connection`);
+    
+    if (!response.ok) {
+      console.error(`Qdrant API not reachable. Status: ${response.status}, StatusText: ${response.statusText}`);
+      return { connected: false, error: `API Error: ${response.status} ${response.statusText}` };
+    }
+    
+    const data = await response.json();
+    console.log('Qdrant connection response:', data);
+    
+    // Return connected true only if status is success
+    const isConnected = data.status === 'success';
+    return { 
+      connected: isConnected,
+      message: data.message || '',
+      status: data.status || 'unknown'
+    };
+  } catch (error) {
+    console.error('Qdrant connection check failed:', error);
+    return { connected: false, error: error.message };
+  }
+};
+
+// Get Qdrant metrics
+export const getQdrantMetrics = async (isConnected) => {
+  if (!isConnected) {
+    console.log('Skipping Qdrant metrics fetch - not connected');
+    return { papers: 0, authors: 0, categories: 0 };
+  }
+  
+  try {
+    console.log(`Fetching Qdrant metrics from: ${apiConfig.API_BASE_URL}/metrics/qdrant/paper-stats`);
+    const response = await fetch(`${apiConfig.API_BASE_URL}/metrics/qdrant/paper-stats`);
+    
+    if (!response.ok) {
+      console.error(`Failed to fetch Qdrant metrics. Status: ${response.status}, StatusText: ${response.statusText}`);
+      return { papers: 0, authors: 0, categories: 0 };
+    }
+    
+    const stats = await response.json();
+    console.log('Received Qdrant metrics:', stats);
+    
+    return {
+      papers: stats.papers || 0,
+      authors: stats.authors || 0,
+      categories: stats.categories || 0
+    };
+  } catch (error) {
+    console.error('Failed to fetch Qdrant metrics:', error);
+    return { papers: 0, authors: 0, categories: 0 };
+  }
 };
 
 // Get all database metrics
@@ -136,7 +186,7 @@ export const getAllDatabaseMetrics = async () => {
     },
     qdrant: {
       connected: qdrantConnection.connected,
-      metrics: { papers: 0, authors: 0, categories: 0 }
+      metrics: await getQdrantMetrics(qdrantConnection.connected)
     }
   };
 };
