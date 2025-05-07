@@ -19,6 +19,9 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-DCK-01   | Dockerfiles for each service                             | BRD-00        | ✅     |                            |
 | FR-DCK-02   | Docker Compose for orchestration                         | BRD-00        | ✅     |                            |
 | FR-DCK-03   | Volume support for persistent local data                 | BRD-00        | ✅     |                            |
+| FR-DCK-04   | Standalone Docker configurations for external deployment  | BRD-16        | ✅     | External deployments for Ollama, MongoDB, Neo4j, Qdrant |
+| FR-DCK-05   | Independent external configurations                       | BRD-16        | ✅     | No dependencies on main pipeline |
+| FR-DCK-06   | Detailed setup documentation for external deployments    | BRD-16        | ✅     | README files with comprehensive instructions |
 
 | FR-ING-01   | Fetch metadata from arXiv Atom XML API                   | BRD-01        | ✅     | Implemented in fetch.py    |
 | FR-ING-02   | Configurable category querying (initial: cs.AI)          | BRD-01        | ✅     | Implemented in fetch.py    |

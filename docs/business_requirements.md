@@ -29,6 +29,7 @@ A modular, offline-capable pipeline that fetches and stores research papers from
 | BRD-10     | Interactive database exploration and testing via Jupyter notebooks | FR-REP-01, FR-REP-02 |
 | BRD-11     | GPU-accelerated vector search with dedicated remote setup | FR-VEC-05, FR-VEC-06, FR-VEC-07 |
 | BRD-12     | PDF download and storage | FR-PDF-01 |
-| BRD-13     | Configurable AI Agent plateform | FR-AGT-01 |
-| BRD-14     | Web UI to start/stops pipelines, view logs, databases status| FR-UI-02 |
-| BRD-15     | web UI to mangage configurations for pipelines | FR-UI-03 |
+| BRD-13     | Configurable AI Agent platform | FR-AGT-01 |
+| BRD-14     | Web UI to start/stop pipelines, view logs, database status | FR-UI-02 |
+| BRD-15     | Web UI to manage configurations for pipelines | FR-UI-03 |
+| BRD-16     | Standalone deployment of key services on external machines | FR-DCK-04, FR-DCK-05, FR-DCK-06 |
