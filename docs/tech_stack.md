@@ -26,6 +26,13 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 - **UV Package Manager**: Fast Python dependency management
 - **Git**: Version control system
 
+### Messaging System
+- **Apache Kafka**: Distributed event streaming platform for high-throughput, fault-tolerant messaging
+- **Confluent Platform**: Enterprise-ready distribution of Kafka
+- **Zookeeper**: Coordinates the Kafka cluster
+- **Confluent Kafka Python Client**: Python client library for producer/consumer interactions
+- **Kafka UI**: Web interface for Kafka cluster management and monitoring (provectuslabs/kafka-ui)
+
 ### Monitoring & Observability
 - **Prometheus**: Time series database for metrics collection and storage
   - Metrics: container performance, system resources, application metrics

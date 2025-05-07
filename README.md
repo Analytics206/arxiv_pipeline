@@ -34,6 +34,9 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 | **Docker Compose**    | Brings it all together for local use         |
 | **Prometheus**        | Time series database for system metrics collection  |
 | **Grafana**           | Visualization platform for system metrics dashboards |
+| **Kafka**             | Distributed event streaming platform for messaging |
+| **Zookeeper**         | Coordinates the Kafka cluster                |
+| **Kafka UI**          | Web interface for Kafka management and monitoring |
 
 ---
 ## 🧵 High Level Overview
@@ -147,6 +150,7 @@ source .venv/bin/activate
 ## 2. Managing Pipeline Service Containers
    * pipelines do not have to run in order if you have previously run them or starting where you left off
    * recommended to run them in order for processing new papers
+   * manual services (Jupyter, Kafka, etc.) are only started when needed with the `--profile manual` flag
   ### a. Run sync_mongodb pipeline to fetch papers from ArXiv API and store in MongoDB:
   ```bash
   # Run the sync-mongodb pipeline container
@@ -236,7 +240,42 @@ f. **Monitoring Diagnostics**
 
 * Refer to `docs/grafana_dashboard_guide.md` for details on customizing and extending these dashboards.**
 
-## 4. Database Connection Settings
+## 4. Managing Manual Services
+
+The following services are configured with the `manual` profile in Docker Compose, which means they will only start when explicitly requested:
+
+### a. Jupyter Notebooks for Data Analysis
+```bash
+# Start Jupyter SciPy notebook server
+docker compose --profile manual up jupyter-scipy
+
+# Stop Jupyter SciPy notebook server
+docker compose --profile manual down jupyter-scipy
+```
+* Access at: http://localhost:8888 (check console for token)
+* Note: If token access is lost, restart the Jupyter docker container to get a new token
+
+### b. Kafka Messaging System
+```bash
+# Start Kafka with required Zookeeper service
+docker compose --profile manual up zookeeper kafka
+
+# Stop Kafka and Zookeeper services
+docker compose --profile manual down zookeeper kafka
+```
+* Kafka broker accessible at: localhost:9092 (from host) or kafka:9092 (from other containers)
+
+### c. Kafka UI Management Interface
+```bash
+# Start complete Kafka stack with UI
+docker compose --profile manual up zookeeper kafka kafka-ui
+
+# Stop complete Kafka stack
+docker compose --profile manual down zookeeper kafka kafka-ui
+```
+* Access Kafka UI at: http://localhost:8080
+
+## 5. Database Connection Settings
 ```yaml
 mongo:
   connection_string: "mongodb://mongodb:27017/" # or http://localhost:27017
@@ -252,7 +291,7 @@ qdrant:
   collection_name: "arxiv_papers"
   vector_size: 768  # For all-MiniLM-L6-v2 model
 ```
-## 5. Web UI
+## 6. Web UI
 * To restart Web UI docker service, starts with docker-compose up above:
    ```bash
    docker-compose up -d web-ui
@@ -282,7 +321,7 @@ c. **Start the development server**:
 
 * The web UI connects to Neo4j using environment variables defined in the docker-compose.yml file.
 
-## 6. Managing Individual Docker Containers
+## 7. Managing Individual Docker Containers
 * For more fine-grained control over system components, you can start, stop, restart, and inspect specific containers:
 
 ### a. Starting Individual Required Containers

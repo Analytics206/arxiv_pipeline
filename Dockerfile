@@ -12,6 +12,9 @@ COPY setup.py .
 # Install Python dependencies (cached unless these files change)
 RUN uv pip install --system -e .
 
+# Install Kafka client
+RUN uv pip install --system confluent-kafka
+
 # Now copy the rest of your code
 COPY . .
 

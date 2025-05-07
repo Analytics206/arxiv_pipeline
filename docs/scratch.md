@@ -19,6 +19,9 @@
 - http://localhost:8000/docs# api documentation
 - http://localhost:3000/docs# web ui documentation (blank)
 - Jupyter notebook docker runs last to more easily rind key, restart Jupyter docker might needed to find key again
+- docker-compose --profile manual up zookeeper kafka
+- docker-compose --profile manual up zookeeper kafka kafka-ui *http://localhost:8080*
+
 
 cd src\web-ui
 $env:PORT=3001

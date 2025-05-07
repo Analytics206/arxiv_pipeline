@@ -1,5 +1,16 @@
 # ArXiv Deep Research Pipeline Release Notes
 
+## Version 0.5.0 (May 7, 2025)
+
+### Major Features
+
+#### Messaging System Integration
+- **Kafka Integration** - Added Apache Kafka for distributed messaging and event streaming
+- **Event-Driven Architecture** - Established foundation for event-driven data processing
+- **Producer/Consumer Framework** - Created infrastructure for asynchronous data flow between components
+- **Confluent Platform** - Implemented industry-standard Kafka ecosystem components
+- **Kafka UI** - Added modern web interface for Kafka management and monitoring
+
 ## Version 0.4.0 (May 6, 2025)
 
 ### Major Features
