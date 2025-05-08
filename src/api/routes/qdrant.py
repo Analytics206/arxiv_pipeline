@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 import requests
 import os
 import logging
 import json
+import subprocess
+import sys
 from typing import Dict, Any
 
 router = APIRouter()
@@ -15,10 +17,38 @@ logger = logging.getLogger(__name__)
 QDRANT_HOST = os.getenv("QDRANT_HOST", "qdrant")
 QDRANT_PORT = os.getenv("QDRANT_PORT", "6333")
 QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "arxiv_papers")
+SUMMARY_COLLECTION = os.getenv("SUMMARY_COLLECTION", "papers_summary")
 
 QDRANT_BASE_URL = f"http://{QDRANT_HOST}:{QDRANT_PORT}"
 
-logger.info(f"Qdrant configured with URL: {QDRANT_BASE_URL}, Collection: {QDRANT_COLLECTION}")
+logger.info(f"Qdrant configured with URL: {QDRANT_BASE_URL}, Collections: {QDRANT_COLLECTION}, {SUMMARY_COLLECTION}")
+
+# Dictionary to track running processes
+running_processes = {}
+
+# Utility function to run a Python script in the background
+def run_script_in_background(script_path):
+    process_id = f"script_{len(running_processes) + 1}"
+    
+    # Construct the command to run the script
+    cmd = [sys.executable, script_path]
+    
+    # Start the process
+    process = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+    
+    # Store the process
+    running_processes[process_id] = {
+        "process": process,
+        "script": script_path,
+        "status": "running"
+    }
+    
+    return process_id
 
 @router.get("/test-connection", tags=["qdrant"])
 def test_qdrant_connection() -> Dict[str, Any]:
@@ -130,4 +160,104 @@ def qdrant_paper_stats() -> Dict[str, int]:
         "papers": vector_count,        # First column: number of vectors/papers 
         "authors": vector_dimensions,  # Second column: vector dimensions
         "categories": collection_count # Third column: collection count
+    }
+
+@router.get("/summary-stats", tags=["qdrant"])
+def qdrant_summary_stats() -> Dict[str, int]:
+    """
+    Returns stats for Qdrant summary collection: vector count (papers), vector dimensions, and collection count.
+    """
+    # Default values if API fails
+    vector_count = 0           # Default to zero for new collection
+    vector_dimensions = 768    # Standard dimension for research paper embeddings
+    collection_count = 1       # The summary collection
+    
+    try:
+        # Try to get the collection info directly
+        collection_url = f"{QDRANT_BASE_URL}/collections/{SUMMARY_COLLECTION}"
+        collection_resp = requests.get(collection_url, timeout=3)
+        
+        if collection_resp.status_code == 200:
+            collection_data = collection_resp.json()
+            logger.info(f"Got summary collection info response with status code {collection_resp.status_code}")
+            
+            # Try to extract vector dimensions and count
+            if "result" in collection_data and "vectors" in collection_data["result"]:
+                vectors_data = collection_data["result"]["vectors"]
+                
+                # Extract vector dimensions and count from first vector
+                for vector_name, vector_info in vectors_data.items():
+                    if "size" in vector_info:
+                        vector_dimensions = vector_info["size"]
+                    if "num_vectors" in vector_info:
+                        vector_count = vector_info["num_vectors"]
+    
+    except Exception as e:
+        logger.error(f"Error fetching Qdrant summary metrics: {str(e)}")
+    
+    # Return metrics in the expected format
+    return {
+        "papers": vector_count,        # First column: number of summary vectors 
+        "authors": vector_dimensions,  # Second column: vector dimensions
+        "categories": collection_count # Third column: collection count
+    }
+
+@router.post("/sync-summaries", tags=["qdrant"])
+def sync_summary_vectors(background_tasks: BackgroundTasks) -> Dict[str, Any]:
+    """
+    Starts a background task to sync paper summaries from MongoDB to Qdrant.
+    """
+    # Path to the sync script
+    script_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+        "pipeline",
+        "sync_summary_vectors.py"
+    )
+    
+    if not os.path.exists(script_path):
+        raise HTTPException(status_code=404, detail=f"Script not found: {script_path}")
+    
+    # Run the script in the background
+    process_id = run_script_in_background(script_path)
+    
+    return {
+        "status": "started",
+        "message": "Paper summaries synchronization started",
+        "process_id": process_id
+    }
+
+@router.get("/sync-status/{process_id}", tags=["qdrant"])
+def check_sync_status(process_id: str) -> Dict[str, Any]:
+    """
+    Checks the status of a background sync process.
+    """
+    if process_id not in running_processes:
+        raise HTTPException(status_code=404, detail=f"Process ID not found: {process_id}")
+    
+    process_info = running_processes[process_id]
+    process = process_info["process"]
+    
+    # Check if the process is still running
+    if process.poll() is None:
+        return {
+            "status": "running",
+            "message": f"Process {process_id} is still running"
+        }
+    
+    # Process has completed, get output
+    stdout, stderr = process.communicate()
+    exit_code = process.returncode
+    
+    # Update process status
+    process_info["status"] = "completed" if exit_code == 0 else "failed"
+    process_info["exit_code"] = exit_code
+    process_info["stdout"] = stdout
+    process_info["stderr"] = stderr
+    
+    return {
+        "status": process_info["status"],
+        "exit_code": exit_code,
+        "message": "Process completed successfully" if exit_code == 0 else "Process failed",
+        "stdout": stdout,
+        "stderr": stderr
     }

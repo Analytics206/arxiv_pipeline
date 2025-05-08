@@ -1,5 +1,29 @@
 # ArXiv Deep Research Pipeline Release Notes
 
+## Version 0.6.0 (May 8, 2025)
+
+### Major Features
+
+#### Paper Summaries Vector Database Integration
+- **Summary Vector Collection** - Created new Qdrant collection for paper summaries independent from full-text embeddings
+- **MongoDB Integration** - Implemented direct extraction of paper summaries from the MongoDB papers collection
+- **Configurable Categories** - Added separate category configuration for summary processing
+- **Date-based Filtering** - Added start/end date filtering for paper summaries processing
+- **Tracking System** - Implemented MongoDB-based tracking for processed summaries with the summary_processed_papers collection
+- **API Integration** - Added FastAPI endpoints for managing and monitoring summary vector processing
+- **Background Processing** - Implemented asynchronous background task processing for summary vectors
+
+### Technical Improvements
+- **Process Isolation** - Created isolated process for summary vectors separate from PDF-based vectors
+- **Configuration Structure** - Enhanced YAML configuration with dedicated paper_summaries section
+- **Batch Processing** - Implemented batch-based processing for efficient summary vectorization
+- **Status Monitoring** - Added API endpoints for checking processing status
+
+### Documentation
+- **Tech Stack Update** - Updated tech stack documentation with new Qdrant collection details
+- **Configuration Documentation** - Added documentation for the new configuration options
+
+
 ## Version 0.5.0 (May 7, 2025)
 
 ### Major Features

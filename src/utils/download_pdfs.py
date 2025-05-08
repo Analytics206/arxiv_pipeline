@@ -13,7 +13,7 @@ def load_config():
 config = load_config()
 
 # Get settings from config
-MONGO_URI = os.getenv("MONGO_URI", config['mongo']['connection_string'])
+MONGO_URI = os.getenv("MONGO_URI", config['mongo']['connection_string_local'])
 DB_NAME = config['mongo']['db_name']
 COLLECTION_NAME = "papers"
 PDF_DIR = config['pdf_storage']['directory']
@@ -42,11 +42,19 @@ def ensure_dir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
+def extract_arxiv_id(pdf_url):
+    """
+    Extract arXiv ID from a PDF URL.
+    Example: http://arxiv.org/pdf/2504.18538v1 -> 2504.18538v1
+    """
+    if not pdf_url:
+        return ""
+    return pdf_url.rstrip("/").split("/")[-1]
+
 def get_pdf_filename(paper):
     # Extract arXiv ID from the pdf_url or id field
     pdf_url = paper.get("pdf_url", "")
-    # Example: http://arxiv.org/pdf/2504.18538v1
-    arxiv_id = pdf_url.rstrip("/").split("/")[-1]
+    arxiv_id = extract_arxiv_id(pdf_url)
     return f"{arxiv_id}.pdf"
 
 def download_pdf(url, filepath):
@@ -109,10 +117,31 @@ def sort_papers_by_date(papers, ascending=False):
     
     return sorted(papers, key=get_date, reverse=not ascending)
 
+def get_downloaded_papers_from_db(db):
+    """
+    Fetch previously downloaded papers from the downloaded_pdfs collection.
+    Returns a set of arXiv IDs.
+    """
+    # Check if collection exists
+    if 'downloaded_pdfs' not in db.list_collection_names():
+        print("Warning: 'downloaded_pdfs' collection not found. Run track_downloaded_pdfs.py first.")
+        return set()
+    
+    # Get collection
+    downloaded_pdfs_collection = db.get_collection('downloaded_pdfs')
+    
+    # Get papers that are marked as downloaded
+    downloaded_papers = downloaded_pdfs_collection.find({"downloaded": True}, {"arxiv_id": 1})
+    return {paper["arxiv_id"] for paper in downloaded_papers}
+
 def main():
     ensure_dir(PDF_DIR)
     client = MongoClient(MONGO_URI)
     db = client[DB_NAME]
+    
+    # Get already downloaded papers from downloaded_pdfs collection
+    downloaded_papers = get_downloaded_papers_from_db(db)
+    print(f"Found {len(downloaded_papers)} already downloaded papers in MongoDB")
     
     # Query MongoDB for papers with PDF URLs
     query = {"pdf_url": {"$exists": True, "$ne": ""}}
@@ -155,10 +184,13 @@ def main():
     
     # Track paper count per category
     category_counts = {}
+    already_downloaded_count = 0
+    skipped_count = 0
+    downloaded_count = 0
     total_papers = len(papers)
     
     # Process all papers by category
-    for paper in tqdm(papers, desc=f"Downloading PDFs ({total_papers} papers)"):
+    for paper in tqdm(papers, desc=f"Processing {total_papers} papers"):
         pdf_url = paper.get("pdf_url")
         if not pdf_url:
             continue
@@ -170,6 +202,14 @@ def main():
         else:
             # Use the first category as the primary one
             category_dir = categories[0]
+        
+        # Extract arXiv ID to check against downloaded_pdfs collection
+        arxiv_id = extract_arxiv_id(pdf_url)
+        
+        # Skip if already in MongoDB downloaded_pdfs collection
+        if arxiv_id in downloaded_papers:
+            already_downloaded_count += 1
+            continue
             
         # Create category directory if it doesn't exist
         category_path = os.path.join(PDF_DIR, category_dir)
@@ -187,26 +227,36 @@ def main():
                 
             # Skip if we've reached the limit for this category
             if category_counts[category_dir] >= PAPERS_PER_CATEGORY:
+                skipped_count += 1
                 continue
         
-        # Skip if already downloaded - this check comes AFTER the limit check
-        # so we don't count already downloaded PDFs toward the limit
+        # Skip if file already exists on disk (secondary check)
         if os.path.exists(filepath):
+            already_downloaded_count += 1
             continue
             
         # Download the PDF
         success = download_pdf(pdf_url, filepath)
         
         # Increment counter if download was successful - only counts NEW downloads
-        if success and PAPERS_PER_CATEGORY > 0:
-            category_counts[category_dir] += 1
+        if success:
+            downloaded_count += 1
+            if PAPERS_PER_CATEGORY > 0:
+                category_counts[category_dir] += 1
             
+    # Print summary of all operations
+    print("\n===== Download Summary =====")
+    print(f"Total papers processed: {total_papers}")
+    print(f"Papers already in downloaded_pdfs collection: {already_downloaded_count}")
+    print(f"Papers skipped due to category limits: {skipped_count}")
+    print(f"Papers successfully downloaded: {downloaded_count}")
+    
     # Print summary of papers downloaded per category
     if category_counts:
-        print("\nPapers downloaded per category:")
+        print("\nNewly downloaded papers by category:")
         for category, count in category_counts.items():
             print(f"  {category}: {count}" + (" (reached limit)" if PAPERS_PER_CATEGORY > 0 and count >= PAPERS_PER_CATEGORY else ""))
-    else:
+    elif downloaded_count == 0:
         print("\nNo new papers were downloaded.")
 
 if __name__ == "__main__":

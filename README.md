@@ -143,6 +143,7 @@ source .venv/bin/activate
  - ✔ Network arxiv_pipeline_default         Started     
  - ✔ Container arxiv_pipeline-neo4j-1       Started     
  - ✔ Container arxiv_pipeline-mongodb-1     Started 
+ - ✔ Container arxiv_pipeline-qdrant-1      Started 
  - ✔ Container arxiv_pipeline-web-ui-1      Started   
  - ✔ Container arxiv_pipeline-api-1         Started   
  - ✔ Container arxiv_pipeline-app-1         Started 

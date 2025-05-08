@@ -265,10 +265,18 @@ The system supports four deployment architectures:
   - (:Paper)-[:BELONGS_TO]->(:Category)
 
 ### Qdrant Collections
-- **paper_embeddings**:
-  - Vector dimension: Model-dependent
+- **paper_embeddings** (arxiv_papers):
+  - Vector dimension: Model-dependent (768 default)
   - Metadata: paper_id, title
   - Distance metric: Cosine similarity
+  - Source: PDF text content
+
+- **papers_summary**:
+  - Vector dimension: Model-dependent (768 default)
+  - Metadata: paper_id, title, category, published date, summary_length
+  - Distance metric: Cosine similarity
+  - Source: Paper summary/abstract from MongoDB
+  - Tracking: summary_processed_papers collection in MongoDB
 
 ## Security Considerations
 - Local-first architecture minimizes external dependencies

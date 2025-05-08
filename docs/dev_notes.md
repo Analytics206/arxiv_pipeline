@@ -1,6 +1,6 @@
 # ArXiv Pipeline Development Notes
 
-This document contains developer notes and reminders for ongoing work on the ArXiv pipeline project.
+## This document contains developer notes and reminders for ongoing work on the ArXiv pipeline project.
 
 ## To-Do Items
 

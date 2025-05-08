@@ -179,6 +179,7 @@ source .venv/bin/activate
  - ✔ Network arxiv_pipeline_default         Started     
  - ✔ Container arxiv_pipeline-neo4j-1       Started     
  - ✔ Container arxiv_pipeline-mongodb-1     Started 
+ - ✔ Container arxiv_pipeline-qdrant-1      Started 
  - ✔ Container arxiv_pipeline-web-ui-1      Started   
  - ✔ Container arxiv_pipeline-api-1         Started   
  - ✔ Container arxiv_pipeline-app-1         Started 
@@ -241,7 +242,7 @@ a. **Start the monitoring stack:**
   ```
 b. **Access monitoring services:**
    - Prometheus: http://localhost:9090
-   - Grafana: http://localhost:3001 (default login: admin/admin)
+   - Grafana: http://localhost:3001 (default login: admin/password)
 
 c. **Explore metrics** for:
    - System resources

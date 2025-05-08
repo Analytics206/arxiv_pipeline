@@ -35,9 +35,12 @@ src/ingestion/fetch.py
 src/pipeline/run_pipeline.py
 src/pipeline/sync_mongodb.py
 src/pipeline/sync_qdrant.py
+src/pipeline/sync_summary_vectors.py
 src/storage/mongo.py
+src/utils/check_pdf_urls.py
 src/utils/download_pdfs.py
 src/utils/logger.py
+src/utils/track_downloaded_pdfs.py
 src/web-ui/node_modules/flatted/python/flatted.py
 tests/test_ingestion.py
 tests/test_storage.py
