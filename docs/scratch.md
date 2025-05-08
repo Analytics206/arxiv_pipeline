@@ -27,6 +27,7 @@ x remove neo4j-sync from docker-compose.yml
 - setup kafka docker for use on external machine and local machine
 - setup kafka-ui docker for use on external machine and local machine
 - Fix local vs docker
+- python src/pipeline/sync_summary_vectors.py
 - ollama api check http://localhost:11434/
 - # Activate venv first
 cd c:\Users\mad_p\OneDrive\Desktop\arxiv_pipeline

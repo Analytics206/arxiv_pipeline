@@ -1,6 +1,6 @@
 # ArXiv Deep Research Pipeline Release Notes
 
-## Version 0.6.0 (May 8, 2025)
+## Version 0.5.0 (May 7, 2025)
 
 ### Major Features
 
@@ -9,25 +9,27 @@
 - **MongoDB Integration** - Implemented direct extraction of paper summaries from the MongoDB papers collection
 - **Configurable Categories** - Added separate category configuration for summary processing
 - **Date-based Filtering** - Added start/end date filtering for paper summaries processing
-- **Tracking System** - Implemented MongoDB-based tracking for processed summaries with the summary_processed_papers collection
+- **Tracking System** - Implemented MongoDB-based tracking for processed summaries with the vector_processed_summary collection
 - **API Integration** - Added FastAPI endpoints for managing and monitoring summary vector processing
 - **Background Processing** - Implemented asynchronous background task processing for summary vectors
+- **Full Summary Storage** - Embedded complete paper summaries in vector payloads for direct access during similarity searches
 
 ### Technical Improvements
 - **Process Isolation** - Created isolated process for summary vectors separate from PDF-based vectors
 - **Configuration Structure** - Enhanced YAML configuration with dedicated paper_summaries section
 - **Batch Processing** - Implemented batch-based processing for efficient summary vectorization
 - **Status Monitoring** - Added API endpoints for checking processing status
+- **Direct Qdrant Integration** - Used direct Qdrant client operations for enhanced control over vector insertion
+- **Deterministic Point IDs** - Created hash-based point IDs for stable references to vectors
+- **Automatic Dimension Detection** - Automatically adjusts vector dimensions to match embedding model output
+- **Collection Reset Logic** - Added intelligent collection management for handling dimension mismatches
+- **Duplicate Prevention** - Implemented robust tracking system to prevent duplicate entries in Qdrant
+- **Bulk Operations** - Used MongoDB bulk operations for efficient tracking updates
+- **Two-way Synchronization** - Added bidirectional sync between Qdrant and MongoDB tracking
 
 ### Documentation
 - **Tech Stack Update** - Updated tech stack documentation with new Qdrant collection details
 - **Configuration Documentation** - Added documentation for the new configuration options
-
-
-## Version 0.5.0 (May 7, 2025)
-
-### Major Features
-
 #### External Service Deployment Options
 - **External Docker Environments** - Added standalone Docker configurations for running key services on separate machines
 - **Ollama External Setup** - Created dedicated Docker setup for running Ollama on a separate machine with detailed model management instructions
