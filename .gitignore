@@ -3,14 +3,14 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.venv/
-venv/
 
 # Environment
 .env
 .myenv
 ENV/
 .env
+.venv/
+venv/
 
 # Data
 data/
@@ -22,13 +22,11 @@ data/
 # VS Code
 .vscode/
 node_modules
-
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
