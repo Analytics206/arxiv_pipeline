@@ -43,11 +43,12 @@ paper_summaries:
   # Categories to prioritize for summary vector processing
   process_categories: # used in sync_summary_vectors.py
     - "cs.AI"
+    - "cs.LG"
   papers_per_category: 5000 # Maximum number of papers to process into summary vectors per category (0 for unlimited)
   date_filter:
     enabled: true         # Set to false to disable date filtering
-    start_date: "2025-01-01" # Process papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2025-05-07"   # Process papers published on or before this date (format: YYYY-MM-DD)
+    start_date: "2024-01-01" # Process papers published on or after this date (format: YYYY-MM-DD)
+    end_date: "2025-05-08"   # Process papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
   # Tracking settings for processed summaries
   tracking:
@@ -64,7 +65,7 @@ arxiv:
     # - "cs.DS"
     # - "cs.GT" 
     # - "cs.LG" 
-    - "cs.LO"
+    # - "cs.LO"
     - "cs.MA"
     - "cs.NA"
     - "cs.NE"
@@ -79,8 +80,8 @@ arxiv:
   sort_order: "descending"
   max_iterations: 1000 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 3
-  start_date: "2024-01-01" # start_date is used in arxiv api call and save pdfs filters
-  end_date: "2025-05-07" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
+  start_date: "2023-01-01" # start_date is used in arxiv api call and save pdfs filters
+  end_date: "2024-07-01" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
 
 # Embedding model settings
 embedding:
@@ -112,7 +113,7 @@ pdf_storage:
   # Date filters for downloading PDFs
   download_date_filter:
     enabled: true         # Set to false to disable date filtering
-    start_date: "2024-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
+    start_date: "2023-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
     end_date: "2025-04-07"   # Download papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
 
