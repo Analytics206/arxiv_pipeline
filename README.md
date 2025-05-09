@@ -15,7 +15,7 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 | 👀 **User Interface** | User-friendly interface for exploring datasets, knowledge graphs, and similarity search. |
 | 📦 **Containerized** | Mostly Dockerized with persistent volumes for reliable data storage and consistent execution. |
 ---
-### ArXiv Ingestion Pipeline
+
 ### Neo4j Graph Database
 ![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
 ### Dashboard reporting
