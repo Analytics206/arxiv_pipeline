@@ -94,7 +94,7 @@ def run_ingestion_pipeline(config: Dict[str, Any]):
             # Always increment start by max_results to avoid infinite loop
             start += max_results
 
-            if empty_batches >= 20:
+            if empty_batches >= config['arxiv']['max_no_papers']:
                 logger.info("No more papers to fetch after 5 empty batches")
                 break
 
