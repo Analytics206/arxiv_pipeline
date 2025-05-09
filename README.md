@@ -18,7 +18,7 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 
 
 ![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
-
+![alt text](<images/Screenshot 2025-05-09 013100.png>)
 ![alt text](<images/Screenshot 2025-05-09 010713.png>)
 ![alt text](<images/Screenshot 2025-05-09 012044.png>)
 ---
