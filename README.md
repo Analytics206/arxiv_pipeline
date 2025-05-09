@@ -421,11 +421,8 @@ docker inspect arxiv_pipeline-mongodb-1
 ## 6. Optional: GPU-Accelerated Qdrant Setup on Remote Windows Machine
 
 * For enhanced vector search performance, you can set up Qdrant with GPU acceleration on a separate Windows machine within the same network. This configuration is beneficial for:
-
 - Processing large volumes of papers with faster embedding searches
-
 - Leveraging dedicated GPU resources for vector operations
-
 - Scaling the vector database independently from other components
 
 ### Quick Overview
@@ -433,11 +430,8 @@ docker inspect arxiv_pipeline-mongodb-1
 a. **Hardware Requirements**:
 
    - Windows 11 with WSL2 enabled
-
    - NVIDIA GPU with CUDA 12.x support (8GB VRAM minimum)
-
    - 16GB RAM (32GB recommended)
-
    - IP address on your local network
 
 
