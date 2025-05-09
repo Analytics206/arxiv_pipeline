@@ -15,11 +15,15 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 | 👀 **User Interface** | User-friendly interface for exploring datasets, knowledge graphs, and similarity search. |
 | 📦 **Containerized** | Mostly Dockerized with persistent volumes for reliable data storage and consistent execution. |
 ---
-
+### ArXiv Ingestion Pipeline
+### Neo4j Graph Database
 ![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
+### Dashboard reporting
 ![alt text](<images/Screenshot 2025-05-09 013100.png>)
-![alt text](<images/Screenshot 2025-05-09 010713.png>)
+### Qdrant Vector Database
 ![alt text](<images/Screenshot 2025-05-09 012044.png>)
+### Qdrant Vector Database similarity search
+![alt text](<images/Screenshot 2025-05-09 010713.png>)
 ---
 
 ## 📦 System Components
