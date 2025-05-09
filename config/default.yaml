@@ -59,13 +59,13 @@ paper_summaries:
 # ArXiv API settings 
 arxiv:
   categories: # used in sync_mongodb.py
-    - "cs.AI"
-    # - "cs.CL"
-    # - "cs.CV"
-    # - "cs.DS"
-    # - "cs.GT" 
-    # - "cs.LG" 
-    # - "cs.LO"
+    # - "cs.AI"
+    - "cs.CL"
+    - "cs.CV"
+    - "cs.DS"
+    - "cs.GT" 
+    - "cs.LG" 
+    - "cs.LO"
     # - "cs.MA"
     # - "cs.NA"
     # - "cs.NE"
@@ -81,8 +81,8 @@ arxiv:
   max_iterations: 1000 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 3
   start_date: "2022-01-01" # start_date is used in arxiv api call and save pdfs filters
-  end_date: "2025-01-31" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
-  max_no_papers: 100 # Maximum number of papers to fetch per category loop (0 for unlimited)
+  end_date: "2025-03-31" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
+  max_no_papers: 200 # Maximum number of papers to fetch per category loop (0 for unlimited)
 # Embedding model settings
 embedding:
   model_name: "all-MiniLM-L6-v2"  # Smaller model to start with
