@@ -202,10 +202,8 @@ a. **Start the monitoring stack:**
   ```bash
   # Start Prometheus
   docker compose -f docker-compose.monitoring.yml start prometheus
-
   # Start Grafana
   docker compose -f docker-compose.monitoring.yml start grafana
-
   # View Grafana logs
   docker compose -f docker-compose.monitoring.yml logs grafana
   ```
@@ -254,7 +252,6 @@ The following services are configured with the `manual` profile in Docker Compos
 ```bash
 # Start Jupyter SciPy notebook server
 docker compose --profile manual up jupyter-scipy
-
 # Stop Jupyter SciPy notebook server
 docker compose --profile manual down jupyter-scipy
 ```
@@ -265,7 +262,6 @@ docker compose --profile manual down jupyter-scipy
 ```bash
 # Start Kafka with required Zookeeper service
 docker compose --profile manual up zookeeper kafka
-
 # Stop Kafka and Zookeeper services
 docker compose --profile manual down zookeeper kafka
 ```
@@ -275,7 +271,6 @@ docker compose --profile manual down zookeeper kafka
 ```bash
 # Start complete Kafka stack with UI
 docker compose --profile manual up zookeeper kafka kafka-ui
-
 # Stop complete Kafka stack
 docker compose --profile manual down zookeeper kafka kafka-ui
 ```
@@ -313,7 +308,6 @@ qdrant:
 ### Web UI Development Setup
 
 * The web interface uses React with the Neo4j JavaScript driver. If you want to develop the web UI locally:
-
 a. **Navigate to the web-ui directory**:
    ```bash
    cd src/web-ui
@@ -325,12 +319,10 @@ b. **Install dependencies including Neo4j JavaScript driver**:
    # Or to install Neo4j driver specifically:
    npm install neo4j-driver@5.13.0
    ```
-
 c. **Start the development server**:
    ```bash
    npm start
    ```
-
 * The web UI connects to Neo4j using environment variables defined in the docker-compose.yml file.
 
 ## 7. Data Visualization and Analysis Dashboards
@@ -454,7 +446,6 @@ docker compose start app
 ### b. Restarting Individual Containers
 
 ```bash
-
 # Restart MongoDB
 
 docker compose restart mongodb
@@ -470,7 +461,6 @@ docker compose restart qdrant
 # Restart Web UI
 
 docker compose restart web-ui
-
 ```
 
 ### c. Viewing Container Logs
@@ -502,7 +492,6 @@ docker compose logs --follow mongodb
 ### d. Inspecting Container Status
 
 ```bash
-
 # Check status of all containers
 
 docker compose ps
@@ -510,7 +499,6 @@ docker compose ps
 # Detailed information about a specific container
 
 docker inspect arxiv_pipeline-mongodb-1
-
 ```
 
 ## 6. Optional: GPU-Accelerated Qdrant Setup on Remote Windows Machine
@@ -644,21 +632,14 @@ The pipeline now supports GPU acceleration for both:
 #### A. Qdrant Vector Database
 
 ```yaml
-
 # In config/default.yaml
-
 qdrant:
-
   # ... other settings ...
-
   gpu_enabled: true # Enable GPU for vector operations
-
   gpu_device: 1 # GPU device index (0 for first GPU, 1 for second, etc.)
-
 ```
 
 #### B. Standalone Qdrant with GPU
-
 For better performance with large vector collections, you can run Qdrant as a standalone application with GPU support as documented in the "Qdrant Deployment Options" section.
 
 ---
@@ -666,17 +647,11 @@ For better performance with large vector collections, you can run Qdrant as a st
 ## Ollama Integration (Optional)
 
 The `sync_qdrant` pipeline uses [Ollama](https://ollama.ai/) app for analyzing images extracted from PDFs if available:
-
 - **What Ollama does**: Enhances the vector database by adding AI-generated descriptions of diagrams and figures in papers
-
 - **Installation Options**:
-
   - **Desktop App**: Download and install Ollama from [ollama.ai](https://ollama.ai/)
-
   - **Docker Container**: Run Ollama in a Docker container for easier integration with the ArXiv pipeline (see `docs/ollama_docker.md` for detailed instructions)
-
 - **Required model**: Run `ollama pull llama3` to download the required model
-
 - **Without Ollama**: The pipeline still functions normally without Ollama, but image descriptions will be placeholders
 
 ## ArXiv Pipeline Configuration Settings
@@ -692,25 +667,17 @@ When running the `sync_qdrant` service in Docker, the PDF directory path specifi
 # In docker-compose.yml
 
 volumes:
-
   - E:/AI Research:/app/data/pdfs  # Maps Windows path to container path
-
 ```
 
 This means:
-
 - Your PDFs should be stored in `E:/AI Research` on your Windows machine
-
 - Inside the Docker container, they will be accessible at `/app/data/pdfs`
-
 - The script automatically detects when running in Docker and adjusts paths accordingly
 
 If you change your PDF storage location, make sure to update both:
-
 1. The `pdf_storage.directory` in `config/default.yaml` (for local runs)
-
 2. The volume mapping in `docker-compose.yml` (for Docker runs)
-
    ## sync_mongodb pipeline
 
    - arxiv.categories: Research categories to fetch papers from api into mongodb
@@ -775,23 +742,14 @@ This pipeline supports two options for running Qdrant (vector database):
 In the `docker-compose.yml` file, we provide a pre-configured Qdrant container:
 
 ```yaml
-
 qdrant:
-
   image: qdrant/qdrant:latest
-
   ports:
-
     - "6333:6333"
-
     - "6334:6334"
-
   volumes:
-
     - qdrant_data:/qdrant/storage
-
   restart: unless-stopped
-
 ```
 
 ### Option 2: Running Qdrant Locally with GPU Support
@@ -799,61 +757,36 @@ qdrant:
 For better performance with large vector collections, you can run Qdrant as a standalone application with GPU acceleration:
 
 1. **Download Qdrant** from [GitHub Releases](https://github.com/qdrant/qdrant/releases)
-
 2. **Create a config file** at `config/qdrant_config.yaml` with GPU settings:
 
 ```yaml
-
 storage:
-
   # Path to the directory where collections will be stored
-
   storage_path: ./storage
-
   # Vector data configuration with GPU support
-
   vector_data:
-
     # Enable CUDA support
-
     enable_cuda: true
-
-    
-
     # GPU device index (0 for first GPU, 1 for second, etc.)
-
     cuda_device: 0
-
 ```
 
 3. **Run Qdrant with the config**:
 
 ```
-
 qdrant.exe --config-path config/qdrant_config.yaml
-
 ```
 
 4. **Update the docker-compose.yml file** to comment out the Qdrant service but keep other services:
-
 ```yaml
-
 # Comment out the Qdrant service
-
 #qdrant:
-
 #  image: qdrant/qdrant:latest
-
 #  ...
-
 # Update service connections to use host.docker.internal
-
 app:
-
   environment:
-
     - QDRANT_URL=http://host.docker.internal:6333
-
 ```
 
 ## GPU Support for Embeddings Generation
@@ -861,7 +794,6 @@ app:
 * The pipeline can use GPU acceleration for generating embeddings in the `sync_qdrant.py` script:
 
 1. **Install PyTorch with CUDA support**:
-
 ```bash
 
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
@@ -871,101 +803,63 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 * Choose the appropriate CUDA version (cu118, cu121, etc.) based on your system. Check with `nvidia-smi`.
 
 2. **Enable GPU in configuration**:
-
 ```yaml
-
 # In config/default.yaml
-
 qdrant:
-
   gpu_enabled: true  # Enable GPU for vector operations
-
   gpu_device: 0      # GPU device index (0 for first GPU)
-
 ```
 
 3. **Verify GPU detection** by checking script output when running:
-
 ```
 
 Using GPU for embeddings: cuda:0
 
 ```
-
 ## Database Installation & Connection Settings
-
 ### MongoDB Installation
-
 #### Option 1: With Docker (recommended)
-
 The Docker setup includes MongoDB, so no additional installation is needed if using Docker Compose.
-
 #### Option 2: Standalone MongoDB Installation
-
 1. **Download MongoDB Community Server**: [https://www.mongodb.com/try/download/community](https://www.mongodb.com/try/download/community)
-
 2. **Install Python driver**:
-
    ```bash
-
    pip install pymongo>=4.3.0
-
    ```
 
 3. **Test your connection**:
-
    ```python
-
    from pymongo import MongoClient
-
    client = MongoClient('mongodb://localhost:27017/')
-
    db = client['arxiv_papers']
-
    print(f"Connected to MongoDB: {client.server_info()['version']}")
-
    ```
 
 ### Neo4j Installation
 
 #### Option 1: With Docker (recommended)
-
 * The Docker setup includes Neo4j, so no additional installation is needed if using Docker Compose.
-
 * Neo4j Desktop is recommended for local development and data exploration.
 
 #### Option 2: Standalone Neo4j Installation
-
 1. **Download Neo4j Desktop**: [https://neo4j.com/download/](https://neo4j.com/download/)
-
 2. **Create a new database** with password 'password' to match configuration
-
 3. **Install Python driver**:
 
    ```bash
-
    pip install neo4j>=5.5.0
-
    ```
 
 4. **Test your connection**:
 
    ```python
-
    from neo4j import GraphDatabase
-
    uri = "bolt://localhost:7687"
-
    driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
-
    with driver.session() as session:
-
        result = session.run("MATCH (n) RETURN count(n) AS count")
-
        print(result.single()["count"])
-
    driver.close()
-
    ```
 
 ---
@@ -973,27 +867,18 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
 ## Notes
 
 - **Python Versions**: 
-
   - Docker containers use `python:3.11-slim`
-
   - Local development 'requires' Python ≥3.11 as specified in pyproject.toml
-
   - All dependencies are managed through pyproject.toml for consistent environments
 
 - **Data Persistence**:
-
   - All persistent data (MongoDB, Neo4j, Qdrant) is stored in Docker volumes or local directories
-
   - PDF files are stored in the configured local directory
 
 - **Development Approach**:
-
   - Either use the Python virtual environment with `python -m` commands
-
   - Or use Docker Compose for containerized execution
-
   - Both methods use the same configuration and produce consistent results
-
   - Deveoper commonly uses both methods running in python env, docker compose and standalone databases
 
 ---
@@ -1001,7 +886,6 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
 ## Troubleshooting
 
 - If you see `ModuleNotFoundError: No module named 'pymongo'`, ensure you have activated your virtual environment and installed dependencies.
-
 - For Docker issues, ensure Docker Desktop is running and you have sufficient permissions.
 
 ---
@@ -1013,127 +897,74 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
 ### MongoDB
 
 - **MongoDB Compass** - A GUI for MongoDB that allows you to explore databases, collections, and documents
-
 - Download: [https://www.mongodb.com/products/compass](https://www.mongodb.com/products/compass)
-
 - Connection string: `mongodb://localhost:27017/onfig` (when connecting to the Docker container)
 
 ### Neo4j
-
 - **Neo4j Desktop** - A complete development environment for Neo4j projects
-
 - Download: [https://neo4j.com/download/](https://neo4j.com/download/)
-
 - Or use the Neo4j Browser at: http://localhost:7474/ (default credentials: neo4j/password)
 
 ### Qdrant
-
 - **Qdrant Web UI** - A built-in web interface for exploring vector collections
-
 - Access at: http://localhost:6333/dashboard when Qdrant is running
-
 - Also consider **Qdrant Cloud Console** for more advanced features if you're using Qdrant Cloud
-
 - Check Jupyter notebooks for more advanced features
-
 These tools provide graphical interfaces to explore, query, and visualize the data stored in each component of the pipeline.
-
 ---
-
 ## 📊 Optional Future Enhancements
-
 The following features are 'planned' for future development to enhance the research pipeline:
-
 ### Data Analysis and Visualization
-
 - **Topic Modeling**: Implement BERTopic or LDA for automatic discovery of research themes
-
 - **Time-Series Analysis**: Track the evolution of research topics over time
 
 ### Research Enhancement Tools
-
 - **PDF Section Parsing**: Intelligently extract structured sections from research papers (abstract, methods, results, etc.)
-
 - **Citation Parsing**: Extract and normalize citations from paper references
-
 - **Mathematical Model Extraction**: Identify and extract mathematical formulas and models from papers
-
 - **Citation Graph Analysis**: Build a graph of paper citations to identify seminal works
-
 - **Researcher Networks**: Map collaboration networks among authors
-
 - **Multi-Modal Analysis**: Extract and analyze figures and tables from papers
-
 - **Fine-tuning Pipelines**: Fine-tune pipelines for specific use cases
-
 - **Research Agents**: Add specific research agents for specific use cases
 
 ### Infrastructure Improvements
-
 - **LangChain-based Research Assistant**: Natural language interface to query the database
-
 - **Hybrid Search**: Combine keyword and semantic search for better results
-
 - **Export Tools**: Add BibTeX and PDF collection exports
-
 - **Web Admin Interface**: Add web admin interface for configuration and running pipelines
 
 ## To-Do List
-
 - [ ] **Short-term Tasks**
-
   - [ ] Optimize PDF download with parallel processing
-
   - [ ] Add citation extraction from PDF full text
-
   - [ ] Implement paper similarity metrics
-
   - [ ] Create basic analytics dashboard
-
   - [ ] Develop basic PDF section parser to extract abstracts and conclusions
-
   - [ ] Add web admin interface for configuration and running pipelines
 
 - [ ] **Medium-term Tasks**
-
   - [ ] Fine-tuning pipelines for specific use cases
-
   - [ ] Add research agent for specific use cases
-
   - [ ] Extend Neo4j schema to include citations between papers
-
   - [ ] Add full-text search capabilities
-
   - [ ] Implement comprehensive citation parsing system
-
   - [x] Create example Jupyter notebooks for research workflows
-
   - [ ] Develop mathematical formula extraction and indexing
-
   - [ ] Implement automated paper summarization
-
   - [ ] Set up scheduled runs for continuous updates
 
 - [ ] **Long-term Tasks**
-
   - [ ] Build a recommendation system for related papers
-
   - [ ] Develop a natural language query interface
-
   - [ ] Create a researcher profile system
-
   - [ ] Add support for other research paper repositories (e.g., PubMed, IEEE)
 
 - [ ] **Infrastructure Tasks**
-
   - [x] Add Prometheus/Grafana for monitoring
-
   - [ ] Implement automated testing
-
   - [ ] Set up CI/CD pipeline for continuous deployment
-
   - [ ] Optimize vector storage for large-scale collections
-
 ---
 
 ## ArXiv API Address to fetch papers metadata
@@ -1145,40 +976,21 @@ List used is in config/defaults.yaml for reference, more categories available.
 ---
 
 - cs.AI - Artificial Intelligence
-
 - cs.CL - Computation and Language
-
 - cs.CV - Computer Vision and Pattern Recognition
-
 - cs.DS - Data Structures and Algorithms
-
 - cs.GT - Computer Science and Game Theory
-
 - cs.LG - Machine Learning
-
 - cs.LO - Logic in Computer Science
-
 - cs.MA - Multiagent Systems
-
 - cs.NA - Numerical Analysis
-
 - cs.NE - Neural and Evolutionary Computing
-
 - math.PR - Probability
-
 - q-bio.NC - Neurons and Cognition
-
 - stat - Statistics
-
 - stat.ML - Machine Learning
-
 - stat.TH - Statistics Theory
-
 - physics.data-an - Data Analysis, Statistics and Probability
-
-
-
 ---
-
 For more details about project and status, see the `docs/` directory.
 
