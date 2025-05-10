@@ -45,7 +45,7 @@ function Home() {
 
   return (
     <div className="home-container">
-      <h1 className="main-title">ArXiv Pipeline Dashboard</h1>
+      <h1 className="main-title">Deep Research Pipeline Dashboard</h1>
       <p className="subtitle">AI Research Papers Analytics Platform</p>
       
       <div className="cards-container">

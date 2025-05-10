@@ -30,7 +30,7 @@ function App() {
         </Routes>
       </div>
       <footer className="App-footer">
-        <p>ArXiv Pipeline - Data Science Deep Research Tool</p>
+        <p>Deep Research Pipeline - Data Science Research Tool</p>
       </footer>
     </div>
   );
