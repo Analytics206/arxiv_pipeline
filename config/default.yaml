@@ -15,7 +15,7 @@ neo4j:
 
 # Qdrant settings
 qdrant:
-  url: "http://localhost:6333"
+  url: "http://qdrant:6333"
   url_local: "http://localhost:6333"
   collection_name: "arxiv_papers"
   vector_size: 768  # For sentence-transformers models

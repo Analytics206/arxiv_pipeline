@@ -13,13 +13,47 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# For Docker container-based networking, use the service name as hostname
-QDRANT_HOST = os.getenv("QDRANT_HOST", "qdrant")
-QDRANT_PORT = os.getenv("QDRANT_PORT", "6333")
-QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "arxiv_papers")
-SUMMARY_COLLECTION = os.getenv("SUMMARY_COLLECTION", "papers_summary")
+# Load configuration from YAML file
+import yaml
+import os.path as path
 
-QDRANT_BASE_URL = f"http://{QDRANT_HOST}:{QDRANT_PORT}"
+# Determine the path to the config file
+config_path = path.join(
+    path.dirname(path.dirname(path.dirname(path.dirname(__file__)))),
+    "config",
+    "default.yaml"
+)
+
+# Load the configuration
+try:
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+    logger.info(f"Loaded configuration from {config_path}")
+    
+    # Get Qdrant configuration from config file
+    qdrant_config = config.get('qdrant', {})
+    paper_summaries_config = config.get('paper_summaries', {}).get('qdrant', {})
+    
+    # Override with environment variables if set
+    QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
+    QDRANT_PORT = os.getenv("QDRANT_PORT", "6333")
+    QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", qdrant_config.get("collection_name", "arxiv_papers"))
+    SUMMARY_COLLECTION = os.getenv("SUMMARY_COLLECTION", paper_summaries_config.get("collection_name", "papers_summary"))
+    
+    # Create the base URL (always use HTTP)
+    QDRANT_BASE_URL = f"http://{QDRANT_HOST}:{QDRANT_PORT}"
+    logger.info(f"Using configuration: QDRANT_HOST={QDRANT_HOST}, QDRANT_PORT={QDRANT_PORT}")
+    
+except Exception as e:
+    logger.error(f"Error loading configuration: {str(e)}. Using default values.")
+    
+    # Default fallback values if config can't be loaded
+    QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
+    QDRANT_PORT = os.getenv("QDRANT_PORT", "6333")
+    QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "arxiv_papers")
+    SUMMARY_COLLECTION = os.getenv("SUMMARY_COLLECTION", "papers_summary")
+    
+    QDRANT_BASE_URL = f"http://{QDRANT_HOST}:{QDRANT_PORT}"
 
 logger.info(f"Qdrant configured with URL: {QDRANT_BASE_URL}, Collections: {QDRANT_COLLECTION}, {SUMMARY_COLLECTION}")
 
