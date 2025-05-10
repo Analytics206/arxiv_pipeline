@@ -25,6 +25,13 @@ config_path = path.join(
 )
 
 # Load the configuration
+# Default fallback values
+DEFAULT_QDRANT_HOST = "localhost"
+DEFAULT_QDRANT_PORT = "6333"
+DEFAULT_COLLECTION_NAME = "arxiv_papers"
+DEFAULT_SUMMARY_COLLECTION = "papers_summary"
+
+# Attempt to load from configuration first
 try:
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
@@ -34,27 +41,23 @@ try:
     qdrant_config = config.get('qdrant', {})
     paper_summaries_config = config.get('paper_summaries', {}).get('qdrant', {})
     
-    # Override with environment variables if set
-    QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
-    QDRANT_PORT = os.getenv("QDRANT_PORT", "6333")
-    QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", qdrant_config.get("collection_name", "arxiv_papers"))
-    SUMMARY_COLLECTION = os.getenv("SUMMARY_COLLECTION", paper_summaries_config.get("collection_name", "papers_summary"))
-    
-    # Create the base URL (always use HTTP)
-    QDRANT_BASE_URL = f"http://{QDRANT_HOST}:{QDRANT_PORT}"
-    logger.info(f"Using configuration: QDRANT_HOST={QDRANT_HOST}, QDRANT_PORT={QDRANT_PORT}")
+    # Use config values as defaults for environment variables
+    DEFAULT_QDRANT_HOST = qdrant_config.get("host", DEFAULT_QDRANT_HOST)
+    DEFAULT_QDRANT_PORT = str(qdrant_config.get("port", DEFAULT_QDRANT_PORT))
+    DEFAULT_COLLECTION_NAME = qdrant_config.get("collection_name", DEFAULT_COLLECTION_NAME)
+    DEFAULT_SUMMARY_COLLECTION = paper_summaries_config.get("collection_name", DEFAULT_SUMMARY_COLLECTION)
     
 except Exception as e:
     logger.error(f"Error loading configuration: {str(e)}. Using default values.")
-    
-    # Default fallback values if config can't be loaded
-    QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
-    QDRANT_PORT = os.getenv("QDRANT_PORT", "6333")
-    QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "arxiv_papers")
-    SUMMARY_COLLECTION = os.getenv("SUMMARY_COLLECTION", "papers_summary")
-    
-    QDRANT_BASE_URL = f"http://{QDRANT_HOST}:{QDRANT_PORT}"
 
+# Override with environment variables if set
+QDRANT_HOST = os.getenv("QDRANT_HOST", DEFAULT_QDRANT_HOST)
+QDRANT_PORT = os.getenv("QDRANT_PORT", DEFAULT_QDRANT_PORT)
+QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", DEFAULT_COLLECTION_NAME)
+SUMMARY_COLLECTION = os.getenv("SUMMARY_COLLECTION", DEFAULT_SUMMARY_COLLECTION)
+
+# Create the base URL (always use HTTP)
+QDRANT_BASE_URL = f"http://{QDRANT_HOST}:{QDRANT_PORT}"
 logger.info(f"Qdrant configured with URL: {QDRANT_BASE_URL}, Collections: {QDRANT_COLLECTION}, {SUMMARY_COLLECTION}")
 
 # Dictionary to track running processes
@@ -93,20 +96,28 @@ def test_qdrant_connection() -> Dict[str, Any]:
         # First try a simple health check
         health_url = f"{QDRANT_BASE_URL}/healthz"
         logger.info(f"Testing Qdrant health at {health_url}")
-        health_resp = requests.get(health_url, timeout=5)
         
-        if health_resp.status_code != 200:
-            logger.error(f"Qdrant health check failed: {health_resp.status_code} {health_resp.text}")
-            return {"status": "error", "message": f"Qdrant health check failed with status {health_resp.status_code}"}
-            
+        try:
+            health_resp = requests.get(health_url, timeout=2)
+            if health_resp.status_code != 200:
+                logger.error(f"Qdrant health check failed: {health_resp.status_code} {health_resp.text}")
+                return {"status": "error", "message": f"Qdrant health check failed with status {health_resp.status_code}"}
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Qdrant health check request failed: {str(e)}")
+            return {"status": "error", "message": f"Qdrant health check failed: {str(e)}"}
+        
         # Check if we can get collection list
         collections_url = f"{QDRANT_BASE_URL}/collections"
         logger.info(f"Getting collections list from {collections_url}")
-        collections_resp = requests.get(collections_url, timeout=5)
         
-        if collections_resp.status_code != 200:
-            logger.error(f"Failed to get collections list: {collections_resp.status_code} {collections_resp.text}")
-            return {"status": "warning", "message": "Qdrant is available but can't list collections"}
+        try:
+            collections_resp = requests.get(collections_url, timeout=2)
+            if collections_resp.status_code != 200:
+                logger.error(f"Failed to get collections list: {collections_resp.status_code} {collections_resp.text}")
+                return {"status": "warning", "message": "Qdrant is available but can't list collections"}
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to get collections list: {str(e)}")
+            return {"status": "warning", "message": f"Qdrant is available but can't list collections: {str(e)}"}
         
         # Now check for specific collection
         collection_url = f"{QDRANT_BASE_URL}/collections/{QDRANT_COLLECTION}"
@@ -191,7 +202,7 @@ def qdrant_paper_stats() -> Dict[str, int]:
     # Return metrics in the expected format
     # If API calls failed, we'll still have our hardcoded values
     return {
-        "papers": vector_count,        # First column: number of vectors/papers 
+        "papers": vector_count,        # First column: number of vectors (papers)
         "authors": vector_dimensions,  # Second column: vector dimensions
         "categories": collection_count # Third column: collection count
     }
@@ -207,27 +218,34 @@ def qdrant_summary_stats() -> Dict[str, int]:
     collection_count = 1       # The summary collection
     
     try:
-        # Try to get the collection info directly
+        # Try to get the collection info directly with short timeout
         collection_url = f"{QDRANT_BASE_URL}/collections/{SUMMARY_COLLECTION}"
-        collection_resp = requests.get(collection_url, timeout=3)
         
-        if collection_resp.status_code == 200:
-            collection_data = collection_resp.json()
-            logger.info(f"Got summary collection info response with status code {collection_resp.status_code}")
+        try:
+            collection_resp = requests.get(collection_url, timeout=2)
             
-            # Try to extract vector dimensions and count
-            if "result" in collection_data and "vectors" in collection_data["result"]:
-                vectors_data = collection_data["result"]["vectors"]
+            if collection_resp.status_code == 200:
+                collection_data = collection_resp.json()
+                logger.info(f"Got summary collection info response with status code {collection_resp.status_code}")
                 
-                # Extract vector dimensions and count from first vector
-                for vector_name, vector_info in vectors_data.items():
-                    if "size" in vector_info:
-                        vector_dimensions = vector_info["size"]
-                    if "num_vectors" in vector_info:
-                        vector_count = vector_info["num_vectors"]
+                # Try to extract vector dimensions and count
+                if "result" in collection_data and "vectors" in collection_data["result"]:
+                    vectors_data = collection_data["result"]["vectors"]
+                    
+                    # Extract vector dimensions and count from first vector
+                    for vector_name, vector_info in vectors_data.items():
+                        if "size" in vector_info:
+                            vector_dimensions = vector_info["size"]
+                        if "num_vectors" in vector_info:
+                            vector_count = vector_info["num_vectors"]
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error fetching summary collection info: {str(e)}")
+            # Using fallback values
+            logger.info(f"Using fallback values for summary collection: {vector_count} papers, {vector_dimensions} dimensions")
     
     except Exception as e:
-        logger.error(f"Error fetching Qdrant summary metrics: {str(e)}")
+        logger.error(f"Error in qdrant_summary_stats: {str(e)}")
+        logger.info(f"Using fallback values for summary collection: {vector_count} papers, {vector_dimensions} dimensions, {collection_count} collections")
     
     # Return metrics in the expected format
     return {

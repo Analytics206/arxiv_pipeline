@@ -19,9 +19,8 @@ services:
     restart: unless-stopped
 
   api:
-    build:
-      context: ./src/api
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    build: .
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000
     depends_on:
       - mongodb
       - qdrant
@@ -34,7 +33,7 @@ services:
       - QDRANT_PORT=6333
       - QDRANT_COLLECTION=arxiv_papers
     volumes:
-      - ./src/api:/app
+      - ./config:/app/config
     ports:
       - "8000:8000"
 

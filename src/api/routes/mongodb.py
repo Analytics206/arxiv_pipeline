@@ -3,20 +3,33 @@ from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 import os
 import sys
+import logging
 from collections import OrderedDict
 from typing import Dict, Any, Optional
 
-# Add the src directory to sys.path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Import the analyze_papers_by_year_month_day function
-from utils.analyze_papers_by_year_month_day import analyze_papers_by_year_month_day
+# Import the analyze_papers_by_year_month_day function - use absolute import
+from src.utils.analyze_papers_by_year_month_day import analyze_papers_by_year_month_day
 
 router = APIRouter()
 
 @router.get("/paper-stats")
 def mongodb_paper_stats():
-    mongo_uri = os.getenv("MONGO_CONNECTION_STRING", "mongodb://mongodb:27017/")
+    # Try different connection strings in order of preference
+    mongo_uri = os.getenv("MONGO_CONNECTION_STRING", None)
+    if not mongo_uri:
+        # For local development
+        if os.path.exists('/etc/hosts'):  # Check if we're in a Unix-like system
+            mongo_uri = "mongodb://localhost:27017/"
+        else:  # Windows or other
+            mongo_uri = "mongodb://localhost:27017/"
+    
+    # Log the connection string (without credentials)
+    safe_uri = mongo_uri.replace("://", "://***:***@") if "@" in mongo_uri else mongo_uri
+    logging.info(f"Connecting to MongoDB using: {safe_uri}")
     try:
         client = MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
         db = client["arxiv_papers"]
@@ -34,13 +47,26 @@ def mongodb_paper_stats():
         categories_count = len(category_set)
         return {"papers": papers_count, "authors": authors_count, "categories": categories_count}
     except Exception as e:
+        logger.error(f"MongoDB stats error: {str(e)}")
+        # Return fallback values for UI compatibility
         return {"papers": 0, "authors": 0, "categories": 0, "error": str(e)}
     finally:
         client.close()
 
 @router.get("/test-connection")
 def test_mongodb_connection():
-    mongo_uri = os.getenv("MONGO_CONNECTION_STRING", "mongodb://mongodb:27017/")
+    # Try different connection strings in order of preference
+    mongo_uri = os.getenv("MONGO_CONNECTION_STRING", None)
+    if not mongo_uri:
+        # For local development
+        if os.path.exists('/etc/hosts'):  # Check if we're in a Unix-like system
+            mongo_uri = "mongodb://localhost:27017/"
+        else:  # Windows or other
+            mongo_uri = "mongodb://localhost:27017/"
+    
+    # Log the connection string (without credentials)
+    safe_uri = mongo_uri.replace("://", "://***:***@") if "@" in mongo_uri else mongo_uri
+    logging.info(f"Connecting to MongoDB using: {safe_uri}")
     try:
         client = MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
         # The ismaster command is cheap and does not require auth.
@@ -71,7 +97,18 @@ def get_papers_by_time(
     Returns:
         Dictionary with yearly, monthly, and daily paper counts
     """
-    mongo_uri = os.getenv("MONGO_CONNECTION_STRING", "mongodb://mongodb:27017/")
+    # Try different connection strings in order of preference
+    mongo_uri = os.getenv("MONGO_CONNECTION_STRING", None)
+    if not mongo_uri:
+        # For local development
+        if os.path.exists('/etc/hosts'):  # Check if we're in a Unix-like system
+            mongo_uri = "mongodb://localhost:27017/"
+        else:  # Windows or other
+            mongo_uri = "mongodb://localhost:27017/"
+    
+    # Log the connection string (without credentials)
+    safe_uri = mongo_uri.replace("://", "://***:***@") if "@" in mongo_uri else mongo_uri
+    logging.info(f"Connecting to MongoDB using: {safe_uri}")
     db_name = os.getenv("MONGO_DB_NAME", "arxiv_papers")
     
     try:
