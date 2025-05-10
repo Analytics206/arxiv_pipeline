@@ -3,8 +3,8 @@
 A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. This system enables offline graph-based and semantic search through an integrated architecture of MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker containers for easy, consistent local deployment.
 
 ## 🚀 Key Features
-| Feature | Description |
-|---------|-------------|
+| Feature                  | Description |
+| ------------------------ |-------------|
 | 🏠 **Local-first** | Everything runs offline with no cloud dependencies on local network with multi machine support. |
 | 💾 **ArXiv Ingestion** | Fetches non-duplicate papers from configurable categories (e.g., cs.AI) with smart date filtering. |
 | 🗒 **MongoDB Storage** | Stores structured metadata, paper information, and download statuses. |
