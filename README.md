@@ -1,4 +1,4 @@
-# 🧠 ArXiv Deep Research Pipeline
+# 🧠 Deep Research Pipeline - DRP
 ## Overview
 A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. This system enables offline graph-based and semantic search through an integrated architecture of MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker containers for easy, consistent local deployment.
 
@@ -27,21 +27,21 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 ---
 
 ## 📦 System Components
-| Component             | Purpose                                      |
-| --------------------- | -------------------------------------------- |
-| **Ingestion Service** | Fetches papers(metadata) using arXiv Atom XML API      |
-| **MongoDB**           | Stores normalized paper metadata and paper processing tracking    |
-| **Neo4j**             | Stores the author-paper-category graph       |
-| **Qdrant**            | Stores paper vector embeddings for semantic search with metrics tracking |
-| **Config Manager**    | Central config for category, limits, model   |
-| **User Interface**    | Web UI for interaction with graphs           |
-| **Logger**            | Tracks events, errors, and skipped entries   |
-| **Docker Compose**    | Brings it all together for local use         |
-| **Prometheus**        | Time series database for system metrics collection  |
-| **Grafana**           | Visualization platform for system metrics dashboards |
-| **Kafka**             | Distributed event streaming platform for messaging |
-| **Zookeeper**         | Coordinates the Kafka cluster                |
-| **Kafka UI**          | Web interface for Kafka management and monitoring |
+| Component                | Purpose                                      |
+| ------------------------ | -------------------------------------------- |
+| **Ingestion Service**    | Fetches papers(metadata) using arXiv Atom XML API      |
+| **MongoDB**              | Stores normalized paper metadata and paper processing tracking    |
+| **Neo4j**                | Stores the author-paper-category graph       |
+| **Qdrant**               | Stores paper vector embeddings for semantic search with metrics tracking |
+| **Config Manager**       | Central config for category, limits, model   |
+| **User Interface**       | Web UI for interaction with graphs           |
+| **Logger**               | Tracks events, errors, and skipped entries   |
+| **Docker Compose**       | Brings it all together for local use         |
+| **Prometheus**           | Time series database for system metrics collection  |
+| **Grafana**              | Visualization platform for system metrics dashboards |
+| **Kafka**                | Distributed event streaming platform for messaging |
+| **Zookeeper**            | Coordinates the Kafka cluster                |
+| **Kafka UI**             | Web interface for Kafka management and monitoring |
 
 ---
 ## 🧵 High Level Overview

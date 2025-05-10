@@ -1,81 +1,63 @@
-import neo4j from 'neo4j-driver';
+import axios from 'axios';
 
-// Use the Docker service name for Neo4j within the Docker network
-// With encrypted:false to avoid certificate issues
-const NEO4J_URI = 'bolt://localhost:7687'; // bolt://neo4j:7687
-const NEO4J_USER = 'neo4j';
-const NEO4J_PASSWORD = 'password';
+// API configuration - use environment variables or defaults
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+const NEO4J_API_URL = `${API_BASE_URL}/neo4j`;
 
-const driver = neo4j.driver(
-  NEO4J_URI,
-  neo4j.auth.basic(NEO4J_USER, NEO4J_PASSWORD),
-  { encrypted: false } // Disable encryption to avoid certificate issues
-);
+// Log API configuration
+console.log(`Neo4j API configured with URL: ${NEO4J_API_URL}`);
 
 export const runQuery = async (cypherQuery) => {
-  const session = driver.session();
-  
   try {
-    const result = await session.run(cypherQuery);
+    // Send the Cypher query to the API
+    const response = await axios.post(`${NEO4J_API_URL}/run-query`, { cypher_query: cypherQuery });
     
-    // Process the records into a format for Cytoscape
-    const nodeMap = new Map();
-    const edges = [];
-    
-    result.records.forEach(record => {
-      record.keys.forEach(key => {
-        const value = record.get(key);
-        
-        // Handle nodes
-        if (value && value.identity && value.labels) {
-          // This is a node
-          if (!nodeMap.has(value.identity.toString())) {
-            const label = value.properties.name || value.properties.title || value.properties.id || key;
-            
-            nodeMap.set(value.identity.toString(), {
-              data: {
-                id: value.identity.toString(),
-                label: typeof label === 'string' ? (label.length > 20 ? label.substring(0, 20) + '...' : label) : key,
-                type: value.labels[0],
-                properties: value.properties
-              }
-            });
-          }
-        }
-        
-        // Handle relationships between nodes
-        if (record._fields) {
-          for (let i = 0; i < record._fields.length; i++) {
-            const field = record._fields[i];
-            if (field && field.start && field.end) {
-              // This is a relationship
-              edges.push({
-                data: {
-                  id: `${field.start.toString()}-${field.end.toString()}`,
-                  source: field.start.toString(),
-                  target: field.end.toString(),
-                  label: field.type,
-                  properties: field.properties
-                }
-              });
-            }
-          }
-        }
-      });
-    });
-    
-    return {
-      nodes: Array.from(nodeMap.values()),
-      edges
-    };
+    // The API already processes the results into the correct format for Cytoscape
+    return response.data;
   } catch (error) {
-    console.error('Error executing Neo4j query:', error);
-    throw error;
-  } finally {
-    await session.close();
+    console.error('Error executing Neo4j query via API:', error);
+    // Return empty dataset on error to avoid breaking the UI
+    return {
+      nodes: [],
+      edges: [],
+      error: error.response?.data?.detail || error.message
+    };
   }
 };
 
+// Test connection to Neo4j via the API
+export const testConnection = async () => {
+  try {
+    const response = await axios.get(`${NEO4J_API_URL}/test-connection`);
+    return response.data;
+  } catch (error) {
+    console.error('Error testing Neo4j connection:', error);
+    return {
+      status: 'error',
+      message: error.response?.data?.detail || error.message
+    };
+  }
+};
+
+// Get Neo4j database statistics
+export const getDBStats = async () => {
+  try {
+    const response = await axios.get(`${NEO4J_API_URL}/db-stats`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting Neo4j stats:', error);
+    return {
+      papers: 0,
+      authors: 0,
+      categories: 0,
+      error: error.response?.data?.detail || error.message
+    };
+  }
+};
+
+// No need to close driver since we're using the API
 export const closeDriver = () => {
-  driver.close();
+  // This is now a no-op since we don't have a driver to close
+  // Kept for backward compatibility
+  console.log('No direct Neo4j connection to close. Using API instead.');
 };

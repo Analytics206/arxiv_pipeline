@@ -24,6 +24,7 @@ services:
     depends_on:
       - mongodb
       - qdrant
+      - neo4j
     environment:
       - MONGO_CONNECTION_STRING=mongodb://mongodb:27017/
       - MONGO_DB=arxiv_papers
@@ -32,6 +33,9 @@ services:
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
       - QDRANT_COLLECTION=arxiv_papers
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=password
     volumes:
       - ./config:/app/config
     ports:
@@ -130,11 +134,13 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - neo4j
+      - api
     environment:
+      # Direct Neo4j environment vars are kept for backward compatibility but are now used via API
       - REACT_APP_NEO4J_URI=bolt://neo4j:7687
       - REACT_APP_NEO4J_USER=neo4j
       - REACT_APP_NEO4J_PASSWORD=password
+      - REACT_APP_API_BASE_URL=http://api:8000
     volumes:
       - ./src/web-ui/src/config:/app/public/config
       

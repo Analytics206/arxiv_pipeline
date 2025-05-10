@@ -20,7 +20,11 @@ src/agents_core/models/claude.py
 src/agents_core/models/huggingface.py
 src/agents_core/models/ollama.py
 src/api/main.py
+src/api/models/mongodb.py
+src/api/models/neo4j.py
+src/api/models/qdrant.py
 src/api/routes/mongodb.py
+src/api/routes/neo4j.py
 src/api/routes/qdrant.py
 src/arxiv_pipeline.egg-info/PKG-INFO
 src/arxiv_pipeline.egg-info/SOURCES.txt

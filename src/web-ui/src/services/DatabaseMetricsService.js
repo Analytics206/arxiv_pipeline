@@ -1,74 +1,37 @@
-import neo4j from 'neo4j-driver';
 import config from '../config';
 import apiConfig from '../config/api-config';
+import axios from 'axios';
 
-// Neo4j metrics queries
-const PAPERS_COUNT_QUERY = 'MATCH (p:Paper) RETURN count(p) as count';
-const AUTHORS_COUNT_QUERY = 'MATCH (a:Author) RETURN count(a) as count';
-const CATEGORIES_COUNT_QUERY = 'MATCH (c:Category) RETURN count(c) as count';
+// API configuration for Neo4j
+const NEO4J_API_URL = `${apiConfig.API_BASE_URL}/neo4j`;
 
-// Initialize driver with connection settings from config
-let neo4jDriver = null;
-
-// Function to initialize Neo4j driver
-const initNeo4jDriver = () => {
-  try {
-    if (!neo4jDriver) {
-      neo4jDriver = neo4j.driver(
-        config.neo4j.uri,
-        neo4j.auth.basic(config.neo4j.user, config.neo4j.password),
-        { encrypted: false }
-      );
-      console.log('Neo4j driver initialized with URI:', config.neo4j.uri);
-    }
-    return neo4jDriver;
-  } catch (error) {
-    console.error('Failed to initialize Neo4j driver:', error);
-    return null;
-  }
-};
-
-// Check Neo4j connection
+// Check Neo4j connection through API
 export const checkNeo4jConnection = async () => {
   try {
-    const driver = initNeo4jDriver();
-    if (!driver) return { connected: false };
-
-    const session = driver.session();
-    await session.run('RETURN 1');
-    await session.close();
-    return { connected: true };
+    console.log(`Checking Neo4j connection via API: ${NEO4J_API_URL}/test-connection`);
+    const response = await axios.get(`${NEO4J_API_URL}/test-connection`);
+    
+    return { 
+      connected: response.data.status === 'success',
+      databases: response.data.databases || [] 
+    };
   } catch (error) {
     console.error('Neo4j connection check failed:', error);
     return { connected: false };
   }
 };
 
-// Get Neo4j metrics
+// Get Neo4j metrics via API
 export const getNeo4jMetrics = async () => {
   try {
-    const connection = await checkNeo4jConnection();
-    if (!connection.connected) {
-      return { papers: 0, authors: 0, categories: 0 };
-    }
-
-    const driver = neo4jDriver;
-    const session = driver.session();
-
-    // Fetch paper count
-    const papersResult = await session.run(PAPERS_COUNT_QUERY);
-    const papers = papersResult.records[0]?.get('count').toNumber() || 0;
-
-    // Fetch author count
-    const authorsResult = await session.run(AUTHORS_COUNT_QUERY);
-    const authors = authorsResult.records[0]?.get('count').toNumber() || 0;
-
-    // Fetch category count
-    const categoriesResult = await session.run(CATEGORIES_COUNT_QUERY);
-    const categories = categoriesResult.records[0]?.get('count').toNumber() || 0;
-
-    await session.close();
-    return { papers, authors, categories };
+    console.log(`Fetching Neo4j metrics from API: ${NEO4J_API_URL}/db-stats`);
+    const response = await axios.get(`${NEO4J_API_URL}/db-stats`);
+    
+    return {
+      papers: response.data.papers || 0,
+      authors: response.data.authors || 0,
+      categories: response.data.categories || 0
+    };
   } catch (error) {
     console.error('Failed to get Neo4j metrics:', error);
     return { papers: 0, authors: 0, categories: 0 };
@@ -180,11 +143,14 @@ export const getPaperAnalysisByTime = async (startDate = null, endDate = null, y
 
 // Get all database metrics
 export const getAllDatabaseMetrics = async () => {
-  const neo4jConnection = await checkNeo4jConnection();
+  // All connections are checked via API
   const mongoDBConnection = await checkMongoDBConnection();
   const qdrantConnection = await checkQdrantConnection();
-
-  const neo4jMetrics = neo4jConnection.connected ? await getNeo4jMetrics() : { papers: 0, authors: 0, categories: 0 };
+  const neo4jConnection = await checkNeo4jConnection();
+  
+  // Always get Neo4j metrics through API regardless of connection status
+  // The API will return zeros if there's an issue
+  const neo4jMetrics = await getNeo4jMetrics();
 
   // For MongoDB: count documents in the arxiv_papers.papers collection if connected
   let mongoMetrics = { papers: 0, authors: 0, categories: 0 };

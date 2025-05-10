@@ -1,10 +1,11 @@
 // Configuration settings for the ArXiv Pipeline Dashboard
 const config = {
-  // Neo4j connection settings
+  // Neo4j API settings (legacy config maintained for backwards compatibility)
   neo4j: {
-    uri: process.env.REACT_APP_NEO4J_URI || 'bolt://localhost:7687',
-    user: process.env.REACT_APP_NEO4J_USER || 'neo4j',
-    password: process.env.REACT_APP_NEO4J_PASSWORD || 'password',
+    // These direct connection settings are no longer used - API is used instead
+    uri: null,
+    user: null,
+    password: null,
   },
   // MongoDB connection settings
   mongodb: {
