@@ -80,7 +80,7 @@ arxiv:
   sort_order: "descending"
   max_iterations: 2000 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 3
-  start_date: "2023-01-01" # start_date is used in arxiv api call and save pdfs filters
+  start_date: "2022-01-01" # start_date is used in arxiv api call and save pdfs filters
   end_date: "2025-05-10" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
   max_no_papers: 200 # Maximum number of papers to fetch per category loop (0 for unlimited)
 # Embedding model settings

@@ -192,7 +192,7 @@ function MongoDBReports() {
                     onChange={(e) => setCategory(e.target.value)}
                   >
                     <option value="">All Categories</option>
-                    {availableCategories.map((cat) => (
+                    {[...availableCategories].sort((a, b) => a.localeCompare(b)).map((cat) => (
                       <option key={cat} value={cat}>
                         {cat}
                       </option>
