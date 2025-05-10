@@ -1,5 +1,48 @@
 # ArXiv Deep Research Pipeline Release Notes
 
+## Version 0.5.2 (May 9, 2025)
+
+### Major Features
+
+#### Web UI Enhancements
+- **Paper Analysis Dashboard** - Added interactive charts displaying paper publication trends by year/month/day
+- **MongoDB Analysis Integration** - Integrated analysis data from `analyze_papers_by_year_month_day.py` into the web UI
+- **API-driven Data Visualization** - Created new API endpoints to provide temporal analysis data
+- **Interactive Filtering** - Added date range, year, and category filtering capabilities to analysis dashboard
+- **Multi-view Charts** - Implemented yearly, monthly, and daily data visualization options
+- **Category Filter** - Added research category filtering using MongoDB's categories field with dynamic dropdown menu
+- **Formatted Metrics Display** - Enhanced numerical formatting with thousands separators for improved readability
+
+## Version 0.5.1 (May 9, 2025)
+
+### Major Features
+
+#### Data Validation and Analysis Utilities
+- **MongoDB Schema Validation** - Added comprehensive validation for paper document schema in MongoDB
+- **Publication Date Analysis** - Implemented flexible date analysis (year/month/day/weekday) for ArXiv papers
+- **Collection Analysis Tools** - Created utilities for analyzing MongoDB collection structure and content
+- **Data Integrity Checking** - Added functions to identify data integrity issues (duplicates, missing fields, temporal anomalies)
+- **Reporting Framework** - Created standardized reporting for temporal data with visualization
+
+### Technical Improvements
+- **Centralized Logger** - Added configurable logging system with standardized formatting
+- **Date Format Handling** - Implemented flexible handling of different date string formats in publications
+- **Validation Sampling** - Created efficient random sampling for validating large MongoDB collections
+- **Error Categorization** - Added systematic error categorization and counting for data quality monitoring
+- **Temporal Consistency Checks** - Implemented algorithms to detect time gaps and inconsistencies in paper collections
+
+### Documentation
+- **README Updates** - Added section on data validation utilities with code examples
+- **Validation Examples** - Created example scripts demonstrating validation usage
+- **Command-line Interface** - Added CLI tools for validating MongoDB collections
+
+### New Utilities
+- **count_papers_by_date.py** - Added utility to analyze paper publication dates with daily/monthly/yearly breakdowns
+- **analyze_papers_by_year_month_day.py** - Created hierarchical date analysis tool with visualization
+- **validate_mongodb_data.py** - Added comprehensive MongoDB validation utility with reporting
+
+---
+
 ## Version 0.5.0 (May 7, 2025)
 
 ### Major Features

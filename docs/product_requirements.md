@@ -72,6 +72,16 @@
 ### 3.10 AI Agent Platform (FR-AGT)
 - **FR-AGT-01**: Configurable AI Agent platform for research paper analysis and exploration
 
+### 3.11 Data Validation and Analysis (FR-VAL)
+- **FR-VAL-01**: Interactive dashboards for validating data loaded across different systems
+- **FR-VAL-02**: Temporal analysis of paper publications by year, month, and day
+- **FR-VAL-03**: Multi-dimensional filtering for data validation (date range, year, category)
+- **FR-VAL-04**: Visualization of data integrity and completeness metrics
+
+### 3.12 Advanced Analytics (FR-ANL)
+- **FR-ANL-01**: Category-based publication trend analysis with interactive filtering
+- **FR-ANL-02**: Visual representation of publication volume across time dimensions
+
 ### Optional/Nice-to-Have Features
 - **FR-PDF-01**: Optional PDF downloading/section parsing
 - **FR-REF-01**: Parse citation relationships

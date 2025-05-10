@@ -1,0 +1,45 @@
+.dashboard-container {
+  padding: 20px;
+}
+
+.dashboard-title {
+  margin-bottom: 20px;
+  color: #343a40;
+  text-align: center;
+}
+
+.view-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.card {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+}
+
+/* Chart container styling */
+.recharts-wrapper {
+  margin: 0 auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .view-tabs {
+    flex-direction: column;
+  }
+  
+  .view-tabs button {
+    margin-bottom: 10px;
+  }
+}

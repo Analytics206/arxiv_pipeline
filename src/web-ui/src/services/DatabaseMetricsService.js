@@ -148,6 +148,36 @@ export const getQdrantMetrics = async (isConnected) => {
   }
 };
 
+// Get papers analysis by year/month/day
+export const getPaperAnalysisByTime = async (startDate = null, endDate = null, yearFilter = null, category = null) => {
+  try {
+    // Build the query parameters
+    const params = new URLSearchParams();
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    if (yearFilter) params.append('year_filter', yearFilter);
+    if (category) params.append('category', category);
+    
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    
+    console.log(`Fetching paper analysis data from: ${apiConfig.API_BASE_URL}/metrics/mongodb/paper-analysis${queryString}`);
+    const response = await fetch(`${apiConfig.API_BASE_URL}/metrics/mongodb/paper-analysis${queryString}`);
+    
+    if (!response.ok) {
+      console.error(`Failed to fetch paper analysis data. Status: ${response.status}`);
+      return { yearly: {}, monthly: {}, daily: {}, total_papers: 0 };
+    }
+    
+    const data = await response.json();
+    console.log('Received paper analysis data:', data);
+    
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch paper analysis data:', error);
+    return { yearly: {}, monthly: {}, daily: {}, total_papers: 0 };
+  }
+};
+
 // Get all database metrics
 export const getAllDatabaseMetrics = async () => {
   const neo4jConnection = await checkNeo4jConnection();

@@ -1,7 +1,16 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 import os
+import sys
+from collections import OrderedDict
+from typing import Dict, Any, Optional
+
+# Add the src directory to sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# Import the analyze_papers_by_year_month_day function
+from utils.analyze_papers_by_year_month_day import analyze_papers_by_year_month_day
 
 router = APIRouter()
 
@@ -42,3 +51,55 @@ def test_mongodb_connection():
         return {"status": "error", "message": str(e)}
     finally:
         client.close()
+
+
+@router.get("/paper-analysis")
+def get_papers_by_time(
+    start_date: Optional[str] = Query(None, description="Start date in YYYY-MM-DD format"),
+    end_date: Optional[str] = Query(None, description="End date in YYYY-MM-DD format"),
+    year_filter: Optional[int] = Query(None, description="Filter by specific year (e.g., 2023)"),
+    category: Optional[str] = Query(None, description="Filter by paper category (e.g., cs.AI)")
+) -> Dict[str, Any]:
+    """
+    Returns analysis of papers by year, month, and day.
+    
+    Args:
+        start_date: Optional start date filter (format: YYYY-MM-DD)
+        end_date: Optional end date filter (format: YYYY-MM-DD)
+        year_filter: Optional year to filter results (e.g., 2023)
+    
+    Returns:
+        Dictionary with yearly, monthly, and daily paper counts
+    """
+    mongo_uri = os.getenv("MONGO_CONNECTION_STRING", "mongodb://mongodb:27017/")
+    db_name = os.getenv("MONGO_DB_NAME", "arxiv_papers")
+    
+    try:
+        # Call the analyze_papers_by_year_month_day function
+        yearly_data, monthly_data, daily_data, total_papers, categories_list = analyze_papers_by_year_month_day(
+            connection_string=mongo_uri,
+            db_name=db_name,
+            start_date=start_date,
+            end_date=end_date,
+            year_filter=year_filter,
+            category=category
+        )
+        
+        # Convert OrderedDict to dictionary for JSON serialization
+        return {
+            "yearly": {k: v for k, v in yearly_data.items()},
+            "monthly": {k: v for k, v in monthly_data.items()},
+            "daily": {k: v for k, v in daily_data.items()},
+            "total_papers": total_papers,
+            "categories": categories_list
+        }
+    except Exception as e:
+        # Return empty datasets in case of error
+        return {
+            "yearly": {},
+            "monthly": {},
+            "daily": {},
+            "total_papers": 0,
+            "categories": [],
+            "error": str(e)
+        }

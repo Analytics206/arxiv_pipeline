@@ -33,6 +33,8 @@ dependencies = [
     "matplotlib>=3.7.0",            # For visualization in notebooks
     "ipywidgets>=8.0.0",            # Interactive widgets for notebooks
     "python-dotenv>=1.0.0",         # Environment variable support
+    "fastapi>=0.100.0",             # API Framework for backend
+    "uvicorn>=0.23.0",              # ASGI server for FastAPI
     # "openai>=1.0.0",               # <-- Commented out, not needed for local-only
 ]
 

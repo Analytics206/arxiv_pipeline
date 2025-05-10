@@ -142,6 +142,8 @@ source .venv/bin/activate
 ## 1. **Build and start all basic required services:**
    ```bash
     docker compose up -d
+    # or to rebuild
+    docker compose up -d --build api
    ```
  - ✔ Network arxiv_pipeline_default         Started     
  - ✔ Container arxiv_pipeline-neo4j-1       Started     
@@ -331,7 +333,100 @@ c. **Start the development server**:
 
 * The web UI connects to Neo4j using environment variables defined in the docker-compose.yml file.
 
-## 7. Managing Individual Docker Containers
+## 7. Data Visualization and Analysis Dashboards
+
+### Paper Analysis Dashboard
+The ArXiv Pipeline includes an interactive Paper Analysis Dashboard that provides visual insights into publication trends and patterns. This dashboard is accessible through the MongoDB Reports section of the web interface.
+
+**Key Features:**
+- **Time-based Analysis**: View paper publication trends by year, month, or day
+- **Multi-dimensional Filtering**: Filter papers by date range, specific year, and research category
+- **Dynamic Category Selection**: Choose from the top 50 research categories in your collection
+- **Interactive Charts**: Toggle between different time granularities with responsive visualizations
+- **Formatted Metrics**: Clear display of total papers with proper numerical formatting
+
+**How to Access:**
+1. Navigate to the web UI (http://localhost:3000) when services are running
+2. Click on "MongoDB Reports" in the navigation menu
+3. Use the filter options to refine your analysis
+
+![Paper Analysis Dashboard](<images/paper_analysis_dashboard.png>)
+
+## 8. Data Validation and Analysis Utilities
+
+The ArXiv Pipeline includes comprehensive data validation and analysis utilities in `src/agents_core/logging_utils.py`. These utilities help ensure data quality, perform temporal analysis, and validate MongoDB collections.
+
+### Paper Schema Validation
+```python
+from src.agents_core.logging_utils import validate_paper_schema
+
+# Validate a paper document
+is_valid, errors = validate_paper_schema(paper_document)
+if not is_valid:
+    print(f"Paper validation failed with errors: {errors}")
+```
+
+### Temporal Analysis
+```python
+from src.agents_core.logging_utils import count_papers_by_date
+from src.storage.mongo import MongoStorage
+
+# Connect to MongoDB
+with MongoStorage() as mongo:
+    # Count papers by year
+    yearly_counts = count_papers_by_date(mongo.papers, date_field="published", group_by="year")
+    
+    # Count papers by month
+    monthly_counts = count_papers_by_date(mongo.papers, date_field="published", group_by="month")
+    
+    # Count papers by day of week
+    weekday_counts = count_papers_by_date(mongo.papers, date_field="published", group_by="weekday")
+```
+
+### MongoDB Collection Analysis
+```python
+from src.agents_core.logging_utils import analyze_mongodb_collection, validate_mongodb_data
+from src.storage.mongo import MongoStorage
+
+# Connect to MongoDB
+with MongoStorage() as mongo:
+    # Analyze collection structure
+    analysis = analyze_mongodb_collection(mongo.papers)
+    
+    # Validate collection data
+    validation_results = validate_mongodb_data(mongo.papers, validate_paper_schema)
+```
+
+### Data Integrity Checking
+```python
+from src.agents_core.logging_utils import check_data_integrity
+from src.storage.mongo import MongoStorage
+
+# Connect to MongoDB
+with MongoStorage() as mongo:
+    # Check data integrity with date range
+    integrity_results = check_data_integrity(
+        mongo.papers, 
+        date_range=("2024-01-01T00:00:00Z", "2025-12-31T23:59:59Z")
+    )
+```
+
+### Formatted Reports
+```python
+from src.agents_core.logging_utils import generate_date_distribution_report, count_papers_by_date
+from src.storage.mongo import MongoStorage
+
+# Connect to MongoDB
+with MongoStorage() as mongo:
+    # Generate monthly report
+    monthly_counts = count_papers_by_date(mongo.papers, group_by="month")
+    report = generate_date_distribution_report(monthly_counts, title="Monthly Paper Distribution")
+    print(report)
+```
+
+These utilities help maintain data quality and provide insights into the ArXiv paper collection. They can be used for monitoring, debugging, and generating reports.
+
+## 9. Managing Individual Docker Containers
 * For more fine-grained control over system components, you can start, stop, restart, and inspect specific containers:
 
 ### a. Starting Individual Required Containers

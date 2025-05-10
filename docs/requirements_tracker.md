@@ -66,3 +66,9 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-REP-02   | Create connectivity testing notebooks                   | BRD-10        | ✅     | In progress                 |  
 | FR-REP-03   | Include data visualization capabilities               | BRD-10        | ⏳     | Planned after connectivity  |  
 | FR-REP-04   | Document notebook usage and setup                     | BRD-10        | ⏳     | To be created               |  
+| FR-VAL-01   | Interactive dashboards for data validation            | BRD-17        | ✅     | Implemented in MongoDB dashboard |  
+| FR-VAL-02   | Temporal analysis of paper publications              | BRD-18        | ✅     | Year/month/day analysis implemented |  
+| FR-VAL-03   | Multi-dimensional filtering for data validation      | BRD-17, BRD-18| ✅     | Date range, year, category filters |  
+| FR-VAL-04   | Visualization of data integrity metrics              | BRD-17        | ✅     | Total papers with formatting |  
+| FR-ANL-01   | Category-based publication trend analysis             | BRD-18        | ✅     | Category filter in dashboard |  
+| FR-ANL-02   | Visual representation of publication volume           | BRD-18        | ✅     | Bar and line charts implemented |  
