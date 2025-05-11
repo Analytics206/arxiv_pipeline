@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Components
 import NavBar from './components/NavBar';
@@ -15,7 +16,8 @@ import PipelineManagement from './components/PipelineManagement';
 
 function App() {
   return (
-    <div className="App">
+    <ThemeProvider>
+      <div className="App">
       <NavBar />
       <div className="content">
         <Routes>
@@ -33,6 +35,7 @@ function App() {
         <p>Deep Research Pipeline - Data Science Research Tool</p>
       </footer>
     </div>
+    </ThemeProvider>
   );
 }
 

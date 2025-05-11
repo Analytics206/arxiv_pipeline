@@ -6,6 +6,10 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+// Initialize theme from localStorage
+const savedTheme = localStorage.getItem('darkMode') === 'true' ? 'dark-theme' : 'light-theme';
+document.documentElement.classList.add(savedTheme);
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

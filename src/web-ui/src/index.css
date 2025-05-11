@@ -1,3 +1,4 @@
+/* All styles in index.css should use theme variables */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,34 +6,42 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+  color: var(--color-text-primary);
 }
 
 .graph-container {
   height: 80vh;
   width: 100%;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 5px;
+  background-color: var(--color-bg-secondary);
 }
 
 .sidebar {
   padding: 15px;
-  border-right: 1px solid #eee;
+  border-right: 1px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
 }
 
 .node-details {
   padding: 15px;
-  background-color: #f8f9fa;
+  background-color: var(--color-card-bg);
   border-radius: 5px;
   margin-top: 15px;
+  color: var(--color-text-primary);
+  box-shadow: 0 2px 4px var(--color-card-shadow);
 }
 
 .query-description {
   margin-bottom: 15px;
   font-style: italic;
-  color: #6c757d;
+  color: var(--color-text-secondary);
 }
