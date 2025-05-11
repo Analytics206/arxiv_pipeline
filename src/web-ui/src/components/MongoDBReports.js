@@ -145,7 +145,7 @@ function MongoDBReports() {
 
   return (
     <Container fluid className="dashboard-container">
-      <h1 className="dashboard-title">Paper Analysis Dashboard</h1>
+      <h1 className="dashboard-title">MongoDB Paper Analysis</h1>
       
       {/* Filter Form */}
       <Card className="mb-4">
