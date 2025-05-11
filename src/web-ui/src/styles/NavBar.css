@@ -18,6 +18,13 @@
   .navbar-logo a {
     color: var(--color-header-text);
     text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar-logo-img {
+    height: 40px;
+    width: auto;
   }
   
   .navbar-links {

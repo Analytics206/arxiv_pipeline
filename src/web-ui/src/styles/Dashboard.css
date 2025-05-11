@@ -4,8 +4,9 @@
 
 .dashboard-title {
   margin-bottom: 20px;
-  color: #343a40;
+  color: var(--color-text-primary);
   text-align: center;
+  transition: color 0.3s ease;
 }
 
 .view-tabs {
@@ -14,14 +15,44 @@
   margin-bottom: 20px;
 }
 
+.view-tabs button {
+  background-color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+}
+
+.view-tabs button:hover {
+  opacity: 0.85;
+}
+
+.view-tabs .btn-outline-primary {
+  color: white !important;
+  background-color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+  opacity: 0.7;
+}
+
+.view-tabs .btn-outline-primary:hover {
+  opacity: 0.85;
+}
+
+.btn-primary {
+  background-color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+}
+
 .card {
   margin-bottom: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px var(--color-card-shadow);
+  background-color: var(--color-card-bg);
+  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-header {
-  background-color: #f8f9fa;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
   font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .filter-section {

@@ -11,12 +11,14 @@
   
   .neo4j-explorer-header h1 {
     font-size: 2.2rem;
-    color: #2c3e50;
+    color: var(--color-text-primary);
     margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
   }
   
   .neo4j-explorer-header p {
-    color: #7f8c8d;
+    color: var(--color-text-secondary);
+    transition: color 0.3s ease;
   }
   
   .neo4j-explorer-loading {
@@ -25,33 +27,39 @@
     align-items: center;
     height: 80vh;
     font-size: 1.2rem;
-    color: #7f8c8d;
+    color: var(--color-text-secondary);
+    transition: color 0.3s ease;
   }
   
   .query-selector {
-    background-color: #f8f9fa;
+    background-color: var(--color-card-bg);
     padding: 1.5rem;
     border-radius: 8px;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--color-card-shadow);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
   
   .query-selector h2 {
     margin-bottom: 1rem;
-    color: #2c3e50;
+    color: var(--color-text-primary);
+    transition: color 0.3s ease;
   }
   
   .query-selector select {
     padding: 0.5rem;
     margin-right: 1rem;
     width: 300px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
   
   .run-query-button {
     padding: 0.5rem 1.5rem;
-    background-color: #3498db;
+    background-color: var(--color-accent);
     color: white;
     border: none;
     border-radius: 4px;
@@ -60,7 +68,8 @@
   }
   
   .run-query-button:hover {
-    background-color: #2980b9;
+    background-color: var(--color-accent);
+    opacity: 0.8;
   }
   
   .run-query-button:disabled {
@@ -69,39 +78,46 @@
   }
   
   .error-message {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-error);
     padding: 1rem;
     border-radius: 4px;
     margin-bottom: 2rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   
   .query-description {
-    background-color: #fff;
+    background-color: var(--color-card-bg);
     padding: 1.5rem;
     border-radius: 8px;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--color-card-shadow);
+    color: var(--color-text-primary);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
   }
   
   .cypher-query {
-    background-color: #f8f9fa;
+    background-color: var(--color-bg-secondary);
     padding: 1rem;
     border-radius: 4px;
     overflow-x: auto;
     font-family: monospace;
+    color: var(--color-text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   
   .visualization-container {
-    background-color: #fff;
+    background-color: var(--color-card-bg);
     padding: 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--color-card-shadow);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
   
   .visualization-container h2 {
     margin-bottom: 1.5rem;
-    color: #2c3e50;
+    color: var(--color-text-primary);
+    transition: color 0.3s ease;
   }
   
   .empty-graph {
@@ -109,8 +125,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f8f9fa;
+    background-color: var(--color-bg-secondary);
     border-radius: 4px;
-    color: #7f8c8d;
+    color: var(--color-text-secondary);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
-  

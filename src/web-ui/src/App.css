@@ -5,6 +5,7 @@
   --color-bg-secondary: #ffffff;
   --color-text-primary: #333333;
   --color-text-secondary: #666666;
+  --color-text-error: #e74c3c;
   --color-accent: #3498db;
   --color-border: #eaeaea;
   --color-card-bg: #ffffff;
@@ -20,16 +21,17 @@ html.dark-theme {
   /* Dark theme variables */
   --color-bg-primary: #121212;
   --color-bg-secondary: #1e1e1e;
-  --color-text-primary: #e0e0e0;
-  --color-text-secondary: #a0a0a0;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cccccc;
+  --color-text-error: #ff6b6b;
   --color-accent: #61dafb;
-  --color-border: #333;
-  --color-card-bg: #1e1e1e;
+  --color-border: #444;
+  --color-card-bg: #2a2a2a;
   --color-card-shadow: rgba(0, 0, 0, 0.4);
   --color-header-bg: #1a1a1a;
-  --color-header-text: #e0e0e0;
+  --color-header-text: #ffffff;
   --color-footer-bg: #1a1a1a;
-  --color-footer-text: #e0e0e0;
+  --color-footer-text: #ffffff;
 }
 
 /* Light theme explicitly set (redundant with :root but kept for consistency) */

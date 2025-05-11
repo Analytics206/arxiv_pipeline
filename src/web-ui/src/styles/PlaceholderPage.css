@@ -3,32 +3,37 @@
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
+    color: var(--color-text-primary);
   }
   
   .placeholder-container h1 {
     font-size: 2.5rem;
-    color: #2c3e50;
+    color: var(--color-text-primary);
     margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   
   .placeholder-subtitle {
     font-size: 1.25rem;
-    color: #7f8c8d;
+    color: var(--color-text-secondary);
     margin-bottom: 3rem;
+    transition: color 0.3s ease;
   }
   
   .placeholder-content {
-    background-color: #f8f9fa;
+    background-color: var(--color-card-bg);
     border-radius: 8px;
     padding: 2rem;
     text-align: left;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px var(--color-card-shadow);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
   
   .placeholder-content p {
     font-size: 1.1rem;
     margin-bottom: 1rem;
-    color: #2c3e50;
+    color: var(--color-text-primary);
+    transition: color 0.3s ease;
   }
   
   .placeholder-content ul {
@@ -37,6 +42,6 @@
   
   .placeholder-content li {
     margin-bottom: 0.75rem;
-    color: #34495e;
+    color: var(--color-text-primary);
+    transition: color 0.3s ease;
   }
-  
