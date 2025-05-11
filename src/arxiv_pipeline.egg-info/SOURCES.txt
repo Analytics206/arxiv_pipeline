@@ -40,6 +40,10 @@ src/pipeline/run_pipeline.py
 src/pipeline/sync_mongodb.py
 src/pipeline/sync_qdrant.py
 src/pipeline/sync_summary_vectors.py
+src/pubmed/config.py
+src/pubmed/db_client.py
+src/pubmed/main.py
+src/pubmed/pubmed_client.py
 src/storage/mongo.py
 src/utils/analyze_papers_by_year_month_day.py
 src/utils/check_pdf_urls.py
