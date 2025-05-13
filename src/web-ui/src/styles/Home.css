@@ -25,25 +25,25 @@
 }
 
 .card {
-  background-color: var(--color-card-bg);
+  background-color: var(--color-tile-bg);
   border-radius: 8px;
-  box-shadow: 0 4px 6px var(--color-card-shadow);
+  box-shadow: 0 4px 6px var(--color-tile-shadow);
   padding: 1.5rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-tile-border);
 }
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 15px var(--color-card-shadow);
+  box-shadow: 0 8px 15px var(--color-tile-hover-shadow);
 }
 
 .card h2 {
-  color: var(--color-text-primary);
+  color: var(--color-tile-heading, var(--color-text-primary));
   margin-bottom: 1rem;
   font-weight: bold;
   transition: color 0.3s ease;
@@ -51,7 +51,7 @@
 }
 
 .card p {
-  color: var(--color-text-secondary);
+  color: var(--color-tile-text, var(--color-text-secondary));
   margin-bottom: 1.5rem;
   flex-grow: 1;
   transition: color 0.3s ease;
@@ -61,13 +61,13 @@
 
 .card-button {
   display: inline-block;
-  background-color: var(--color-accent);
-  color: white;
+  background-color: var(--color-tile-button-bg, var(--color-accent));
+  color: var(--color-tile-button-text, white);
   padding: 0.5rem 1.5rem;
   border-radius: 4px;
   text-decoration: none;
   font-weight: bold;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .card-button:hover {
@@ -78,9 +78,9 @@
 .metrics-table-container {
   margin-top: 3rem;
   padding: 1.5rem;
-  background-color: var(--color-card-bg);
+  background-color: var(--color-metrics-bg);
   border-radius: 8px;
-  box-shadow: 0 4px 8px var(--color-card-shadow);
+  box-shadow: 0 4px 8px var(--color-metrics-shadow);
   transition: background-color 0.3s ease;
 }
 
@@ -95,8 +95,8 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1rem;
-  background-color: var(--color-card-bg);
-  box-shadow: 0 2px 4px var(--color-card-shadow);
+  background-color: var(--color-metrics-bg);
+  box-shadow: 0 2px 4px var(--color-metrics-shadow);
   transition: background-color 0.3s ease;
 }
 
@@ -122,12 +122,12 @@
 }
 
 .metrics-table tr {
-  background-color: var(--color-card-bg);
+  background-color: var(--color-metrics-row);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .metrics-table tr:nth-child(even) {
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-metrics-row-alt);
 }
 
 .metrics-table tbody tr:hover {

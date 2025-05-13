@@ -7,7 +7,7 @@ function NavBar() {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <Link to="/"><img src="/images/drp_logo.png" alt="DRP Home" className="navbar-logo-img" /></Link>
+        <Link to="/"><img src="/images/drp_logo_blue.png" alt="DRP Home" className="navbar-logo-img" /></Link>
       </div>
       <div className="navbar-links">
         <Link to="/neo4j" className="nav-link">Neo4j Explorer</Link>

@@ -1,3 +1,4 @@
+/* #be4d25 - orange, #2596be - dark blue, #17b0e6 - would like - #E64D17 - orange */
 /* Define CSS variables on :root so they cascade to all elements */
 :root {
   /* Light theme variables (default) */
@@ -6,10 +7,21 @@
   --color-text-primary: #333333;
   --color-text-secondary: #666666;
   --color-text-error: #e74c3c;
-  --color-accent: #3498db;
+  --color-accent: #17b0e6;
   --color-border: #eaeaea;
+  /* General card variables */
   --color-card-bg: #ffffff;
   --color-card-shadow: rgba(0, 0, 0, 0.1);
+  /* Homepage tile specific variables */
+  --color-tile-bg: #ffffff;
+  --color-tile-shadow: rgba(0, 0, 0, 0.1);
+  --color-tile-border: #eaeaea;
+  --color-tile-hover-shadow: rgba(0, 0, 0, 0.2);
+  /* Metrics table specific variables */
+  --color-metrics-bg: #ffffff;
+  --color-metrics-shadow: rgba(0, 0, 0, 0.1);
+  --color-metrics-row: #ffffff;
+  --color-metrics-row-alt: #f5f8fa;
   --color-header-bg: #2c3e50;
   --color-header-text: #ffffff;
   --color-footer-bg: #2c3e50;
@@ -24,10 +36,25 @@ html.dark-theme {
   --color-text-primary: #ffffff;
   --color-text-secondary: #cccccc;
   --color-text-error: #ff6b6b;
-  --color-accent: #61dafb;
+  --color-accent: #17b0e6;
   --color-border: #444;
+  /* General card variables */  
   --color-card-bg: #2a2a2a;
-  --color-card-shadow: rgba(0, 0, 0, 0.4);
+  --color-card-shadow: rgba(124, 95, 95, 0.4);
+  /* Homepage tile specific variables */
+  --color-tile-bg: #2a2a2a;
+  --color-tile-shadow: rgba(124, 95, 95, 0.4);
+  --color-tile-border: #444;
+  --color-tile-hover-shadow: rgba(124, 95, 95, 0.6);
+  --color-tile-heading: #17b0e6;
+  --color-tile-text: #cccccc;
+  --color-tile-button-bg: #17b0e6;
+  --color-tile-button-text: #121212;
+  /* Metrics table specific variables */
+  --color-metrics-bg: #1e1e1e;
+  --color-metrics-shadow: rgba(0, 0, 0, 0.5);
+  --color-metrics-row: #2a2a2a;
+  --color-metrics-row-alt: #262626;
   --color-header-bg: #1a1a1a;
   --color-header-text: #ffffff;
   --color-footer-bg: #1a1a1a;
@@ -40,10 +67,21 @@ html.light-theme {
   --color-bg-secondary: #ffffff;
   --color-text-primary: #333333;
   --color-text-secondary: #666666;
-  --color-accent: #3498db;
-  --color-border: #eaeaea;
+  /* General card variables */
   --color-card-bg: #ffffff;
   --color-card-shadow: rgba(0, 0, 0, 0.1);
+  /* Homepage tile specific variables */
+  --color-tile-bg: #ffffff;
+  --color-tile-shadow: rgba(0, 0, 0, 0.1);
+  --color-tile-border: #eaeaea;
+  --color-tile-hover-shadow: rgba(0, 0, 0, 0.2);
+  /* Metrics table specific variables */
+  --color-metrics-bg: #ffffff;
+  --color-metrics-shadow: rgba(0, 0, 0, 0.1);
+  --color-metrics-row: #ffffff;
+  --color-metrics-row-alt: #f5f8fa;
+  --color-accent: #17b0e6;
+  --color-border: #eaeaea;
   --color-header-bg: #2c3e50;
   --color-header-text: #ffffff;
   --color-footer-bg: #2c3e50;
