@@ -1,4 +1,5 @@
-# 🧠 Deep Research Pipeline - DRP
+# [<img src="src/web-ui/public/images/drp_logo_blue.png" width="250"/>](src/web-ui/public/images/drp_logo_blue.png)
+🧠 Deep Research Pipeline  
 ## Overview
 A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. This system enables offline graph-based and semantic search through an integrated architecture of MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker containers for easy, consistent local deployment.
 
@@ -17,6 +18,7 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 ---
 
 ### Neo4j Graph Database
+
 ![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
 ### Dashboard reporting
 ![alt text](<images/Screenshot 2025-05-09 013100.png>)
