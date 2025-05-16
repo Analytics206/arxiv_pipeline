@@ -1,5 +1,16 @@
 # ArXiv Deep Research Pipeline Release Notes
 
+---
+## Version 0.5.2 (May 15, 2025)
+
+### PDF Download Improvements
+- **Invalid URL Tracking** - Added tracking of invalid PDF URLs in MongoDB's `invalid_pdfs` collection
+- **Efficient Filtering** - Enhanced download script to skip papers that are either downloaded or marked as invalid
+- **Detailed Error Logging** - Improved error handling to log HTTP status codes and reasons for failed downloads
+- **Configuration Update** - Reduced `papers_per_category` limit from 500 to 100 in default configuration
+
+---
+
 ## Version 0.5.1 (May 9, 2025)
 
 ### Major Features
@@ -38,6 +49,7 @@
 - **validate_mongodb_data.py** - Added comprehensive MongoDB validation utility with reporting
 
 ---
+
 
 ## Version 0.5.0 (May 7, 2025)
 

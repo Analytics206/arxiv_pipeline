@@ -3,6 +3,7 @@ import requests
 import yaml
 from pymongo import MongoClient
 from tqdm import tqdm
+from datetime import datetime
 
 # Load configuration from file
 def load_config():
@@ -57,7 +58,7 @@ def get_pdf_filename(paper):
     arxiv_id = extract_arxiv_id(pdf_url)
     return f"{arxiv_id}.pdf"
 
-def download_pdf(url, filepath):
+def download_pdf(url, filepath, db):
     try:
         response = requests.get(url, stream=True, timeout=30)
         response.raise_for_status()
@@ -66,6 +67,19 @@ def download_pdf(url, filepath):
                 if chunk:
                     f.write(chunk)
         return True
+    except requests.exceptions.HTTPError as e:
+        arxiv_id = extract_arxiv_id(url)
+        invalid_pdfs = db["invalid_pdfs"]
+        # Check if this URL is already logged
+        if not invalid_pdfs.find_one({"url": url}):
+            invalid_pdfs.insert_one({
+                "url": url,
+                "arxiv_id": arxiv_id,
+                "timestamp": datetime.utcnow(),
+                "error": f"HTTP {e.response.status_code}: {e.response.reason}"
+            })
+        print(f"HTTP Error {e.response.status_code} for URL: {url}")
+        return False
     except Exception as e:
         print(f"Failed to download {url}: {e}")
         return False
@@ -119,29 +133,36 @@ def sort_papers_by_date(papers, ascending=False):
 
 def get_downloaded_papers_from_db(db):
     """
-    Fetch previously downloaded papers from the downloaded_pdfs collection.
-    Returns a set of arXiv IDs.
+    Fetch previously downloaded papers from both downloaded_pdfs and invalid_pdfs collections.
+    Returns a set of arXiv IDs that should be skipped.
     """
-    # Check if collection exists
-    if 'downloaded_pdfs' not in db.list_collection_names():
+    downloaded_ids = set()
+    
+    # Get downloaded papers
+    if 'downloaded_pdfs' in db.list_collection_names():
+        downloaded_pdfs_collection = db.get_collection('downloaded_pdfs')
+        downloaded_papers = downloaded_pdfs_collection.find({"downloaded": True}, {"arxiv_id": 1})
+        downloaded_ids.update({paper["arxiv_id"] for paper in downloaded_papers})
+    else:
         print("Warning: 'downloaded_pdfs' collection not found. Run track_downloaded_pdfs.py first.")
-        return set()
     
-    # Get collection
-    downloaded_pdfs_collection = db.get_collection('downloaded_pdfs')
+    # Get invalid papers
+    if 'invalid_pdfs' in db.list_collection_names():
+        invalid_pdfs_collection = db.get_collection('invalid_pdfs')
+        invalid_papers = invalid_pdfs_collection.find({}, {"arxiv_id": 1})
+        downloaded_ids.update({paper["arxiv_id"] for paper in invalid_papers})
     
-    # Get papers that are marked as downloaded
-    downloaded_papers = downloaded_pdfs_collection.find({"downloaded": True}, {"arxiv_id": 1})
-    return {paper["arxiv_id"] for paper in downloaded_papers}
+    return downloaded_ids
 
 def main():
-    ensure_dir(PDF_DIR)
+    """Main function to download PDFs from arXiv."""
     client = MongoClient(MONGO_URI)
     db = client[DB_NAME]
+    ensure_dir(PDF_DIR)
     
-    # Get already downloaded papers from downloaded_pdfs collection
+    # Get already downloaded or invalid papers
     downloaded_papers = get_downloaded_papers_from_db(db)
-    print(f"Found {len(downloaded_papers)} already downloaded papers in MongoDB")
+    print(f"Found {len(downloaded_papers)} papers already downloaded or marked as invalid")
     
     # Query MongoDB for papers with PDF URLs
     query = {"pdf_url": {"$exists": True, "$ne": ""}}
@@ -206,7 +227,7 @@ def main():
         # Extract arXiv ID to check against downloaded_pdfs collection
         arxiv_id = extract_arxiv_id(pdf_url)
         
-        # Skip if already in MongoDB downloaded_pdfs collection
+        # Skip if already downloaded or marked as invalid
         if arxiv_id in downloaded_papers:
             already_downloaded_count += 1
             continue
@@ -236,7 +257,7 @@ def main():
             continue
             
         # Download the PDF
-        success = download_pdf(pdf_url, filepath)
+        success = download_pdf(pdf_url, filepath, db)
         
         # Increment counter if download was successful - only counts NEW downloads
         if success:

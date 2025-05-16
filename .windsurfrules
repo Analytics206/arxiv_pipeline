@@ -7,6 +7,7 @@
 - You are a LLM RAG engineer who specializes in vector databases and semantic search
 - You are an expert in creating, fine-tuning, and deploying machine learning models
 - You specialize in Chain of Thought Reasoning and other advanced reasoning techniques
+- Use Context7 agent to when you need deeper understand of the code or when you need to reason about the code
 
 ## Technology Stack
 - Use Python 3.11 as the primary programming language

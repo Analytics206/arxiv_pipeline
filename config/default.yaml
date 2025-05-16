@@ -25,7 +25,7 @@ qdrant:
     - "cs.CV" 
     - "cs.LG"
   papers_per_category: 9 # Maximum number of papers to process into vectors per category (0 for unlimited)
-  default_pdf_path: "E:/AI Research" # Base directory where PDFs are loaded from for vector processing
+  default_pdf_path: "X:/AI Research" # Base directory where PDFs are loaded from for vector processing
   gpu_enabled: true # Enable GPU for vector operations
   gpu_device: 1 # Use the second GPU (index 1)
   # Tracking settings for processed PDFs
@@ -90,16 +90,16 @@ embedding:
 
 # PDF storage settings
 pdf_storage:
-  directory: "E:/AI Research" # where papers are downloaded @download_pdfs.py subdirectory is auto created by category
-  papers_per_category: 100 # Maximum number of papers to download per category (0 for unlimited)
+  directory: "X:/AI Research" # where papers are downloaded @download_pdfs.py subdirectory is auto created by category
+  papers_per_category: 200 # Maximum number of papers to download per category (0 for unlimited)
   # Categories to prioritize for PDF downloads - if empty, all papers in MongoDB will be considered
   process_categories: # used in download_pdfs.py - comment out categories you don't want to download
     - "cs.AI"
     # - "cs.CL"
-    - "cs.CV"
+    # - "cs.CV"
     # - "cs.DS"
     # - "cs.GT"
-    - "cs.LG"
+    # - "cs.LG"
     # - "cs.LO"
     # - "cs.MA"
     # - "cs.NA"
