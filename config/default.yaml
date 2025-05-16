@@ -34,7 +34,7 @@ qdrant:
     collection_name: "vector_processed_pdfs" # MongoDB collection to store tracking information
     sync_with_qdrant: true # Whether to sync tracking with actual Qdrant contents
 
-# Paper Summary Vector settings
+# Qdrant Paper Summary Vector settings
 paper_summaries:
   enabled: true
   qdrant:
@@ -91,16 +91,16 @@ embedding:
 # PDF storage settings
 pdf_storage:
   directory: "E:/AI Research" # where papers are downloaded @download_pdfs.py subdirectory is auto created by category
-  papers_per_category: 200 # Maximum number of papers to download per category (0 for unlimited)
+  papers_per_category: 100 # Maximum number of papers to download per category (0 for unlimited)
   # Categories to prioritize for PDF downloads - if empty, all papers in MongoDB will be considered
   process_categories: # used in download_pdfs.py - comment out categories you don't want to download
     - "cs.AI"
-    - "cs.CL"
+    # - "cs.CL"
     - "cs.CV"
-    - "cs.DS"
-    - "cs.GT"
+    # - "cs.DS"
+    # - "cs.GT"
     - "cs.LG"
-    - "cs.LO"
+    # - "cs.LO"
     # - "cs.MA"
     # - "cs.NA"
     # - "cs.NE"
@@ -114,7 +114,7 @@ pdf_storage:
   download_date_filter:
     enabled: true         # Set to false to disable date filtering
     start_date: "2023-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2025-05-10"   # Download papers published on or before this date (format: YYYY-MM-DD)
+    end_date: "2025-05-20"   # Download papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
 
 # Logging settings

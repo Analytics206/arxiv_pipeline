@@ -50,6 +50,7 @@
 - Always maintain configuration in YAML files (config/default.yaml)
 - Support environment variable overrides for configuration values
 - Monitor system performance using Prometheus/Grafana stack
+- System should run on Windows 11 and ubuntu 24.04
 
 ## Important Safeguards
 - Do not delete or remove features unless specified by the user

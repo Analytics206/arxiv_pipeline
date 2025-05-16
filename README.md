@@ -141,7 +141,7 @@ source .venv/bin/activate
 # Dockerized Deployment - Docker Desktop Running
 ## 0. Suggested run in venv from scripts above for your operating system
 
-## 1. **Build and start all basic required services:**
+## 1. **Build and start all basic required services:** 196,293
    ```bash
     docker compose up -d
     # or to rebuild

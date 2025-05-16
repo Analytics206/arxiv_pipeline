@@ -88,7 +88,7 @@ def update_mongodb(mongo_client, db_name, collection_name, downloaded_pdfs):
     
     # Use bulk operations for better performance
     bulk_operations = []
-    max_bulk_size = 500  # Process in chunks to avoid memory issues
+    max_bulk_size = 1000  # Process in chunks to avoid memory issues
     timestamp = datetime.utcnow().isoformat()
     
     logger.info(f"Processing {len(downloaded_pdfs)} downloaded PDFs in MongoDB")

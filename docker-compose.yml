@@ -115,18 +115,17 @@ services:
       - manual
     build: .
     command: python -m src.pipeline.sync_qdrant
-    depends_on:
-      - mongodb
-      - qdrant
     environment:
-      # Point to local Qdrant instance using host.docker.internal
-      - QDRANT_URL=http://host.docker.internal:6333
+      - MONGO_URI=mongodb://mongodb:27017/
+      - QDRANT_URL=http://qdrant:6333
     volumes:
       - ./config:/app/config
       - ./data:/app/data
-      # Map your Windows PDF directory to /app/data/pdfs in the container
-      - E:/AI Research:/app/data/pdfs
-      
+      - "E:/AI Research:/app/data/pdfs"
+    depends_on:
+      - mongodb
+      - qdrant
+
   web-ui:
     build:
       context: ./src/web-ui

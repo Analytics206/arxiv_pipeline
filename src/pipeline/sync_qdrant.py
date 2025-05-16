@@ -28,14 +28,12 @@ QDRANT_URL = config['qdrant']['url']
 QDRANT_COLLECTION = config['qdrant']['collection_name']
 
 # Handle path differences between Docker container and local environment
-# In Docker, the E:/AI Research is mapped to /app/data/pdfs
 PDF_BASE_DIR = config['qdrant'].get('default_pdf_path', "E:/AI Research")
-# If running in Docker, the path will be /app/data/pdfs
 if os.path.exists("/app/data/pdfs"):
     print("Running in Docker environment, using /app/data/pdfs")
     PDF_BASE_DIR = "/app/data/pdfs"
 else:
-    print(f"Running in local environment, using {PDF_BASE_DIR}")
+    print(f"Using local environment path: {PDF_BASE_DIR}")
 
 PROCESS_CATEGORIES = config['qdrant'].get('process_categories', [])
 MAX_PAPERS_PER_CATEGORY = config['qdrant'].get('papers_per_category', 0)  # 0 means unlimited
@@ -200,19 +198,82 @@ def process_pdf(pdf_path, qdrant_url=QDRANT_URL, qdrant_collection=QDRANT_COLLEC
         device = "cpu"
         print("CUDA not available or not enabled, using CPU for embeddings")
     
-    # Initialize embeddings with device
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
-        model_kwargs={"device": device}
-    )
+    # Initialize embeddings with device and ensure we use local cached models
+    try:
+        from sentence_transformers import SentenceTransformer
+        # Try to load the model first with cache_folder to ensure we're using a local copy
+        model_name = "sentence-transformers/all-MiniLM-L6-v2"
+        local_model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 
+                                      "data", "models", "all-MiniLM-L6-v2")
+        
+        # Create the directory if it doesn't exist
+        os.makedirs(local_model_path, exist_ok=True)
+        
+        print(f"Loading embeddings model from local path: {local_model_path}")
+        model = SentenceTransformer(model_name, device=device, cache_folder=local_model_path)
+        
+        # Custom offline embeddings with our loaded model
+        def get_embeddings(texts):
+            return model.encode(texts, convert_to_tensor=False).tolist()
+        
+        # Create Qdrant client directly
+        from qdrant_client import QdrantClient
+        from qdrant_client.http import models as rest
+        
+        # Try to connect to Qdrant
+        host = "localhost"
+        port = 6333
+        print(f"Connecting to Qdrant at {host}:{port}...")
+        
+        # Initialize Qdrant client
+        qdrant = QdrantClient(host=host, port=port)
+        
+        # Create or get collection
+        try:
+            collection_info = qdrant.get_collection(collection_name=qdrant_collection)
+            print(f"Using existing collection: {qdrant_collection}")
+        except Exception:
+            # Create new collection if it doesn't exist
+            print(f"Creating new collection: {qdrant_collection}")
+            qdrant.create_collection(
+                collection_name=qdrant_collection,
+                vectors_config=rest.VectorParams(
+                    size=384,  # MiniLM-L6-v2 dimension
+                    distance=rest.Distance.COSINE
+                )
+            )
+            
+        # Process and store each text chunk
+        print(f"Processing {len(chunks)} text chunks from PDF...")
+        for i, chunk in enumerate(chunks):
+            # Convert LangChain Document to text content
+            text = chunk.page_content
+            metadata = chunk.metadata
+            
+            # Get embeddings for the text
+            embedding = get_embeddings([text])[0]
+            
+            # Add vectors to Qdrant
+            qdrant.upsert(
+                collection_name=qdrant_collection,
+                points=[
+                    rest.PointStruct(
+                        id=hash(f"{pdf_path}_{i}") % (2**63-1),  # Create a unique ID
+                        vector=embedding,
+                        payload={
+                            "text": text,
+                            "source": pdf_path,
+                            **metadata
+                        }
+                    )
+                ]
+            )
+        print(f"Successfully added {len(chunks)} chunks to Qdrant")
     
-    # Create Qdrant collection
-    vectorstore = Qdrant.from_documents(
-        documents=chunks,
-        embedding=embeddings,
-        url=qdrant_url,
-        collection_name=qdrant_collection
-    )
+    except Exception as e:
+        print(f"Error connecting to Qdrant or processing embeddings: {str(e)}")
+        print("Continuing with extraction-only mode (no vector storage)")
+        # Just continue with the image extraction, don't fail the entire process
 
     # 3. Extract images from PDF
     image_dir = os.path.splitext(pdf_path)[0] + "_images"
@@ -255,26 +316,31 @@ def process_all_categories():
     """Process PDFs from all specified categories in the config."""
     results = {}
     total_files_processed = 0
+    found_pdfs = False
     
     # Sync MongoDB tracking with Qdrant if enabled
     if TRACKING_ENABLED and SYNC_WITH_QDRANT:
         sync_qdrant_with_tracking()
     
     print(f"Processing PDFs from categories: {PROCESS_CATEGORIES}")
+    print(f"PDF_BASE_DIR: {PDF_BASE_DIR}")
     
+    # Try category folders first
     for category in PROCESS_CATEGORIES:
         category_dir = os.path.join(PDF_BASE_DIR, category)
         if not os.path.exists(category_dir):
-            print(f"Category directory not found: {category_dir}")
+            print(f"Creating missing category directory: {category_dir}")
+            os.makedirs(category_dir, exist_ok=True)
             continue
             
-        print(f"Processing category: {category}")
+        print(f"Found category directory: {category_dir}")
         pdf_files = [f for f in os.listdir(category_dir) if f.endswith('.pdf')]
         
         if not pdf_files:
-            print(f"No PDF files found in {category_dir}")
+            print(f"  No PDF files found in {category_dir}")
             continue
             
+        found_pdfs = True
         print(f"Found {len(pdf_files)} PDF files in {category}")
         category_results = []
         
@@ -327,20 +393,75 @@ def process_all_categories():
         
         results[category] = category_results
     
+    # If no PDFs found in category directories, check in the root directory
+    if not found_pdfs:
+        print("No PDFs found in category directories, trying root directory...")
+        if os.path.exists(PDF_BASE_DIR):
+            root_pdfs = [f for f in os.listdir(PDF_BASE_DIR) if f.endswith('.pdf')]
+            if root_pdfs:
+                print(f"Found {len(root_pdfs)} PDF files in root directory")
+                root_results = []
+                
+                # Process PDFs from root directory
+                for pdf_file in root_pdfs:
+                    pdf_path = os.path.join(PDF_BASE_DIR, pdf_file)
+                    try:
+                        print(f"Processing {pdf_file} from root directory...")
+                        result = process_pdf(pdf_path)
+                        
+                        # Record processing in MongoDB tracking with a special 'root' category
+                        if TRACKING_ENABLED:
+                            mark_pdf_as_processed(pdf_path, "root", len(result["chunks"]))
+                        
+                        root_results.append({
+                            "file": pdf_file,
+                            "chunks": len(result["chunks"]),
+                            "images": len(result["images"])
+                        })
+                        total_files_processed += 1
+                    except Exception as e:
+                        print(f"Error processing {pdf_file}: {str(e)}")
+                
+                results["root"] = root_results
+                found_pdfs = True
+            else:
+                print(f"No PDF files found in root directory {PDF_BASE_DIR}")
+    
+    if not found_pdfs:
+        print(f"No PDF files found in {PDF_BASE_DIR} or its subdirectories")
+    
     print(f"Total PDFs processed: {total_files_processed}")
     return results
 
 if __name__ == "__main__":
+    print(f"Using PDF directory: {PDF_BASE_DIR}")
+    
+    # Check if PDF base directory exists
+    if not os.path.exists(PDF_BASE_DIR):
+        print(f"✗ PDF directory does not exist: {PDF_BASE_DIR}")
+        print("  You may need to create this directory or update your configuration.")
+        
+    # If we have tracking enabled, sync MongoDB with Qdrant
+    if TRACKING_ENABLED and SYNC_WITH_QDRANT:
+        sync_qdrant_with_tracking()
+        
     # Check if we have process_categories defined
     if PROCESS_CATEGORIES:
         # Process PDFs from all specified categories
         results = process_all_categories()
     else:
         # Fall back to processing a single PDF from the base directory
-        test_pdf = os.path.join(PDF_BASE_DIR, next(os.walk(PDF_BASE_DIR))[2][0]) if os.path.exists(PDF_BASE_DIR) else None
-        if test_pdf and test_pdf.endswith('.pdf'):
-            print(f"Processing single PDF: {test_pdf}")
-            result = process_pdf(test_pdf)
-            print(f"Processed {len(result['chunks'])} chunks and {len(result['images'])} images")
-        else:
-            print(f"No PDF files found in {PDF_BASE_DIR}")
+        try:
+            if os.path.exists(PDF_BASE_DIR) and any(f.endswith('.pdf') for f in os.listdir(PDF_BASE_DIR)):
+                pdf_files = [f for f in os.listdir(PDF_BASE_DIR) if f.endswith('.pdf')]
+                if pdf_files:
+                    test_pdf = os.path.join(PDF_BASE_DIR, pdf_files[0])
+                    print(f"Processing single PDF: {test_pdf}")
+                    result = process_pdf(test_pdf)
+                    print(f"Processed {len(result['chunks'])} chunks and {len(result['images'])} images")
+            else:
+                print(f"No PDF files found in {PDF_BASE_DIR}")
+        except Exception as e:
+            print(f"Error processing PDF: {str(e)}")
+            print("Please ensure you have PDFs in the configured directory.")
+            print(f"You can download PDFs by running the download_pdfs.py script first.")
