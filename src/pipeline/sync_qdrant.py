@@ -28,7 +28,7 @@ QDRANT_URL = config['qdrant']['url']
 QDRANT_COLLECTION = config['qdrant']['collection_name']
 
 # Handle path differences between Docker container and local environment
-PDF_BASE_DIR = config['qdrant'].get('default_pdf_path', "E:/AI Research")
+PDF_BASE_DIR = config['qdrant'].get('default_pdf_path', "X:/AI Research")
 if os.path.exists("/app/data/pdfs"):
     print("Running in Docker environment, using /app/data/pdfs")
     PDF_BASE_DIR = "/app/data/pdfs"

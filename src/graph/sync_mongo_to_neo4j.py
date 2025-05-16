@@ -63,8 +63,8 @@ def main():
         # Process in batches
         for skip in range(0, total_count, batch_size):
             try:
-                # Fetch a batch of papers
-                papers_batch = list(db.papers.find({}).skip(skip).limit(batch_size))
+                # Fetch a batch of papers with consistent ordering by _id
+                papers_batch = list(db.papers.find().sort('_id', 1).skip(skip).limit(batch_size))
                 batch_count = len(papers_batch)
                 
                 if batch_count == 0:
