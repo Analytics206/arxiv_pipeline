@@ -54,14 +54,25 @@ def preprocess_text(text: str) -> str:
     # Remove scientific/math/technical stop phrases
     stop_phrases = [
         'et al', 'proposed method', 'proposed approach', 'experimental results',
-        'fig', 'figure', 'table', 'eq', 'equation', 'section', 'chapter',
-        'we propose', 'we present', 'we introduce', 'in this paper',
-        'experimental results show', 'paper proposes', 'proposed algorithm'
+        'we propose', 'we present', 'we introduce', 'in this paper', 'this paper',
+        'experimental results show', 'paper proposes', 'proposed algorithm',
+        'in this work', 'in this study', 'performance evaluation', 'the results show',
+        'the proposed', 'state of the art', 'state-of-the-art'
     ]
     
     for phrase in stop_phrases:
         text = text.replace(phrase, '')
+        text = re.sub(r'\b' + phrase + r'\b', '', text)
     
+        # Remove special characters but keep useful punctuation
+        text = re.sub(r'[^\w\s\.,\-\:]', ' ', text)
+        
+        # Replace multiple spaces with a single space
+        text = re.sub(r'\s+', ' ', text).strip()
+        
+        # Ensure document has minimum length
+        if len(text.split()) < 10:
+            text = text + " document research scientific content"
     return text
 
 def classify_papers(summaries: List[str], doc_ids: List[Any] = None) -> Dict:
