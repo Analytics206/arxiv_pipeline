@@ -26,12 +26,17 @@ dependencies = [
     "transformers",
     "torch>=2.0.0",                 # Base PyTorch package
     "ollama",                        # For local LLM support with Ollama
+    "numpy>=1.24.0",               # For data manipulation in notebooks
+    "scipy<1.11.0,>=1.9.0",        # Compatible version for Top2Vec
     "bertopic>=0.15.0",             # For topic modeling
+    "top2vec>=1.0.0",              # For Top2Vec topic modeling
+    "nltk>=3.8.0",                 # For NLP text processing
     "pypdf",                         # Required for PDF loading with LangChain
     "jupyter>=1.0.0",               # Jupyter Notebook support
     "jupyterlab>=4.0.0",            # JupyterLab interface
     "pandas>=2.0.0",                # For data manipulation in notebooks
     "matplotlib>=3.7.0",            # For visualization in notebooks
+    "seaborn>=0.12.0",              # For enhanced visualization (needed by Top2Vec)
     "ipywidgets>=8.0.0",            # Interactive widgets for notebooks
     "python-dotenv>=1.0.0",         # Environment variable support
     "fastapi>=0.100.0",             # API Framework for backend

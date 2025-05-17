@@ -120,6 +120,19 @@ services:
       - ./config:/app/config
       - ./data:/app/data
       
+  sync-top2vec:
+    profiles:
+      - manual
+    build: .
+    command: python -m src.pipeline.insert_top2vec_mongodb --config /app/config/default.yaml
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      
   sync-qdrant:
     profiles:
       - manual

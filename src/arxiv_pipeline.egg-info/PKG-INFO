@@ -21,12 +21,17 @@ Requires-Dist: motor>=3.3.0
 Requires-Dist: transformers
 Requires-Dist: torch>=2.0.0
 Requires-Dist: ollama
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: scipy<1.11.0,>=1.9.0
 Requires-Dist: bertopic>=0.15.0
+Requires-Dist: top2vec>=1.0.0
+Requires-Dist: nltk>=3.8.0
 Requires-Dist: pypdf
 Requires-Dist: jupyter>=1.0.0
 Requires-Dist: jupyterlab>=4.0.0
 Requires-Dist: pandas>=2.0.0
 Requires-Dist: matplotlib>=3.7.0
+Requires-Dist: seaborn>=0.12.0
 Requires-Dist: ipywidgets>=8.0.0
 Requires-Dist: python-dotenv>=1.0.0
 Requires-Dist: fastapi>=0.100.0
@@ -180,7 +185,7 @@ source .venv/bin/activate
 # Dockerized Deployment - Docker Desktop Running
 ## 0. Suggested run in venv from scripts above for your operating system
 
-## 1. **Build and start all basic required services:** 196,293
+## 1. **Build and start all basic required services:**
    ```bash
     docker compose up -d
     # or to rebuild
