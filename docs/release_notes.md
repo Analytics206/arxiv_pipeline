@@ -1,6 +1,29 @@
 # ArXiv Deep Research Pipeline Release Notes
 
 ---
+## Version 0.5.3 (May 16, 2025)
+
+### Major Features
+
+#### BERTopic Processing Pipeline
+- **Topic Modeling** - Added BERTopic-based topic extraction from paper summaries
+- **Batch Processing** - Implemented memory-efficient batch processing with configurable size
+- **Filtering System** - Added category and date-based filtering for paper selection
+- **MongoDB Integration** - Created new `paper_topics` collection for storing topic data
+- **Docker Support** - Added `sync-bertopic` service with manual execution profile
+
+### Technical Improvements
+- **Consistent Pagination** - Enhanced MongoDB queries with consistent sorting by _id
+- **Documentation** - Added comprehensive docstrings to BERTopic processing code
+- **Error Handling** - Improved logging and error handling in processing pipeline
+
+### Configuration Updates
+- **BERTopic Settings** - Added new section in default.yaml for BERTopic configuration
+  - MongoDB connection settings for both Docker and local environments
+  - Batch processing parameters (batch_size, max_papers)
+  - Category and date filters for paper selection
+
+---
 ## Version 0.5.2 (May 15, 2025)
 
 ### PDF Download Improvements

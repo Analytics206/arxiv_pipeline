@@ -21,6 +21,7 @@ Requires-Dist: motor>=3.3.0
 Requires-Dist: transformers
 Requires-Dist: torch>=2.0.0
 Requires-Dist: ollama
+Requires-Dist: bertopic>=0.15.0
 Requires-Dist: pypdf
 Requires-Dist: jupyter>=1.0.0
 Requires-Dist: jupyterlab>=4.0.0
@@ -57,13 +58,13 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 
 ### Neo4j Graph Database
 
-![Image](https://github.com/user-attachments/assets/3233595b-ecbc-4029-a0f9-1e6723c026a7)
+![alt text](<images/neo4j-graph.png>)
 ### Dashboard reporting
-![alt text](<images/Screenshot 2025-05-09 013100.png>)
+![alt text](<images/web-ui-home.png>)
 ### Qdrant Vector Database
-![alt text](<images/Screenshot 2025-05-09 012044.png>)
+![alt text](<images/qdrant-graph.png>)
 ### Qdrant Vector Database similarity search
-![alt text](<images/Screenshot 2025-05-09 010713.png>)
+![alt text](<images/qdrant-cluster.png>)
 ---
 
 ## 📦 System Components
@@ -217,14 +218,24 @@ source .venv/bin/activate
    python -m src.graph.sync_mongo_to_neo4j
   ```
 
-   ### c. Run sync_qdrant pipeline to process downloaded PDFs and store as vector embeddings in Qdrant:
+  ### c. Run insert-bertopic pipeline for topic creation from paper summaries from mongodb:
+  ```bash
+   docker compose up --build insert-bertopic
+   or
+   echo $env:MONGO_URI
+   $env:MONGO_URI="mongodb://localhost:27017/config"
+   echo $env:MONGO_URI
+   python -m src.pipeline.insert_bertopic_mongodb
+  ```
+
+   ### d. Run sync_qdrant pipeline to process downloaded PDFs and store as vector embeddings in Qdrant:
    ```bash
    docker compose up --build sync-qdrant
    or *Need to uncomment docker-compose.yml sync-qdrant service????
    python -m src.pipeline.sync_qdrant
    ```
 
-   ### d. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
+   ### e. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
   * pdf download does not have a docker container
    ```bash
    echo $env:MONGO_URI

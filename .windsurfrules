@@ -31,6 +31,7 @@
 - Interface: Web UI and API for interacting with the system
 - PDF files are saved to external storage (default: E:\AI Research\)
 - System supports both dockerized and standalone component deployment
+- Use the folder test_temp folder for temporary test and trouble shooting scripts
 
 ## Database Schema Knowledge
 - MongoDB papers collection schema: id, title, summary, authors, categories, published, pdf_url
@@ -52,6 +53,7 @@
 - Support environment variable overrides for configuration values
 - Monitor system performance using Prometheus/Grafana stack
 - System should run on Windows 11 and ubuntu 24.04
+- use docstrings for all functions and classes
 
 ## Important Safeguards
 - Do not delete or remove features unless specified by the user

@@ -51,6 +51,8 @@ Unlike the Business Requirements Document (BRD) and Product Requirements Documen
 | External MongoDB Deployment | Standalone Docker setup for MongoDB with persistent storage | May 7, 2025 |
 | External Neo4j Deployment | Standalone Docker setup for Neo4j graph database | May 7, 2025 |
 | Enhanced Qdrant GPU Setup | Updated Docker configuration for GPU-accelerated Qdrant | May 7, 2025 |
+| BERTopic Processing | Topic modeling with batch processing and filtering | May 16, 2025 |
+| Paper Topics Collection | MongoDB collection for storing extracted topics | May 16, 2025 |
 
 ### System Monitoring
 
@@ -68,6 +70,7 @@ Unlike the Business Requirements Document (BRD) and Product Requirements Documen
 
 | Feature | Description | Implementation Date |
 |---------|-------------|---------------------|
+| BERTopic Sync | Extracts topics from paper summaries with filtering | May 16, 2025 |
 | ArXiv Ingestion | Fetches metadata from ArXiv API | Initial |
 | PDF Downloader | Downloads PDFs based on database records | Initial |
 | PDF Processor | Extracts and processes PDF content for vector database | Initial |
@@ -105,6 +108,7 @@ The system supports both direct script execution and module-based execution patt
 2. MongoDB → Local PDF Storage (organized by category)
 3. Local PDFs → Qdrant Vector DB (selective by category)
 4. MongoDB → Neo4j (graph relationships)
+5. MongoDB → BERTopic → MongoDB (topic extraction)
 
 ## Monitoring Architecture
 

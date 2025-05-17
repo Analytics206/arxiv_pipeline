@@ -117,6 +117,28 @@ pdf_storage:
     end_date: "2025-05-20"   # Download papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
 
+# BERTopic settings
+bertopic:
+  # MongoDB connection settings
+  mongo:
+    connection_string: "mongodb://mongodb:27017/"  # For Docker
+    connection_string_local: "mongodb://localhost:27017/"  # For local development
+    db_name: "arxiv_papers"
+    papers_collection: "papers"  # Source collection
+    topics_collection: "paper_topics"  # Target collection for topics
+  # Processing settings
+  batch_size: 100  # Number of papers to process in each batch
+  max_papers: 10000  # Maximum papers to process (0 for unlimited)
+  # Category filter
+  categories:
+    - "cs.AI"
+    - "cs.LG"
+  # Date filter
+  date_filter:
+    enabled: true
+    start_date: "2023-01-01"  # Process papers published on or after this date
+    end_date: "2025-05-20"    # Process papers published on or before this date
+
 # Logging settings
 logging:
   level: "INFO"

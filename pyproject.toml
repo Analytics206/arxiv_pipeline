@@ -26,6 +26,7 @@ dependencies = [
     "transformers",
     "torch>=2.0.0",                 # Base PyTorch package
     "ollama",                        # For local LLM support with Ollama
+    "bertopic>=0.15.0",             # For topic modeling
     "pypdf",                         # Required for PDF loading with LangChain
     "jupyter>=1.0.0",               # Jupyter Notebook support
     "jupyterlab>=4.0.0",            # JupyterLab interface

@@ -103,6 +103,16 @@ services:
       - neo4j
     environment:
       - MONGO_CONNECTION_STRING=mongodb://mongodb:27017/
+      
+  sync-bertopic:
+    profiles:
+      - manual
+    build: .
+    command: python -m src.pipeline.insert_bertopic_mongodb --config /app/config/default.yaml
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
       - NEO4J_URL=bolt://neo4j:7687
       - NEO4J_USER=neo4j
       - NEO4J_PASSWORD=password

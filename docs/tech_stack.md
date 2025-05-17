@@ -70,9 +70,13 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
     - External Docker: Standalone deployment on separate machine with persistent storage
 - **Neo4j Python Driver**: Interface for graph operations
 
-### Vector Embeddings
+### Vector Embeddings & Topic Modeling
 - **Hugging Face Transformers**: Machine learning models for text embeddings
 - **PyTorch with CUDA**: GPU-accelerated embeddings generation
+- **BERTopic**: Topic modeling with BERT-based embeddings
+  - Memory-efficient batch processing
+  - Category and date filtering support
+  - MongoDB integration for topic storage
 - **Ollama**: Local LLM server for text analysis and embedding generation
   - Deployment options:
     - Local instance: Run directly on the host machine
@@ -247,6 +251,7 @@ The system supports four deployment architectures:
   - published: Publication date
   - pdf_url: URL to PDF file
   - vector_id: Reference to vector embedding (if processed)
+  - topics: Array of extracted topics with probabilities (if processed)
 - **vector_processed_pdfs**: PDF processing tracking for Qdrant vector storage
   - file_id: Unique identifier for the PDF file
   - file_path: Full path to the PDF file
@@ -263,6 +268,14 @@ The system supports four deployment architectures:
 - **Relationships**:
   - (:Author)-[:AUTHORED]->(:Paper)
   - (:Paper)-[:BELONGS_TO]->(:Category)
+
+### MongoDB Topic Collection
+- **paper_topics**: Topic modeling results
+  - paper_id: ArXiv ID
+  - topics: Array of topic assignments
+  - probabilities: Topic probability scores
+  - model_version: BERTopic model version
+  - processed_date: Processing timestamp
 
 ### Qdrant Collections
 - **paper_embeddings** (arxiv_papers):
