@@ -24,7 +24,7 @@ qdrant:
     - "cs.AI"
     # - "cs.CV" 
     # - "cs.LG"
-  papers_per_category: 9 # Maximum number of papers to process into vectors per category (0 for unlimited)
+  papers_per_category: 3 # Maximum number of papers to process into vectors per category (0 for unlimited)
   default_pdf_path: "X:/AI Research" # Base directory where PDFs are loaded from for vector processing
   gpu_enabled: true # Enable GPU for vector operations
   gpu_device: 1 # Use the second GPU (index 1)
@@ -44,7 +44,7 @@ paper_summaries:
   process_categories: # used in sync_summary_vectors.py
     - "cs.AI"
     # - "cs.LG"
-  papers_per_category: 10000 # Maximum number of papers to process into summary vectors per category (0 for unlimited)
+  papers_per_category: 1000 # Maximum number of papers to process into summary vectors per category (0 for unlimited)
   date_filter:
     enabled: true         # Set to false to disable date filtering
     start_date: "2025-01-01" # Process papers published on or after this date (format: YYYY-MM-DD)
@@ -78,7 +78,7 @@ arxiv:
   max_results: 200 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 500 # Number of times to loop the pipeline for each category above
+  max_iterations: 10 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 3
   start_date: "2023-01-01" # start_date is used in arxiv api call and save pdfs filters
   end_date: "2025-05-20" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs

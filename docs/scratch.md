@@ -28,6 +28,14 @@
 cd c:\Users\mad_p\OneDrive\Desktop\arxiv_pipeline
 python src/utils/track_downloaded_pdfs.py
 
+docker-compose --profile manual build --no-cache sync-top2vec
+docker-compose --profile manual up sync-top2vec
+
+Remove-Item -Recurse -Force .venv  # or venv, depending on your folder name
+python3.11 -m venv .venv
+.\.venv\Scripts\Activate
+pip install -e .
+
 cd src\web-ui
 $env:PORT=3001
 npm start

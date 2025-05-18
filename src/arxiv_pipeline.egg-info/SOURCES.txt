@@ -57,6 +57,7 @@ src/utils/count_papers_by_date.py
 src/utils/download_pdfs.py
 src/utils/inspect_paper_schema.py
 src/utils/logger.py
+src/utils/query_top2vec_topics.py
 src/utils/track_downloaded_pdfs.py
 src/utils/validate_mongodb_data.py
 src/web-ui/node_modules/flatted/python/flatted.py

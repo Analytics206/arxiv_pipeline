@@ -132,7 +132,7 @@ source .venv/bin/activate
 ## Windows (PowerShell):
 ```powershell
 # Run the setup script
-.\scripts\setup_uv.ps1
+docker compose up -d
 
 # Activate the virtual environment
 .venv\Scripts\Activate.ps1
@@ -166,7 +166,7 @@ source .venv/bin/activate
   or
    echo $env:MONGO_URI
    $env:MONGO_URI="mongodb://localhost:27017/config"
-   python -m src.pipeline.sync_mongodb --config config/default.yaml
+   python -m src.pipeline.sync_mongodb
   ```
 
   ### b. Run sync-neo4j pipeline for new pdf metadata inserted from MongoDB:
