@@ -28,6 +28,8 @@
 cd c:\Users\mad_p\OneDrive\Desktop\arxiv_pipeline
 python src/utils/track_downloaded_pdfs.py
 
+docker image prune -a
+
 docker-compose --profile manual build --no-cache sync-top2vec
 docker-compose --profile manual up sync-top2vec
 

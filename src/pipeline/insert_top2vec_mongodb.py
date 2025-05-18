@@ -52,12 +52,12 @@ def preprocess_text(text: str) -> str:
     text = re.sub(r'\s+', ' ', text).strip()
     
     # Remove scientific/math/technical stop phrases
-    stop_phrases = [
-        'et al', 'proposed method', 'proposed approach', 'experimental results',
-        'we propose', 'we present', 'we introduce', 'in this paper', 'this paper',
-        'experimental results show', 'paper proposes', 'proposed algorithm',
-        'in this work', 'in this study', 'performance evaluation', 'the results show',
-        'the proposed', 'state of the art', 'state-of-the-art'
+    stop_phrases = [''
+    #     'et al', 'proposed method', 'proposed approach', 'experimental results',
+    #     'we propose', 'we present', 'we introduce', 'in this paper', 'this paper',
+    #     'experimental results show', 'paper proposes', 'proposed algorithm',
+    #     'in this work', 'in this study', 'performance evaluation', 'the results show',
+    #     'the proposed', 'state of the art', 'state-of-the-art'
     ]
     
     for phrase in stop_phrases:
