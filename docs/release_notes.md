@@ -1,6 +1,23 @@
 # ArXiv Deep Research Pipeline Release Notes
 
 ---
+## Version 0.5.4 (May 18, 2025)
+
+### Major Features
+
+#### Top2Vec Topic Processing
+- **Alternative Topic Modeling** - Integrated Top2Vec for additional topic modeling capabilities
+- **Docker Integration** - Added new `sync-top2vec` service to docker-compose.yml
+- **MongoDB Storage** - Created dedicated `paper_top2vec_topics` collection for storing topic data
+- **Consistent Processing** - Implemented reliable pagination with `sort('_id', 1)` for complete dataset coverage
+- **Dependency Management** - Added and configured all required Python dependencies in pyproject.toml
+
+### Technical Improvements
+- **Robust Pagination** - Enhanced batch processing with consistent document ordering
+- **Containerization** - Ensured seamless operation within Docker environment
+- **Error Handling** - Added comprehensive error handling and logging for topic extraction
+
+---
 ## Version 0.5.3 (May 16, 2025)
 
 ### Major Features

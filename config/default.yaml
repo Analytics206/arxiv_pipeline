@@ -60,25 +60,30 @@ paper_summaries:
 arxiv:
   categories: # used in sync_mongodb.py
     - "cs.AI"
-    # - "cs.CL"
-    # - "cs.CV"
-    # - "cs.DS"
-    # - "cs.GT" 
+    - "cs.CL"
+    - "cs.CV"
+    - "cs.DB"
+    - "cs.DS"
+    - "cs.GT" 
+    - "cs.IT"
     - "cs.LG" 
-    # - "cs.LO"
-    # - "cs.MA"
-    # - "cs.NA"
-    # - "cs.NE"
-    # - "math.PR"
-    # - "physics.data-an"
-    # - "q-bio.NC"
-    # - "stat"
-    # - "stat.ML"
-    # - "stat.TH"
+    - "cs.LO"
+    - "cs.MA"
+    - "cs.NE"
+    - "cs.RO"
+    - "cs.SI"
+    - "math.PR"
+    - "physics.data-an"
+    - "q-bio.NC"
+    - "stat.AP"
+    - "stat.CO"
+    - "stat.ME"
+    - "stat.ML"
+    - "stat.OT"
   max_results: 200 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 100 # Number of times to loop the pipeline for each category above
+  max_iterations: 1000 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 3
   start_date: "2023-01-01" # start_date is used in arxiv api call and save pdfs filters
   end_date: "2025-05-20" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
@@ -91,25 +96,30 @@ embedding:
 # PDF storage settings
 pdf_storage:
   directory: "X:/AI Research" # where papers are downloaded @download_pdfs.py subdirectory is auto created by category
-  papers_per_category: 500 # Maximum number of papers to download per category (0 for unlimited)
+  papers_per_category: 1000 # Maximum number of papers to download per category (0 for unlimited)
   # Categories to prioritize for PDF downloads - if empty, all papers in MongoDB will be considered
   process_categories: # used in download_pdfs.py - comment out categories you don't want to download
     - "cs.AI"
-    # - "cs.CL"
-    # - "cs.CV"
-    # - "cs.DS"
-    # - "cs.GT"
-    # - "cs.LG"
-    # - "cs.LO"
-    # - "cs.MA"
-    # - "cs.NA"
-    # - "cs.NE"
-    # - "math.PR"
-    # - "physics.data-an"
-    # - "q-bio.NC"
-    # - "stat"
-    # - "stat.ML"
-    # - "stat.TH"
+    - "cs.CL"
+    - "cs.CV"
+    - "cs.DB"
+    - "cs.DS"
+    - "cs.GT" 
+    - "cs.IT"
+    - "cs.LG" 
+    - "cs.LO"
+    - "cs.MA"
+    - "cs.NE"
+    - "cs.RO"
+    - "cs.SI"
+    - "math.PR"
+    - "physics.data-an"
+    - "q-bio.NC"
+    - "stat.AP"
+    - "stat.CO"
+    - "stat.ME"
+    - "stat.ML"
+    - "stat.OT"
   # Date filters for downloading PDFs
   download_date_filter:
     enabled: true         # Set to false to disable date filtering
@@ -155,11 +165,11 @@ top2vec:
   embedding_model: "doc2vec"  # Embedding model to use (doc2vec is the default and always available)
   # Processing settings
   batch_size: 200  # Number of papers to process in each batch
-  max_papers: 2000  # Maximum papers to process (0 for unlimited)
+  max_papers: 10000  # Maximum papers to process (0 for unlimited)
   # Category filter
   categories:
-    - "cs.AI"
-    # - "cs.LG"
+    # - "cs.AI"
+    - "cs.LG"
   # Date filter
   date_filter:
     enabled: true

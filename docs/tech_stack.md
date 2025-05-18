@@ -73,6 +73,10 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 ### Vector Embeddings & Topic Modeling
 - **Hugging Face Transformers**: Machine learning models for text embeddings
 - **PyTorch with CUDA**: GPU-accelerated embeddings generation
+- **Top2Vec**: Topic modeling with BERT-based embeddings
+  - Memory-efficient batch processing
+  - Category and date filtering support
+  - MongoDB integration for topic storage
 - **BERTopic**: Topic modeling with BERT-based embeddings
   - Memory-efficient batch processing
   - Category and date filtering support

@@ -187,15 +187,24 @@ chmod +x scripts/setup_uv.sh
    echo $env:MONGO_URI
    python -m src.pipeline.insert_bertopic_mongodb
   ```
+  ### d. Run insert-top2vec pipeline for topic creation from paper summaries from mongodb:
+  ```bash
+   docker compose up --build insert-top2vec
+   or
+   echo $env:MONGO_URI
+   $env:MONGO_URI="mongodb://localhost:27017/config"
+   echo $env:MONGO_URI
+   python -m src.pipeline.insert_top2vec_mongodb
+  ```
 
-   ### d. Run sync_qdrant pipeline to process downloaded PDFs and store as vector embeddings in Qdrant:
+   ### e. Run sync_qdrant pipeline to process downloaded PDFs and store as vector embeddings in Qdrant:
    ```bash
    docker compose up --build sync-qdrant
    or *Need to uncomment docker-compose.yml sync-qdrant service????
    python -m src.pipeline.sync_qdrant
    ```
 
-   ### e. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
+   ### f. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
   * pdf download does not have a docker container
    ```bash
    echo $env:MONGO_URI
@@ -989,16 +998,19 @@ List used is in config/defaults.yaml for reference, more categories available.
 - cs.AI - Artificial Intelligence
 - cs.CL - Computation and Language
 - cs.CV - Computer Vision and Pattern Recognition
+- cs.DB - Databases
 - cs.DS - Data Structures and Algorithms
 - cs.GT - Computer Science and Game Theory
+- cs.IT - Information Theory
 - cs.LG - Machine Learning
 - cs.LO - Logic in Computer Science
 - cs.MA - Multiagent Systems
-- cs.NA - Numerical Analysis
 - cs.NE - Neural and Evolutionary Computing
+- cs.OH - Other Computer Science
+- cs.RO - Robotics
+- cs.SI - Social and Information Networks
 - math.PR - Probability
 - q-bio.NC - Neurons and Cognition
-- stat - Statistics
 - stat.ML - Machine Learning
 - stat.TH - Statistics Theory
 - physics.data-an - Data Analysis, Statistics and Probability
