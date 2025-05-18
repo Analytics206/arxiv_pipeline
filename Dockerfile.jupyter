@@ -16,12 +16,14 @@ RUN pip install --no-cache-dir uv && \
     uv pip install --system -e .
 
 # Install additional data science packages
+# Install Python packages with specific versions
 RUN pip install --no-cache-dir \
-    matplotlib \
-    seaborn \
-    scikit-learn \
-    plotly \
-    ipywidgets
+    matplotlib==3.8.3 \
+    seaborn==0.13.2 \
+    scikit-learn==1.4.1.post1 \
+    plotly==5.19.0 \
+    ipywidgets==8.1.2 \
+    && jupyter nbextension enable --py widgetsnbextension
 
 # Set working directory
 WORKDIR /home/jovyan/work

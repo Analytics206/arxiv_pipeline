@@ -123,20 +123,19 @@ For more deep dive into project and status, see the `docs/` directory.
 chmod +x scripts/setup_uv.sh
 
 # Run the setup script
-./scripts/setup_uv.sh
+.\scripts\setup_uv.ps1
 
 # Activate the virtual environment
-source .venv/bin/activate
+.venv\Scripts\Activate.ps1
 ```
 
 ## Windows (PowerShell):
 ```powershell
 # Run the setup script
-docker compose up -d
+.\scripts\setup_uv.ps1
 
 # Activate the virtual environment
 .venv\Scripts\Activate.ps1
-```
 
 # Dockerized Deployment - Docker Desktop Running
 ## 0. Suggested run in venv from scripts above for your operating system
