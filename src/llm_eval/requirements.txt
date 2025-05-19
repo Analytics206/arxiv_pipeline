@@ -1,0 +1,7 @@
+transformers
+datasets
+torch
+rouge-score
+nltk
+pycocoevalcap
+pyyaml

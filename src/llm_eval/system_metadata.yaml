@@ -1,0 +1,342 @@
+modules:
+- name: metadata_generator
+  filename: metadata_generator.py
+  metadata: {}
+  components:
+  - name: parse_metadata
+    type: function
+    filename: metadata_generator.py
+    metadata: {}
+    dependencies:
+    - match.group
+    - re.search
+    - yaml.safe_load
+    docstring: Extract YAML metadata from docstring
+    line: 12
+  - name: parse_python_file
+    type: function
+    filename: metadata_generator.py
+    metadata: {}
+    dependencies:
+    - CodeAnalyzer
+    - analyzer.visit
+    - ast.parse
+    - f.read
+    - first_comment.group
+    - open
+    - parse_metadata
+    - re.search
+    docstring: ''
+    line: 105
+  - name: generate_system_metadata
+    type: function
+    filename: metadata_generator.py
+    metadata: {}
+    dependencies:
+    - Path
+    - append
+    - component.get
+    - extend
+    - file.endswith
+    - file_data.get
+    - get
+    - list
+    - open
+    - os.path.join
+    - os.walk
+    - parse_python_file
+    - print
+    - relative_file_path.replace
+    - relative_to
+    - replace
+    - set
+    - sorted
+    - str
+    - yaml.dump
+    docstring: ''
+    line: 125
+  - name: CodeAnalyzer
+    type: class
+    filename: metadata_generator.py
+    metadata: {}
+    dependencies:
+    - _get_full_name
+    - append
+    - ast.get_docstring
+    - ast.walk
+    - dependencies.add
+    - dependencies.update
+    - docstring.split
+    - isinstance
+    - parse_metadata
+    - self._get_dependencies
+    - self.generic_visit
+    - self.modules.setdefault
+    - set
+    - setdefault
+    - sorted
+    - strip
+    docstring: ''
+    line: 28
+  dependencies:
+  - CodeAnalyzer
+  - Path
+  - _get_full_name
+  - analyzer.visit
+  - append
+  - ast.get_docstring
+  - ast.parse
+  - ast.walk
+  - component.get
+  - dependencies.add
+  - dependencies.update
+  - docstring.split
+  - extend
+  - f.read
+  - file.endswith
+  - file_data.get
+  - first_comment.group
+  - get
+  - isinstance
+  - list
+  - match.group
+  - open
+  - os.path.join
+  - os.walk
+  - parse_metadata
+  - parse_python_file
+  - print
+  - re.search
+  - relative_file_path.replace
+  - relative_to
+  - replace
+  - self._get_dependencies
+  - self.generic_visit
+  - self.modules.setdefault
+  - set
+  - setdefault
+  - sorted
+  - str
+  - strip
+  - yaml.dump
+  - yaml.safe_load
+- name: main
+  filename: main.py
+  metadata: {}
+  components:
+  - name: main
+    type: function
+    filename: main.py
+    metadata: {}
+    dependencies:
+    - compare_results
+    - enumerate
+    - evaluate_model
+    docstring: ''
+    line: 5
+  dependencies:
+  - compare_results
+  - enumerate
+  - evaluate_model
+- name: utils.helpers
+  filename: utils/helpers.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: models.hf_model_filter
+  filename: models/hf_model_filter.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: models.hf_model_list
+  filename: models/hf_model_list.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: models.load_model
+  filename: models/load_model.py
+  metadata: {}
+  components:
+  - name: load_model
+    type: function
+    filename: models/load_model.py
+    metadata:
+      developer: Tom Hanks
+      movie_reference: Forrest Gump
+      fun_fact: Loves typewriters
+    dependencies:
+    - AutoModelForCausalLM.from_pretrained
+    - AutoTokenizer.from_pretrained
+    - model.to
+    - torch.cuda.is_available
+    docstring: ''
+    line: 4
+  dependencies:
+  - AutoModelForCausalLM.from_pretrained
+  - AutoTokenizer.from_pretrained
+  - model.to
+  - torch.cuda.is_available
+- name: models.models_to_compare
+  filename: models/models_to_compare.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: evaluation.compare_results
+  filename: evaluation/compare_results.py
+  metadata: {}
+  components:
+  - name: compare_results
+    type: function
+    filename: evaluation/compare_results.py
+    metadata: {}
+    dependencies:
+    - f.write
+    - json.load
+    - open
+    - print
+    docstring: ''
+    line: 3
+  dependencies:
+  - f.write
+  - json.load
+  - open
+  - print
+- name: evaluation.metrics
+  filename: evaluation/metrics.py
+  metadata: {}
+  components:
+  - name: calculate_bleu
+    type: function
+    filename: evaluation/metrics.py
+    metadata: {}
+    dependencies:
+    - SmoothingFunction
+    - generated.split
+    - reference.split
+    - sentence_bleu
+    docstring: ''
+    line: 10
+  - name: calculate_bleu
+    type: function
+    filename: evaluation/metrics.py
+    metadata: {}
+    dependencies:
+    - SmoothingFunction
+    - generated.split
+    - reference.split
+    - sentence_bleu
+    docstring: ''
+    line: 20
+  - name: calculate_meteor
+    type: function
+    filename: evaluation/metrics.py
+    metadata: {}
+    dependencies:
+    - generated.split
+    - meteor_score
+    - reference.split
+    docstring: ''
+    line: 25
+  - name: calculate_rouge
+    type: function
+    filename: evaluation/metrics.py
+    metadata: {}
+    dependencies:
+    - rouge_scorer.RougeScorer
+    - scorer.score
+    docstring: ''
+    line: 29
+  - name: calculate_distinct_n
+    type: function
+    filename: evaluation/metrics.py
+    metadata: {}
+    dependencies:
+    - len
+    - ngrams.extend
+    - range
+    - set
+    - text.split
+    - zip
+    docstring: ''
+    line: 34
+  - name: calculate_self_bleu
+    type: function
+    filename: evaluation/metrics.py
+    metadata: {}
+    dependencies:
+    - enumerate
+    - len
+    - range
+    - scores.append
+    - sentence_bleu
+    - split
+    - sum
+    - text.split
+    docstring: ''
+    line: 42
+  dependencies:
+  - SmoothingFunction
+  - enumerate
+  - generated.split
+  - len
+  - meteor_score
+  - ngrams.extend
+  - range
+  - reference.split
+  - rouge_scorer.RougeScorer
+  - scorer.score
+  - scores.append
+  - sentence_bleu
+  - set
+  - split
+  - sum
+  - text.split
+  - zip
+- name: evaluation.evaluate
+  filename: evaluation/evaluate.py
+  metadata: {}
+  components:
+  - name: evaluate_model
+    type: function
+    filename: evaluation/evaluate.py
+    metadata: {}
+    dependencies:
+    - append
+    - calculate_bleu
+    - calculate_distinct_n
+    - calculate_meteor
+    - calculate_rouge
+    - calculate_self_bleu
+    - generated_texts.append
+    - json.dump
+    - json.load
+    - len
+    - load_model
+    - model.generate
+    - open
+    - print
+    - to
+    - tokenizer
+    - tokenizer.decode
+    docstring: ''
+    line: 8
+  dependencies:
+  - append
+  - calculate_bleu
+  - calculate_distinct_n
+  - calculate_meteor
+  - calculate_rouge
+  - calculate_self_bleu
+  - generated_texts.append
+  - json.dump
+  - json.load
+  - len
+  - load_model
+  - model.generate
+  - open
+  - print
+  - to
+  - tokenizer
+  - tokenizer.decode
+entry_points: []
+external_connections: []

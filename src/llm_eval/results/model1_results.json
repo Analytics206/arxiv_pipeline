@@ -1,0 +1,38 @@
+{
+    "model_name": "microsoft/DialoGPT-large",
+    "avg_bleu": 0.15881828579275759,
+    "avg_meteor": 0.6405448309421634,
+    "avg_rouge1": 0.8358308358308357,
+    "avg_rougeL": 0.7369297369297368,
+    "distinct_2": 0.875,
+    "self_bleu": 3.5971829134979824e-78,
+    "samples": [
+        {
+            "input": "What is the capital of France?",
+            "reference": "The capital of France is Paris.",
+            "generated": "What is the capital of France? Paris.",
+            "bleu": 0.08307018474412793,
+            "meteor": 0.7311475409836065,
+            "rouge1": 0.923076923076923,
+            "rougeL": 0.7692307692307692
+        },
+        {
+            "input": "Who wrote 'Pride and Prejudice'?",
+            "reference": "Jane Austen wrote 'Pride and Prejudice'.",
+            "generated": "Who wrote 'Pride and Prejudice'?.",
+            "bleu": 0.21771262023986562,
+            "meteor": 0.4990583804143125,
+            "rouge1": 0.7272727272727272,
+            "rougeL": 0.7272727272727272
+        },
+        {
+            "input": "What is the square root of 64?",
+            "reference": "The square root of 64 is 8.",
+            "generated": "What is the square root of 64?",
+            "bleu": 0.17567205239427922,
+            "meteor": 0.6914285714285714,
+            "rouge1": 0.8571428571428571,
+            "rougeL": 0.7142857142857143
+        }
+    ]
+}
