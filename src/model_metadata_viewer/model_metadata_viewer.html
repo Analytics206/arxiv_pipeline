@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArXiv Pipeline - Model Metadata Viewer</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary-color: #4a6fa5;
+      --secondary-color: #6c757d;
+      --light-bg: #f8f9fa;
+      --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--light-bg);
+      color: #212529;
+      line-height: 1.6;
+    }
+    
+    .header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1.5rem 0;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header h1 {
+      font-weight: 600;
+      margin: 0;
+      font-size: 1.75rem;
+    }
+    
+    .header .subtitle {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 0.5rem;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 1.5rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+      background-color: white;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+      padding: 1rem 1.25rem;
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    .model-card {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--card-shadow);
+      transition: all 0.2s ease;
+    }
+    
+    .model-card:hover {
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .model-card h2 {
+      font-size: 1.25rem;
+      margin: 0 0 0.75rem 0;
+      color: var(--primary-color);
+    }
+    
+    .meta {
+      font-size: 0.875rem;
+      color: var(--secondary-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .badge {
+      font-weight: 500;
+      padding: 0.35em 0.65em;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .search-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-select, .form-control, .btn {
+      border-radius: 0.375rem;
+      padding: 0.5rem 1rem;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .btn-outline-secondary {
+      color: var(--secondary-color);
+      border-color: #dee2e6;
+    }
+    
+    .btn-outline-secondary:hover {
+      background-color: #f8f9fa;
+      border-color: #dee2e6;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--secondary-color);
+    }
+    
+    .error-message {
+      color: #dc3545;
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+    }
+    
+    .model-stats {
+      font-size: 0.9rem;
+      color: var(--secondary-color);
+      margin-bottom: 1rem;
+    }
+    
+    pre {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.85rem;
+      overflow-x: auto;
+    }
+    
+    @media (max-width: 768px) {
+      .header {
+        padding: 1rem 0;
+      }
+      
+      .header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .search-container {
+        padding: 1rem;
+      }
+      
+      .btn {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1>ArXiv Pipeline</h1>
+          <div class="subtitle">Model Metadata Viewer</div>
+        </div>
+        <div>
+          <a href="https://github.com/yourusername/arxiv_pipeline" target="_blank" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-github me-1"></i> View on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="search-container">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="sourceSelector" class="form-label">Model Source</label>
+          <select id="sourceSelector" class="form-select">
+            <option value="huggingface">Hugging Face Models</option>
+            <option value="ollama">Ollama (Installed)</option>
+            <option value="ollama-available">Ollama (Available)</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="searchBox" class="form-label">Search Models</label>
+          <input type="text" id="searchBox" class="form-control" placeholder="Search by model ID or name...">
+        </div>
+        <div class="col-md-2">
+          <label for="pipelineFilter" class="form-label">Filter by Type</label>
+          <select id="pipelineFilter" class="form-select">
+            <option value="">All Types</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button id="sortButton" class="btn btn-outline-secondary w-100" onclick="toggleSort()">
+            <i class="bi bi-sort-numeric-down-alt me-1"></i> Sort by Score
+          </button>
+        </div>
+      </div>
+      <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="model-stats d-flex justify-content-between align-items-center mb-3">
+          <div id="modelCount">Loading models...</div>
+          <div id="lastUpdated" class="text-muted small"></div>
+        </div>
+        <div id="models-container">
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Loading model data...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let models = [];
+    let currentSortByScore = false;
+    let currentSource = 'huggingface';
+    let lastFetched = null;
+
+    function showError(message) {
+      const errorEl = document.getElementById('errorMessage');
+      errorEl.textContent = message;
+      errorEl.style.display = message ? 'block' : 'none';
+      
+      const container = document.getElementById('models-container');
+      container.innerHTML = `
+        <div class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          ${message}
+        </div>
+      `;
+    }
+    
+    function updateLastUpdated(timestamp) {
+      const el = document.getElementById('lastUpdated');
+      if (!timestamp) {
+        el.textContent = '';
+        return;
+      }
+      
+      try {
+        const date = new Date(timestamp);
+        if (isNaN(date.getTime())) {
+          el.textContent = '';
+          return;
+        }
+        
+        const options = { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric',
+          hour: '2-digit', 
+          minute: '2-digit',
+          hour12: true
+        };
+        
+        el.textContent = `Last updated: ${date.toLocaleString(undefined, options)}`;
+      } catch (e) {
+        console.error('Error formatting date:', e);
+        el.textContent = '';
+      }
+    }
+
+    async function loadModels(source = 'huggingface') {
+      currentSource = source;
+      const container = document.getElementById('models-container');
+      const modelCountEl = document.getElementById('modelCount');
+      
+      // Show loading state
+      container.innerHTML = `
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3">Loading ${source} models...</p>
+        </div>
+      `;
+      
+      showError('');
+      
+      try {
+        let file;
+        if (source === 'huggingface') file = 'open_models_data.json';
+        else if (source === 'ollama') file = 'ollama_models_data.json';
+        else if (source === 'ollama-available') file = 'ollama_available_models.json';
+        else {
+          throw new Error('Invalid model source');
+        }
+
+        const response = await fetch(file);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        models = data.models || [];
+        lastFetched = data.fetched_at || null;
+        
+        updateLastUpdated(lastFetched);
+        modelCountEl.textContent = `Showing ${models.length} models`;
+        
+        // Reset sort state when changing sources
+        currentSortByScore = false;
+        document.getElementById('sortButton').classList.remove('active');
+        
+        populatePipelineFilter();
+        renderModels();
+      } catch (err) {
+        console.error('Error loading models:', err);
+        showError(`Failed to load models: ${err.message}`);
+      }
+    }
+
+    function populatePipelineFilter() {
+      const filterSelect = document.getElementById('pipelineFilter');
+      filterSelect.innerHTML = '<option value="">All Types</option>';
+      
+      if (currentSource === 'huggingface') {
+        // For Hugging Face, use pipeline tags
+        const uniquePipelines = [...new Set(models.map(m => m.pipeline_tag).filter(Boolean))];
+        uniquePipelines.sort();
+        
+        uniquePipelines.forEach(pipeline => {
+          const opt = document.createElement('option');
+          opt.value = pipeline;
+          opt.textContent = pipeline.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          filterSelect.appendChild(opt);
+        });
+      } else if (currentSource === 'ollama-available') {
+        // For Ollama available models, we don't have pipeline tags
+        filterSelect.innerHTML = '<option value="">All Models</option>';
+      } else {
+        // For installed Ollama models
+        filterSelect.innerHTML = `
+          <option value="">All Models</option>
+          <option value="small">Small (&lt; 4GB)</option>
+          <option value="medium">Medium (4-20GB)</option>
+          <option value="large">Large (20GB+)</option>
+        `;
+      }
+    }
+
+    function toggleSort() {
+      currentSortByScore = !currentSortByScore;
+      const sortButton = document.getElementById('sortButton');
+      
+      if (currentSortByScore) {
+        sortButton.classList.add('active', 'btn-primary');
+        sortButton.innerHTML = '<i class="bi bi-sort-numeric-down me-1"></i> Sorted by Score';
+      } else {
+        sortButton.classList.remove('active', 'btn-primary');
+        sortButton.innerHTML = '<i class="bi bi-sort-numeric-down-alt me-1"></i> Sort by Score';
+      }
+      
+      renderModels();
+    }
+
+    function formatNumber(num) {
+      if (num === undefined || num === null) return 'N/A';
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    
+    function formatBytes(bytes, decimals = 2) {
+      if (bytes === 0 || bytes === 'N/A') return 'N/A';
+      if (typeof bytes === 'string') bytes = parseInt(bytes);
+      if (isNaN(bytes)) return 'N/A';
+      
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+    
+    function getModelSizeBadge(size) {
+      if (!size || size === 'N/A') return '';
+      if (typeof size === 'string') size = parseInt(size);
+      if (isNaN(size)) return '';
+      
+      const gbSize = size / (1024 * 1024 * 1024);
+      let badgeClass = 'bg-secondary';
+      
+      if (gbSize > 20) badgeClass = 'bg-danger';
+      else if (gbSize > 4) badgeClass = 'bg-warning text-dark';
+      else if (gbSize > 0) badgeClass = 'bg-success';
+      
+      return `<span class="badge ${badgeClass} mb-2">${formatBytes(size)}</span>`;
+    }
+    
+    function renderModels() {
+      const container = document.getElementById('models-container');
+      const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+      const selectedFilter = document.getElementById('pipelineFilter').value;
+      
+      // Filter models based on search and filter criteria
+      let filtered = models.filter(model => {
+        // Search by model ID or display name
+        const searchFields = [model.modelId.toLowerCase()];
+        if (model.displayName) {
+          searchFields.push(model.displayName.toLowerCase());
+        }
+        
+        const matchSearch = searchFields.some(field => 
+          field.includes(searchTerm)
+        );
+        
+        // Apply filter based on source
+        let matchFilter = true;
+        
+        if (currentSource === 'huggingface') {
+          matchFilter = !selectedFilter || model.pipeline_tag === selectedFilter;
+        } else if (currentSource === 'ollama' && selectedFilter) {
+          if (!model.size) {
+            matchFilter = false;
+          } else {
+            const sizeGB = model.size / (1024 * 1024 * 1024);
+            if (selectedFilter === 'small') matchFilter = sizeGB < 4;
+            else if (selectedFilter === 'medium') matchFilter = sizeGB >= 4 && sizeGB < 20;
+            else if (selectedFilter === 'large') matchFilter = sizeGB >= 20;
+          }
+        }
+        
+        return matchSearch && matchFilter;
+      });
+      
+      // Update model count
+      const modelCountEl = document.getElementById('modelCount');
+      modelCountEl.textContent = `Showing ${filtered.length} of ${models.length} models`;
+      
+      // Sort if needed
+      if (currentSortByScore) {
+        filtered.sort((a, b) => {
+          const scoreA = getPrimaryScore(a.benchmark_scores);
+          const scoreB = getPrimaryScore(b.benchmark_scores);
+          return scoreB - scoreA; // Descending order
+        });
+      }
+      
+      // Clear container
+      container.innerHTML = '';
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            No models found matching your criteria.
+          </div>
+        `;
+        return;
+      }
+      
+      // Render each model card
+      filtered.forEach(model => {
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+        
+        let modelLink = '';
+        let title = model.modelId;
+        let description = '';
+        let metadata = [];
+        
+        // Determine model details based on source
+        if (currentSource === 'huggingface') {
+          modelLink = `https://huggingface.co/${model.modelId}`;
+          title = model.modelId;
+          
+          if (model.pipeline_tag) {
+            metadata.push(`<span class="badge bg-primary">${model.pipeline_tag}</span>`);
+          }
+          
+          if (model.library_name) {
+            metadata.push(`<span class="badge bg-secondary">${model.library_name}</span>`);
+          }
+          
+          if (model.tags && model.tags.length > 0) {
+            model.tags.slice(0, 3).forEach(tag => {
+              metadata.push(`<span class="badge bg-light text-dark">${tag}</span>`);
+            });
+          }
+          
+          description = `
+            <div class="d-flex flex-wrap gap-1 mb-2">
+              ${metadata.join('')}
+            </div>
+            <div class="d-flex gap-4 text-muted small mb-2">
+              <span><i class="bi bi-hand-thumbs-up-fill text-primary"></i> ${formatNumber(model.likes)}</span>
+              <span><i class="bi bi-download text-primary"></i> ${formatNumber(model.downloads)}</span>
+            </div>
+          `;
+          
+          if (model.parameters && Object.keys(model.parameters).length > 0) {
+            description += `
+              <div class="mt-2">
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" 
+                  data-bs-target="#params-${model.modelId.replace(/[^a-z0-9]/gi, '')}" 
+                  aria-expanded="false" aria-controls="params-${model.modelId.replace(/[^a-z0-9]/gi, '')}">
+                  Show Parameters
+                </button>
+                <div class="collapse" id="params-${model.modelId.replace(/[^a-z0-9]/gi, '')}">
+                  <pre class="mt-2 p-2 bg-light rounded">${JSON.stringify(model.parameters, null, 2)}</pre>
+                </div>
+              </div>
+            `;
+          }
+          
+        } else if (currentSource === 'ollama-available') {
+          modelLink = model.link || `https://ollama.com/library/${model.modelId}`;
+          title = model.displayName || model.modelId;
+          description = `
+            <div class="text-muted small mb-2">${model.modelId}</div>
+            ${getModelSizeBadge(model.size)}
+          `;
+          
+        } else { // Installed Ollama models
+          modelLink = `https://ollama.com/library/${model.modelId.split(':')[0]}`;
+          title = model.modelId;
+          
+          if (model.size) {
+            description = `
+              <div class="d-flex flex-wrap gap-2">
+                ${getModelSizeBadge(model.size)}
+                <span class="badge bg-secondary">${new Date(model.modified_at).toLocaleDateString()}</span>
+              </div>
+            `;
+          }
+        }
+        
+        card.innerHTML = `
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="${modelLink}" target="_blank" class="text-decoration-none">
+                ${title} <i class="bi bi-box-arrow-up-right small text-muted"></i>
+              </a>
+            </h5>
+            ${description}
+          </div>
+        `;
+        
+        container.appendChild(card);
+      });
+    }
+
+    function getPrimaryScore(scores) {
+      if (!scores || typeof scores !== 'object') return 0;
+      const values = Object.values(scores).filter(val => typeof val === 'number');
+      return values.length ? values[0] : 0;
+    }
+
+    // Debounce function to limit how often a function is called
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Initialize event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      // Search with debounce
+      const searchBox = document.getElementById('searchBox');
+      searchBox.addEventListener('input', debounce(() => {
+        renderModels();
+      }, 300));
+      
+      // Filter change
+      document.getElementById('pipelineFilter').addEventListener('change', () => {
+        renderModels();
+      });
+      
+      // Source change
+      document.getElementById('sourceSelector').addEventListener('change', (e) => {
+        loadModels(e.target.value);
+      });
+      
+      // Initial load
+      loadModels();
+    });
+  </script>
+</body>
+</html>

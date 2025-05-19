@@ -1,11 +1,17 @@
 import requests
 import json
+import os
 from datetime import datetime
+from pathlib import Path
 
 # Configuration
 API_URL = "https://huggingface.co/api/models"
 QUERY_LIMIT = 100  # Max models per request
-OUTPUT_FILE = "open_models_data.json"
+OUTPUT_DIR = Path(__file__).parent.parent / "model_metadata_viewer"
+OUTPUT_FILE = OUTPUT_DIR / "open_models_data.json"
+
+# Ensure output directory exists
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Optional filter keywords (you can modify these)
 FILTERS = {
@@ -43,15 +49,30 @@ def extract_model_info(model_data):
     return extracted
 
 def save_to_json(data, filename):
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump({"fetched_at": datetime.utcnow().isoformat(), "models": data}, f, indent=2)
+    try:
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump({"fetched_at": datetime.utcnow().isoformat(), "models": data}, f, indent=2)
+        print(f"Successfully saved data to {filename}")
+        return True
+    except Exception as e:
+        print(f"Error saving to {filename}: {str(e)}")
+        return False
 
 def main():
-    print("Fetching model data from Hugging Face...")
-    models_raw = fetch_models(limit=QUERY_LIMIT, filters=FILTERS)
-    models_info = extract_model_info(models_raw)
-    save_to_json(models_info, OUTPUT_FILE)
-    print(f"Saved {len(models_info)} models to {OUTPUT_FILE}")
+    print(f"Fetching up to {QUERY_LIMIT} models from Hugging Face...")
+    try:
+        models_raw = fetch_models(limit=QUERY_LIMIT, filters=FILTERS)
+        if not models_raw:
+            print("No models found with the current filters.")
+            return
+        
+        models_info = extract_model_info(models_raw)
+        if save_to_json(models_info, OUTPUT_FILE):
+            print(f"Saved {len(models_info)} models to {OUTPUT_FILE}")
+        else:
+            print("Failed to save model data.")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 
 if __name__ == "__main__":
     main()
