@@ -1,0 +1,5245 @@
+modules:
+- name: metadata_generator
+  filename: metadata_generator.py
+  metadata: {}
+  components:
+  - name: parse_metadata
+    type: function
+    filename: metadata_generator.py
+    metadata: {}
+    dependencies:
+    - match.group
+    - re.search
+    - yaml.safe_load
+    docstring: Extract YAML metadata from docstring
+    line: 12
+  - name: parse_python_file
+    type: function
+    filename: metadata_generator.py
+    metadata: {}
+    dependencies:
+    - CodeAnalyzer
+    - analyzer.visit
+    - ast.parse
+    - f.read
+    - first_comment.group
+    - open
+    - parse_metadata
+    - re.search
+    docstring: ''
+    line: 105
+  - name: generate_system_metadata
+    type: function
+    filename: metadata_generator.py
+    metadata: {}
+    dependencies:
+    - Path
+    - append
+    - component.get
+    - extend
+    - file.endswith
+    - file_data.get
+    - get
+    - list
+    - open
+    - os.path.join
+    - os.walk
+    - parse_python_file
+    - print
+    - relative_file_path.replace
+    - relative_to
+    - replace
+    - set
+    - sorted
+    - str
+    - yaml.dump
+    docstring: ''
+    line: 125
+  - name: CodeAnalyzer
+    type: class
+    filename: metadata_generator.py
+    metadata: {}
+    dependencies:
+    - _get_full_name
+    - append
+    - ast.get_docstring
+    - ast.walk
+    - dependencies.add
+    - dependencies.update
+    - docstring.split
+    - isinstance
+    - parse_metadata
+    - self._get_dependencies
+    - self.generic_visit
+    - self.modules.setdefault
+    - set
+    - setdefault
+    - sorted
+    - strip
+    docstring: ''
+    line: 28
+  dependencies:
+  - CodeAnalyzer
+  - Path
+  - _get_full_name
+  - analyzer.visit
+  - append
+  - ast.get_docstring
+  - ast.parse
+  - ast.walk
+  - component.get
+  - dependencies.add
+  - dependencies.update
+  - docstring.split
+  - extend
+  - f.read
+  - file.endswith
+  - file_data.get
+  - first_comment.group
+  - get
+  - isinstance
+  - list
+  - match.group
+  - open
+  - os.path.join
+  - os.walk
+  - parse_metadata
+  - parse_python_file
+  - print
+  - re.search
+  - relative_file_path.replace
+  - relative_to
+  - replace
+  - self._get_dependencies
+  - self.generic_visit
+  - self.modules.setdefault
+  - set
+  - setdefault
+  - sorted
+  - str
+  - strip
+  - yaml.dump
+  - yaml.safe_load
+- name: setup
+  filename: setup.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: build\lib\__init__
+  filename: build\lib\__init__.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: build\lib\embedding\embed
+  filename: build\lib\embedding\embed.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: build\lib\graph\neo4j
+  filename: build\lib\graph\neo4j.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: build\lib\ingestion\fetch
+  filename: build\lib\ingestion\fetch.py
+  metadata: {}
+  components:
+  - name: ArxivClient
+    type: class
+    filename: build\lib\ingestion\fetch.py
+    metadata: {}
+    dependencies:
+    - ET.fromstring
+    - append
+    - element.find
+    - entry.findall
+    - join
+    - len
+    - logger.error
+    - logger.info
+    - query_parts.append
+    - replace
+    - requests.get
+    - results.append
+    - root.findall
+    - self._get_text
+    - self._parse_response
+    - text.strip
+    docstring: Client for fetching papers from arXiv API using Atom XML format.
+    line: 9
+  dependencies:
+  - ET.fromstring
+  - append
+  - element.find
+  - entry.findall
+  - join
+  - len
+  - logger.error
+  - logger.info
+  - query_parts.append
+  - replace
+  - requests.get
+  - results.append
+  - root.findall
+  - self._get_text
+  - self._parse_response
+  - text.strip
+- name: build\lib\pipeline\run_pipeline
+  filename: build\lib\pipeline\run_pipeline.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: build\lib\pipeline\run_pipeline.py
+    metadata: {}
+    dependencies:
+    - open
+    - yaml.safe_load
+    docstring: Load configuration from YAML file.
+    line: 17
+  - name: run_ingestion_pipeline
+    type: function
+    filename: build\lib\pipeline\run_pipeline.py
+    metadata: {}
+    dependencies:
+    - ArxivClient
+    - MongoStorage
+    - arxiv_client.fetch_papers
+    - get
+    - len
+    - logger.info
+    - mongo_storage.store_papers
+    - range
+    - time
+    - time.sleep
+    docstring: Run the arXiv ingestion pipeline.
+    line: 22
+  - name: main
+    type: function
+    filename: build\lib\pipeline\run_pipeline.py
+    metadata: {}
+    dependencies:
+    - argparse.ArgumentParser
+    - datetime.now
+    - load_config
+    - logger.error
+    - logger.info
+    - parser.add_argument
+    - parser.parse_args
+    - run_ingestion_pipeline
+    - str
+    docstring: Main entry point with command line argument parsing.
+    line: 77
+  dependencies:
+  - ArxivClient
+  - MongoStorage
+  - argparse.ArgumentParser
+  - arxiv_client.fetch_papers
+  - datetime.now
+  - get
+  - len
+  - load_config
+  - logger.error
+  - logger.info
+  - mongo_storage.store_papers
+  - open
+  - parser.add_argument
+  - parser.parse_args
+  - range
+  - run_ingestion_pipeline
+  - str
+  - time
+  - time.sleep
+  - yaml.safe_load
+- name: build\lib\storage\mongo
+  filename: build\lib\storage\mongo.py
+  metadata: {}
+  components:
+  - name: MongoStorage
+    type: class
+    filename: build\lib\storage\mongo.py
+    metadata: {}
+    dependencies:
+    - UpdateOne
+    - cursor.sort
+    - datetime.utcnow
+    - len
+    - limit
+    - list
+    - logger.error
+    - logger.exception
+    - logger.info
+    - logger.warning
+    - operations.append
+    - paper.get
+    - pymongo.MongoClient
+    - pymongo.UpdateOne
+    - pymongo.errors.BulkWriteError
+    - pymongo.errors.PyMongoError
+    - self._setup_indexes
+    - self.client.close
+    - self.close
+    - self.papers.bulk_write
+    - self.papers.create_index
+    - self.papers.find
+    - self.papers.find_one
+    - self.papers.update_one
+    - self.stats.find
+    - self.stats.insert_one
+    - skip
+    - sort
+    - str
+    docstring: MongoDB storage for arXiv papers.
+    line: 8
+  dependencies:
+  - UpdateOne
+  - cursor.sort
+  - datetime.utcnow
+  - len
+  - limit
+  - list
+  - logger.error
+  - logger.exception
+  - logger.info
+  - logger.warning
+  - operations.append
+  - paper.get
+  - pymongo.MongoClient
+  - pymongo.UpdateOne
+  - pymongo.errors.BulkWriteError
+  - pymongo.errors.PyMongoError
+  - self._setup_indexes
+  - self.client.close
+  - self.close
+  - self.papers.bulk_write
+  - self.papers.create_index
+  - self.papers.find
+  - self.papers.find_one
+  - self.papers.update_one
+  - self.stats.find
+  - self.stats.insert_one
+  - skip
+  - sort
+  - str
+- name: build\lib\utils\logger
+  filename: build\lib\utils\logger.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: cli\main
+  filename: cli\main.py
+  metadata: {}
+  components:
+  - name: setup_logging
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - ValueError
+    - getattr
+    - isinstance
+    - log_level.upper
+    - logging.FileHandler
+    - logging.StreamHandler
+    - logging.basicConfig
+    - os.makedirs
+    docstring: Setup logging configuration.
+    line: 14
+  - name: cli
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - click.group
+    - click.option
+    - create_default_config
+    - ctx.ensure_object
+    - setup_logging
+    docstring: Command line interface for AI Agent System.
+    line: 38
+  - name: agent
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - cli.group
+    docstring: Manage AI agents.
+    line: 51
+  - name: list_agents
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - agent.command
+    - agent_config.get
+    - click.echo
+    - config.get
+    - items
+    - load_config
+    docstring: List all configured agents and their status.
+    line: 57
+  - name: start_agent
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - _start_agent
+    - agent.command
+    - asyncio.run
+    - click.argument
+    docstring: Start a specific agent.
+    line: 71
+  - name: stop_agent
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - _stop_agent
+    - agent.command
+    - asyncio.run
+    - click.argument
+    docstring: Stop a specific agent.
+    line: 109
+  - name: agent_status
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - _agent_status
+    - agent.command
+    - asyncio.run
+    - click.argument
+    docstring: Check the status of agents.
+    line: 131
+  - name: config
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - cli.group
+    docstring: Manage system configuration.
+    line: 162
+  - name: show_config
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - agent_config.get
+    - click.echo
+    - config.command
+    - config.get
+    - get
+    - items
+    - load_config
+    - model.get
+    - provider_config.get
+    docstring: Show the current configuration.
+    line: 168
+  - name: logs
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - cli.group
+    docstring: View and manage logs.
+    line: 201
+  - name: view_logs
+    type: function
+    filename: cli\main.py
+    metadata: {}
+    dependencies:
+    - click.argument
+    - click.echo
+    - click.option
+    - config.get
+    - file.readlines
+    - get
+    - len
+    - line.strip
+    - load_config
+    - logs.command
+    - open
+    - os.path.exists
+    - os.path.join
+    - str
+    docstring: View logs for the system or a specific agent.
+    line: 209
+  dependencies:
+  - ValueError
+  - _agent_status
+  - _start_agent
+  - _stop_agent
+  - agent.command
+  - agent_config.get
+  - asyncio.run
+  - cli.group
+  - click.argument
+  - click.echo
+  - click.group
+  - click.option
+  - config.command
+  - config.get
+  - create_default_config
+  - ctx.ensure_object
+  - file.readlines
+  - get
+  - getattr
+  - isinstance
+  - items
+  - len
+  - line.strip
+  - load_config
+  - log_level.upper
+  - logging.FileHandler
+  - logging.StreamHandler
+  - logging.basicConfig
+  - logs.command
+  - model.get
+  - open
+  - os.makedirs
+  - os.path.exists
+  - os.path.join
+  - provider_config.get
+  - setup_logging
+  - str
+- name: cli\utils
+  filename: cli\utils.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: cli\commands\agent
+  filename: cli\commands\agent.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: cli\commands\config
+  filename: cli\commands\config.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: cli\commands\logs
+  filename: cli\commands\logs.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: config\settings
+  filename: config\settings.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: scripts\check_prometheus_metrics
+  filename: scripts\check_prometheus_metrics.py
+  metadata: {}
+  components:
+  - name: check_prometheus_up
+    type: function
+    filename: scripts\check_prometheus_metrics.py
+    metadata: {}
+    dependencies:
+    - info.get
+    - print
+    - requests.get
+    - response.json
+    docstring: Check if Prometheus is running and responding
+    line: 17
+  - name: get_metrics_list
+    type: function
+    filename: scripts\check_prometheus_metrics.py
+    metadata: {}
+    dependencies:
+    - print
+    - requests.get
+    - response.json
+    docstring: Get a list of all available metrics in Prometheus
+    line: 32
+  - name: check_container_metrics
+    type: function
+    filename: scripts\check_prometheus_metrics.py
+    metadata: {}
+    dependencies:
+    - available.append
+    - len
+    - print
+    - requests.get
+    - response.json
+    docstring: Check if container metrics are available
+    line: 46
+  - name: check_host_metrics
+    type: function
+    filename: scripts\check_prometheus_metrics.py
+    metadata: {}
+    dependencies:
+    - available.append
+    - len
+    - print
+    - requests.get
+    - response.json
+    docstring: Check if host metrics are available
+    line: 70
+  - name: check_targets
+    type: function
+    filename: scripts\check_prometheus_metrics.py
+    metadata: {}
+    dependencies:
+    - get
+    - len
+    - print
+    - requests.get
+    - response.json
+    - sum
+    - target.get
+    docstring: Check Prometheus targets and their status
+    line: 94
+  - name: check_container_labels
+    type: function
+    filename: scripts\check_prometheus_metrics.py
+    metadata: {}
+    dependencies:
+    - all_labels.update
+    - get
+    - join
+    - keys
+    - len
+    - list
+    - print
+    - requests.get
+    - response.json
+    - set
+    - sorted
+    docstring: Check what labels are available for container metrics
+    line: 116
+  - name: check_mongodb_metrics
+    type: function
+    filename: scripts\check_prometheus_metrics.py
+    metadata: {}
+    dependencies:
+    - available.append
+    - connection_states.append
+    - join
+    - len
+    - operation_types.append
+    - print
+    - requests.get
+    - response.json
+    - set
+    docstring: Check for MongoDB metrics critical for ArXiv pipeline vector database
+      operations
+    line: 161
+  - name: verify_dashboard_queries
+    type: function
+    filename: scripts\check_prometheus_metrics.py
+    metadata: {}
+    dependencies:
+    - len
+    - print
+    - requests.get
+    - response.json
+    docstring: Verify that key queries used in the ArXiv Pipeline dashboard are working
+    line: 205
+  - name: main
+    type: function
+    filename: scripts\check_prometheus_metrics.py
+    metadata: {}
+    dependencies:
+    - argparse.ArgumentParser
+    - bool
+    - check_container_labels
+    - check_container_metrics
+    - check_host_metrics
+    - check_mongodb_metrics
+    - check_prometheus_up
+    - check_targets
+    - datetime.now
+    - get_metrics_list
+    - len
+    - parser.add_argument
+    - parser.parse_args
+    - print
+    - strftime
+    - sys.exit
+    - verify_dashboard_queries
+    docstring: ''
+    line: 230
+  dependencies:
+  - all_labels.update
+  - argparse.ArgumentParser
+  - available.append
+  - bool
+  - check_container_labels
+  - check_container_metrics
+  - check_host_metrics
+  - check_mongodb_metrics
+  - check_prometheus_up
+  - check_targets
+  - connection_states.append
+  - datetime.now
+  - get
+  - get_metrics_list
+  - info.get
+  - join
+  - keys
+  - len
+  - list
+  - operation_types.append
+  - parser.add_argument
+  - parser.parse_args
+  - print
+  - requests.get
+  - response.json
+  - set
+  - sorted
+  - strftime
+  - sum
+  - sys.exit
+  - target.get
+  - verify_dashboard_queries
+- name: src\__init__
+  filename: src\__init__.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\agents\base_agent
+  filename: src\agents\base_agent.py
+  metadata: {}
+  components:
+  - name: BaseAgent
+    type: class
+    filename: src\agents\base_agent.py
+    metadata: {}
+    dependencies:
+    - asyncio.sleep
+    - datetime.now
+    - logging.getLogger
+    - self._get_interval_seconds
+    - self.config.get
+    - self.initialize
+    - self.logger.error
+    - self.logger.info
+    - self.logger.warning
+    - self.run_cycle
+    - str
+    docstring: Base class for all agents.
+    line: 8
+  dependencies:
+  - asyncio.sleep
+  - datetime.now
+  - logging.getLogger
+  - self._get_interval_seconds
+  - self.config.get
+  - self.initialize
+  - self.logger.error
+  - self.logger.info
+  - self.logger.warning
+  - self.run_cycle
+  - str
+- name: src\agents\manager
+  filename: src\agents\manager.py
+  metadata: {}
+  components:
+  - name: AgentManager
+    type: class
+    filename: src\agents\manager.py
+    metadata: {}
+    dependencies:
+    - agent.last_run.isoformat
+    - agent.start
+    - agent.stop
+    - agent_class
+    - agent_config.get
+    - agent_configs.items
+    - agent_name.title
+    - asyncio.create_task
+    - getattr
+    - importlib.import_module
+    - items
+    - load_config
+    - logging.getLogger
+    - model.get
+    - model_class
+    - model_config.get
+    - model_interface.initialize
+    - provider_config.get
+    - provider_name.capitalize
+    - replace
+    - self._get_model_provider
+    - self._initialize_agents
+    - self._initialize_models
+    - self.agents.items
+    - self.config.get
+    - self.get_agent_status
+    - self.logger.error
+    - self.logger.info
+    - self.tasks.append
+    - str
+    docstring: Manages the lifecycle of all agents in the system.
+    line: 13
+  dependencies:
+  - agent.last_run.isoformat
+  - agent.start
+  - agent.stop
+  - agent_class
+  - agent_config.get
+  - agent_configs.items
+  - agent_name.title
+  - asyncio.create_task
+  - getattr
+  - importlib.import_module
+  - items
+  - load_config
+  - logging.getLogger
+  - model.get
+  - model_class
+  - model_config.get
+  - model_interface.initialize
+  - provider_config.get
+  - provider_name.capitalize
+  - replace
+  - self._get_model_provider
+  - self._initialize_agents
+  - self._initialize_models
+  - self.agents.items
+  - self.config.get
+  - self.get_agent_status
+  - self.logger.error
+  - self.logger.info
+  - self.tasks.append
+  - str
+- name: src\agents\code_doc\agent
+  filename: src\agents\code_doc\agent.py
+  metadata: {}
+  components:
+  - name: CodeDocAgent
+    type: class
+    filename: src\agents\code_doc\agent.py
+    metadata: {}
+    dependencies:
+    - CodeParser
+    - GitMonitor
+    - Path
+    - __init__
+    - any
+    - change.get
+    - config.get
+    - filtered.append
+    - len
+    - os.path.exists
+    - parsed_code.get
+    - re.match
+    - read_text
+    - result.get
+    - results.append
+    - self._analyze_file_changes
+    - self._analyze_git_changes
+    - self._create_doc_prompt
+    - self._filter_relevant_changes
+    - self._format_results
+    - self._process_changes
+    - self.config.get
+    - self.git_monitor.get_recent_changes
+    - self.logger.error
+    - self.logger.info
+    - self.model.generate
+    - self.parser.parse
+    - str
+    - super
+    docstring: Agent for monitoring code changes and suggesting documentation updates.
+    line: 15
+  dependencies:
+  - CodeParser
+  - GitMonitor
+  - Path
+  - __init__
+  - any
+  - change.get
+  - config.get
+  - filtered.append
+  - len
+  - os.path.exists
+  - parsed_code.get
+  - re.match
+  - read_text
+  - result.get
+  - results.append
+  - self._analyze_file_changes
+  - self._analyze_git_changes
+  - self._create_doc_prompt
+  - self._filter_relevant_changes
+  - self._format_results
+  - self._process_changes
+  - self.config.get
+  - self.git_monitor.get_recent_changes
+  - self.logger.error
+  - self.logger.info
+  - self.model.generate
+  - self.parser.parse
+  - str
+  - super
+- name: src\agents\code_doc\code_parser
+  filename: src\agents\code_doc\code_parser.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\agents\code_doc\git_monitor
+  filename: src\agents\code_doc\git_monitor.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\agents\research\agent
+  filename: src\agents\research\agent.py
+  metadata: {}
+  components:
+  - name: ResearchAnalysisAgent
+    type: class
+    filename: src\agents\research\agent.py
+    metadata: {}
+    dependencies:
+    - ConceptMapper
+    - MongoDBClient
+    - Neo4jClient
+    - PaperProcessor
+    - QdrantClient
+    - __init__
+    - all_papers.extend
+    - client.get_collection
+    - client.run_query
+    - collection.find
+    - config.get
+    - f.read
+    - join
+    - len
+    - list
+    - open
+    - os.environ.get
+    - os.path.exists
+    - paper.get
+    - prompt_template.format
+    - replace
+    - self._fetch_papers
+    - self._get_default_prompt
+    - self._process_task
+    - self.logger.info
+    - self.model.generate
+    - self.mongodb_clients.items
+    - self.neo4j_clients.items
+    - self.vector_store_config.get
+    - source.get
+    - startswith
+    - str
+    - super
+    - task.get
+    docstring: Agent for analyzing research papers and generating insights.
+    line: 15
+  dependencies:
+  - ConceptMapper
+  - MongoDBClient
+  - Neo4jClient
+  - PaperProcessor
+  - QdrantClient
+  - __init__
+  - all_papers.extend
+  - client.get_collection
+  - client.run_query
+  - collection.find
+  - config.get
+  - f.read
+  - join
+  - len
+  - list
+  - open
+  - os.environ.get
+  - os.path.exists
+  - paper.get
+  - prompt_template.format
+  - replace
+  - self._fetch_papers
+  - self._get_default_prompt
+  - self._process_task
+  - self.logger.info
+  - self.model.generate
+  - self.mongodb_clients.items
+  - self.neo4j_clients.items
+  - self.vector_store_config.get
+  - source.get
+  - startswith
+  - str
+  - super
+  - task.get
+- name: src\agents\research\concept_mapper
+  filename: src\agents\research\concept_mapper.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\agents\research\paper_processor
+  filename: src\agents\research\paper_processor.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\agents_core\config
+  filename: src\agents_core\config.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\agents_core\config.py
+    metadata: {}
+    dependencies:
+    - FileNotFoundError
+    - ValueError
+    - _replace_env_vars
+    - _validate_config
+    - logger.error
+    - logging.getLogger
+    - open
+    - os.path.exists
+    - str
+    - yaml.safe_load
+    docstring: 'Load and validate configuration from a YAML file.
+
+      Replaces environment variables in the format ${ENV_VAR}.'
+    line: 13
+  - name: _replace_env_vars
+    type: function
+    filename: src\agents_core\config.py
+    metadata: {}
+    dependencies:
+    - _replace_env_vars
+    - isinstance
+    - obj.items
+    - obj.replace
+    - os.environ.get
+    - re.findall
+    docstring: Recursively replace environment variables in strings.
+    line: 42
+  - name: _validate_config
+    type: function
+    filename: src\agents_core\config.py
+    metadata: {}
+    dependencies:
+    - ValueError
+    - agents_config.items
+    - config.get
+    - isinstance
+    - logger.warning
+    - logging.getLogger
+    - models_config.get
+    docstring: Validate the configuration structure.
+    line: 59
+  - name: create_default_config
+    type: function
+    filename: src\agents_core\config.py
+    metadata: {}
+    dependencies:
+    - open
+    - os.makedirs
+    - os.path.dirname
+    - os.path.exists
+    - yaml.dump
+    docstring: Create a default configuration file if none exists.
+    line: 106
+  dependencies:
+  - FileNotFoundError
+  - ValueError
+  - _replace_env_vars
+  - _validate_config
+  - agents_config.items
+  - config.get
+  - isinstance
+  - logger.error
+  - logger.warning
+  - logging.getLogger
+  - models_config.get
+  - obj.items
+  - obj.replace
+  - open
+  - os.environ.get
+  - os.makedirs
+  - os.path.dirname
+  - os.path.exists
+  - re.findall
+  - str
+  - yaml.dump
+  - yaml.safe_load
+- name: src\agents_core\logging_utils
+  filename: src\agents_core\logging_utils.py
+  metadata: {}
+  components:
+  - name: setup_logger
+    type: function
+    filename: src\agents_core\logging_utils.py
+    metadata: {}
+    dependencies:
+    - getattr
+    - handler.setFormatter
+    - log_level.upper
+    - logger.addHandler
+    - logger.setLevel
+    - logging.Formatter
+    - logging.StreamHandler
+    - logging.getLogger
+    docstring: "Configure a logger with the specified name and log level.\n\nArgs:\n\
+      \    name: Logger name\n    log_level: Logging level (DEBUG, INFO, WARNING,\
+      \ ERROR, CRITICAL)\n    \nReturns:\n    Configured logger instance"
+    line: 16
+  - name: validate_paper_schema
+    type: function
+    filename: src\agents_core\logging_utils.py
+    metadata: {}
+    dependencies:
+    - all
+    - datetime.strptime
+    - errors.append
+    - isinstance
+    - len
+    docstring: "Validate a paper document against the expected schema.\n\nArgs:\n\
+      \    paper: Paper document dictionary\n    \nReturns:\n    Tuple of (is_valid,\
+      \ list_of_errors)"
+    line: 45
+  - name: validate_publication_date
+    type: function
+    filename: src\agents_core\logging_utils.py
+    metadata: {}
+    dependencies:
+    - datetime
+    - datetime.strptime
+    - datetime.utcnow
+    - isinstance
+    - len
+    docstring: "Validate a publication date string and convert to datetime object.\n\
+      \nArgs:\n    date_str: ISO-format date string (YYYY-MM-DDThh:mm:ssZ)\n    \n\
+      Returns:\n    Tuple of (is_valid, datetime_obj or None)"
+    line: 97
+  - name: count_papers_by_date
+    type: function
+    filename: src\agents_core\logging_utils.py
+    metadata: {}
+    dependencies:
+    - OrderedDict
+    - ValueError
+    - datetime.strptime
+    - defaultdict
+    - doc.get
+    - dt.strftime
+    - isinstance
+    - list
+    - mongo_collection.aggregate
+    - mongo_collection.find
+    - pipeline.append
+    - pipeline.extend
+    - weekday_counts.get
+    docstring: "Count papers by publication date with flexible grouping.\n\nArgs:\n\
+      \    mongo_collection: MongoDB collection object\n    date_field: Field name\
+      \ containing the date\n    group_by: Grouping level ('day', 'month', 'year',\
+      \ 'weekday')\n    \nReturns:\n    OrderedDict of date counts"
+    line: 136
+  - name: analyze_mongodb_collection
+    type: function
+    filename: src\agents_core\logging_utils.py
+    metadata: {}
+    dependencies:
+    - add
+    - defaultdict
+    - doc.items
+    - isinstance
+    - items
+    - keys
+    - len
+    - limit
+    - list
+    - min
+    - mongo_collection.count_documents
+    - mongo_collection.find
+    - set
+    - str
+    - type
+    docstring: "Analyze the structure and content of a MongoDB collection.\n\nArgs:\n\
+      \    mongo_collection: MongoDB collection object\n    query: Optional filter\
+      \ query\n    projection: Optional field projection\n    \nReturns:\n    Dictionary\
+      \ with analysis results"
+    line: 206
+  - name: generate_date_distribution_report
+    type: function
+    filename: src\agents_core\logging_utils.py
+    metadata: {}
+    dependencies:
+    - date_counts.items
+    - date_counts.keys
+    - date_counts.values
+    - int
+    - iter
+    - join
+    - len
+    - lines.append
+    - max
+    - next
+    - sum
+    docstring: "Generate a formatted report of date-based paper distribution.\n\n\
+      Args:\n    date_counts: OrderedDict of dates and counts\n    title: Report title\n\
+      \    \nReturns:\n    Formatted report string"
+    line: 279
+  - name: validate_mongodb_data
+    type: function
+    filename: src\agents_core\logging_utils.py
+    metadata: {}
+    dependencies:
+    - defaultdict
+    - dict
+    - doc.get
+    - len
+    - list
+    - min
+    - mongo_collection.aggregate
+    - mongo_collection.count_documents
+    - sample_errors.append
+    - str
+    - validation_func
+    docstring: "Validate a sample of documents in a MongoDB collection.\n\nArgs:\n\
+      \    mongo_collection: MongoDB collection object\n    validation_func: Function\
+      \ that validates a document and returns (bool, [errors])\n    sample_size: Number\
+      \ of documents to validate\n    \nReturns:\n    Dictionary with validation results"
+    line: 333
+  - name: check_data_integrity
+    type: function
+    filename: src\agents_core\logging_utils.py
+    metadata: {}
+    dependencies:
+    - count_papers_by_date
+    - current_month.replace
+    - datetime.strptime
+    - datetime.utcnow
+    - expected_next.replace
+    - gap_date.replace
+    - gap_date.strftime
+    - gap_months.append
+    - gaps.append
+    - len
+    - list
+    - mongo_collection.aggregate
+    - mongo_collection.count_documents
+    - monthly_counts.items
+    - months.sort
+    - query.copy
+    - range
+    - strftime
+    docstring: "Check data integrity with focus on temporal consistency.\n\nArgs:\n\
+      \    mongo_collection: MongoDB collection to check\n    date_range: Optional\
+      \ tuple of (start_date, end_date) strings\n    \nReturns:\n    Dictionary with\
+      \ integrity check results"
+    line: 399
+  dependencies:
+  - OrderedDict
+  - ValueError
+  - add
+  - all
+  - count_papers_by_date
+  - current_month.replace
+  - date_counts.items
+  - date_counts.keys
+  - date_counts.values
+  - datetime
+  - datetime.strptime
+  - datetime.utcnow
+  - defaultdict
+  - dict
+  - doc.get
+  - doc.items
+  - dt.strftime
+  - errors.append
+  - expected_next.replace
+  - gap_date.replace
+  - gap_date.strftime
+  - gap_months.append
+  - gaps.append
+  - getattr
+  - handler.setFormatter
+  - int
+  - isinstance
+  - items
+  - iter
+  - join
+  - keys
+  - len
+  - limit
+  - lines.append
+  - list
+  - log_level.upper
+  - logger.addHandler
+  - logger.setLevel
+  - logging.Formatter
+  - logging.StreamHandler
+  - logging.getLogger
+  - max
+  - min
+  - mongo_collection.aggregate
+  - mongo_collection.count_documents
+  - mongo_collection.find
+  - monthly_counts.items
+  - months.sort
+  - next
+  - pipeline.append
+  - pipeline.extend
+  - query.copy
+  - range
+  - sample_errors.append
+  - set
+  - str
+  - strftime
+  - sum
+  - type
+  - validation_func
+  - weekday_counts.get
+- name: src\agents_core\data\mongodb
+  filename: src\agents_core\data\mongodb.py
+  metadata: {}
+  components:
+  - name: MongoDBClient
+    type: class
+    filename: src\agents_core\data\mongodb.py
+    metadata: {}
+    dependencies:
+    - collection.find
+    - collection.insert_one
+    - cursor.sort
+    - limit
+    - list
+    - pymongo.MongoClient
+    - pymongo.datetime.datetime.utcnow
+    - self.get_collection
+    - skip
+    - str
+    docstring: Client for MongoDB operations.
+    line: 5
+  dependencies:
+  - collection.find
+  - collection.insert_one
+  - cursor.sort
+  - limit
+  - list
+  - pymongo.MongoClient
+  - pymongo.datetime.datetime.utcnow
+  - self.get_collection
+  - skip
+  - str
+- name: src\agents_core\data\neo4j
+  filename: src\agents_core\data\neo4j.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\agents_core\data\qdrant
+  filename: src\agents_core\data\qdrant.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\agents_core\models\base
+  filename: src\agents_core\models\base.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\agents_core\models\claude
+  filename: src\agents_core\models\claude.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\agents_core\models\huggingface
+  filename: src\agents_core\models\huggingface.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\agents_core\models\ollama
+  filename: src\agents_core\models\ollama.py
+  metadata: {}
+  components:
+  - name: OllamaModelInterface
+    type: class
+    filename: src\agents_core\models\ollama.py
+    metadata: {}
+    dependencies:
+    - aiohttp.ClientSession
+    - config.get
+    - get
+    - logging.getLogger
+    - model_config.get
+    - models_data.get
+    - parameters.get
+    - params.update
+    - response.json
+    - response.text
+    - response_data.get
+    - self.logger.error
+    - self.logger.info
+    - self.logger.warning
+    - session.get
+    - session.post
+    - str
+    docstring: Interface for interacting with Ollama models.
+    line: 9
+  dependencies:
+  - aiohttp.ClientSession
+  - config.get
+  - get
+  - logging.getLogger
+  - model_config.get
+  - models_data.get
+  - parameters.get
+  - params.update
+  - response.json
+  - response.text
+  - response_data.get
+  - self.logger.error
+  - self.logger.info
+  - self.logger.warning
+  - session.get
+  - session.post
+  - str
+- name: src\api\main
+  filename: src\api\main.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\api\models\mongodb
+  filename: src\api\models\mongodb.py
+  metadata: {}
+  components:
+  - name: MongoDBStats
+    type: class
+    filename: src\api\models\mongodb.py
+    metadata: {}
+    dependencies: []
+    docstring: Response model for MongoDB paper statistics
+    line: 4
+  - name: MongoDBConnectionResponse
+    type: class
+    filename: src\api\models\mongodb.py
+    metadata: {}
+    dependencies: []
+    docstring: Response model for MongoDB connection test
+    line: 11
+  - name: CategoryCount
+    type: class
+    filename: src\api\models\mongodb.py
+    metadata: {}
+    dependencies: []
+    docstring: Model for category count data
+    line: 17
+  - name: PaperAnalysisResponse
+    type: class
+    filename: src\api\models\mongodb.py
+    metadata: {}
+    dependencies: []
+    docstring: Response model for paper analysis by time
+    line: 22
+  dependencies: []
+- name: src\api\models\neo4j
+  filename: src\api\models\neo4j.py
+  metadata: {}
+  components:
+  - name: Neo4jConnectionResponse
+    type: class
+    filename: src\api\models\neo4j.py
+    metadata: {}
+    dependencies: []
+    docstring: Response model for Neo4j connection test
+    line: 4
+  - name: Neo4jStats
+    type: class
+    filename: src\api\models\neo4j.py
+    metadata: {}
+    dependencies: []
+    docstring: Response model for Neo4j database statistics
+    line: 10
+  - name: Neo4jGraphResponse
+    type: class
+    filename: src\api\models\neo4j.py
+    metadata: {}
+    dependencies: []
+    docstring: Response model for Neo4j graph data
+    line: 17
+  dependencies: []
+- name: src\api\models\qdrant
+  filename: src\api\models\qdrant.py
+  metadata: {}
+  components:
+  - name: QdrantStats
+    type: class
+    filename: src\api\models\qdrant.py
+    metadata: {}
+    dependencies: []
+    docstring: Response model for Qdrant paper statistics
+    line: 4
+  - name: QdrantConnectionResponse
+    type: class
+    filename: src\api\models\qdrant.py
+    metadata: {}
+    dependencies: []
+    docstring: Response model for Qdrant connection test
+    line: 11
+  - name: SyncResponse
+    type: class
+    filename: src\api\models\qdrant.py
+    metadata: {}
+    dependencies: []
+    docstring: Response model for sync operations
+    line: 18
+  - name: SyncStatusResponse
+    type: class
+    filename: src\api\models\qdrant.py
+    metadata: {}
+    dependencies: []
+    docstring: Response model for sync status check
+    line: 24
+  dependencies: []
+- name: src\api\routes\mongodb
+  filename: src\api\routes\mongodb.py
+  metadata: {}
+  components:
+  - name: mongodb_paper_stats
+    type: function
+    filename: src\api\routes\mongodb.py
+    metadata: {}
+    dependencies:
+    - MongoClient
+    - author_set.update
+    - category_set.update
+    - client.close
+    - isinstance
+    - len
+    - logger.error
+    - logging.info
+    - mongo_uri.replace
+    - os.getenv
+    - os.path.exists
+    - papers_collection.count_documents
+    - papers_collection.find
+    - router.get
+    - set
+    - str
+    docstring: ''
+    line: 20
+  - name: test_mongodb_connection
+    type: function
+    filename: src\api\routes\mongodb.py
+    metadata: {}
+    dependencies:
+    - MongoClient
+    - client.admin.command
+    - client.close
+    - client.list_database_names
+    - logging.info
+    - mongo_uri.replace
+    - os.getenv
+    - os.path.exists
+    - router.get
+    - str
+    docstring: ''
+    line: 57
+  - name: get_papers_by_time
+    type: function
+    filename: src\api\routes\mongodb.py
+    metadata: {}
+    dependencies:
+    - Query
+    - analyze_papers_by_year_month_day
+    - daily_data.items
+    - logging.info
+    - mongo_uri.replace
+    - monthly_data.items
+    - os.getenv
+    - os.path.exists
+    - router.get
+    - str
+    - yearly_data.items
+    docstring: "Returns analysis of papers by year, month, and day.\n\nArgs:\n   \
+      \ start_date: Optional start date filter (format: YYYY-MM-DD)\n    end_date:\
+      \ Optional end date filter (format: YYYY-MM-DD)\n    year_filter: Optional year\
+      \ to filter results (e.g., 2023)\n\nReturns:\n    Dictionary with yearly, monthly,\
+      \ and daily paper counts"
+    line: 83
+  dependencies:
+  - MongoClient
+  - Query
+  - analyze_papers_by_year_month_day
+  - author_set.update
+  - category_set.update
+  - client.admin.command
+  - client.close
+  - client.list_database_names
+  - daily_data.items
+  - isinstance
+  - len
+  - logger.error
+  - logging.info
+  - mongo_uri.replace
+  - monthly_data.items
+  - os.getenv
+  - os.path.exists
+  - papers_collection.count_documents
+  - papers_collection.find
+  - router.get
+  - set
+  - str
+  - yearly_data.items
+- name: src\api\routes\neo4j
+  filename: src\api\routes\neo4j.py
+  metadata: {}
+  components:
+  - name: get_driver
+    type: function
+    filename: src\api\routes\neo4j.py
+    metadata: {}
+    dependencies:
+    - GraphDatabase.driver
+    - logger.error
+    - str
+    docstring: Get a Neo4j driver instance with proper error handling
+    line: 24
+  - name: test_neo4j_connection
+    type: function
+    filename: src\api\routes\neo4j.py
+    metadata: {}
+    dependencies:
+    - driver.close
+    - driver.session
+    - get_driver
+    - result.single
+    - router.get
+    - session.run
+    - str
+    docstring: Test connection to Neo4j database
+    line: 38
+  - name: neo4j_db_stats
+    type: function
+    filename: src\api\routes\neo4j.py
+    metadata: {}
+    dependencies:
+    - author_result.peek
+    - author_result.single
+    - category_result.peek
+    - category_result.single
+    - driver.close
+    - driver.session
+    - get_driver
+    - logger.error
+    - paper_result.peek
+    - paper_result.single
+    - router.get
+    - session.run
+    - str
+    docstring: Get Neo4j database statistics (papers, authors, categories)
+    line: 72
+  - name: run_neo4j_query
+    type: function
+    filename: src\api\routes\neo4j.py
+    metadata: {}
+    dependencies:
+    - Body
+    - dict
+    - driver.close
+    - driver.session
+    - edges.append
+    - get_driver
+    - hasattr
+    - isinstance
+    - len
+    - list
+    - logger.error
+    - node_map.values
+    - record.keys
+    - router.post
+    - session.run
+    - str
+    - value.get
+    docstring: Run a Cypher query and return the results in a format suitable for
+      visualization
+    line: 102
+  dependencies:
+  - Body
+  - GraphDatabase.driver
+  - author_result.peek
+  - author_result.single
+  - category_result.peek
+  - category_result.single
+  - dict
+  - driver.close
+  - driver.session
+  - edges.append
+  - get_driver
+  - hasattr
+  - isinstance
+  - len
+  - list
+  - logger.error
+  - node_map.values
+  - paper_result.peek
+  - paper_result.single
+  - record.keys
+  - result.single
+  - router.get
+  - router.post
+  - session.run
+  - str
+  - value.get
+- name: src\api\routes\qdrant
+  filename: src\api\routes\qdrant.py
+  metadata: {}
+  components:
+  - name: run_script_in_background
+    type: function
+    filename: src\api\routes\qdrant.py
+    metadata: {}
+    dependencies:
+    - len
+    - subprocess.Popen
+    docstring: ''
+    line: 67
+  - name: test_qdrant_connection
+    type: function
+    filename: src\api\routes\qdrant.py
+    metadata: {}
+    dependencies:
+    - logger.error
+    - logger.info
+    - logger.warning
+    - requests.get
+    - router.get
+    - str
+    docstring: Tests connection to Qdrant server.
+    line: 91
+  - name: qdrant_paper_stats
+    type: function
+    filename: src\api\routes\qdrant.py
+    metadata: {}
+    dependencies:
+    - collection.get
+    - collection_resp.json
+    - collections_resp.json
+    - isinstance
+    - json.dumps
+    - len
+    - logger.error
+    - logger.info
+    - requests.get
+    - router.get
+    - str
+    - vectors_data.items
+    docstring: 'Returns stats for Qdrant collection: vector count (papers), vector
+      dimensions, and collection count.'
+    line: 142
+  - name: qdrant_summary_stats
+    type: function
+    filename: src\api\routes\qdrant.py
+    metadata: {}
+    dependencies:
+    - collection_resp.json
+    - logger.error
+    - logger.info
+    - requests.get
+    - router.get
+    - str
+    - vectors_data.items
+    docstring: 'Returns stats for Qdrant summary collection: vector count (papers),
+      vector dimensions, and collection count.'
+    line: 211
+  - name: sync_summary_vectors
+    type: function
+    filename: src\api\routes\qdrant.py
+    metadata: {}
+    dependencies:
+    - HTTPException
+    - os.path.dirname
+    - os.path.exists
+    - os.path.join
+    - router.post
+    - run_script_in_background
+    docstring: Starts a background task to sync paper summaries from MongoDB to Qdrant.
+    line: 258
+  - name: check_sync_status
+    type: function
+    filename: src\api\routes\qdrant.py
+    metadata: {}
+    dependencies:
+    - HTTPException
+    - process.communicate
+    - process.poll
+    - router.get
+    docstring: Checks the status of a background sync process.
+    line: 282
+  dependencies:
+  - HTTPException
+  - collection.get
+  - collection_resp.json
+  - collections_resp.json
+  - isinstance
+  - json.dumps
+  - len
+  - logger.error
+  - logger.info
+  - logger.warning
+  - os.path.dirname
+  - os.path.exists
+  - os.path.join
+  - process.communicate
+  - process.poll
+  - requests.get
+  - router.get
+  - router.post
+  - run_script_in_background
+  - str
+  - subprocess.Popen
+  - vectors_data.items
+- name: src\embedding\embed
+  filename: src\embedding\embed.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\graph\neo4j_sync
+  filename: src\graph\neo4j_sync.py
+  metadata: {}
+  components:
+  - name: Neo4jSync
+    type: class
+    filename: src\graph\neo4j_sync.py
+    metadata: {}
+    dependencies:
+    - GraphDatabase.driver
+    - enumerate
+    - len
+    - logger.error
+    - logger.info
+    - paper.get
+    - self.driver.close
+    - self.driver.session
+    - self.sync_papers_batch
+    - session.run
+    - session.write_transaction
+    - time.time
+    - tx.run
+    docstring: ''
+    line: 8
+  dependencies:
+  - GraphDatabase.driver
+  - enumerate
+  - len
+  - logger.error
+  - logger.info
+  - paper.get
+  - self.driver.close
+  - self.driver.session
+  - self.sync_papers_batch
+  - session.run
+  - session.write_transaction
+  - time.time
+  - tx.run
+- name: src\graph\sync_mongo_to_neo4j
+  filename: src\graph\sync_mongo_to_neo4j.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\graph\sync_mongo_to_neo4j.py
+    metadata: {}
+    dependencies:
+    - logger.error
+    - open
+    - yaml.safe_load
+    docstring: Load configuration from YAML file
+    line: 12
+  - name: main
+    type: function
+    filename: src\graph\sync_mongo_to_neo4j.py
+    metadata: {}
+    dependencies:
+    - MongoClient
+    - Neo4jSync
+    - datetime.now
+    - db.papers.count_documents
+    - db.papers.find
+    - isoformat
+    - len
+    - limit
+    - list
+    - load_config
+    - logger.error
+    - logger.info
+    - mongo_client.close
+    - neo4j_sync.close
+    - neo4j_sync.sync_papers_batch
+    - progress.close
+    - progress.update
+    - range
+    - skip
+    - sort
+    - time.time
+    - tqdm
+    docstring: ''
+    line: 21
+  dependencies:
+  - MongoClient
+  - Neo4jSync
+  - datetime.now
+  - db.papers.count_documents
+  - db.papers.find
+  - isoformat
+  - len
+  - limit
+  - list
+  - load_config
+  - logger.error
+  - logger.info
+  - mongo_client.close
+  - neo4j_sync.close
+  - neo4j_sync.sync_papers_batch
+  - open
+  - progress.close
+  - progress.update
+  - range
+  - skip
+  - sort
+  - time.time
+  - tqdm
+  - yaml.safe_load
+- name: src\graph\test_neo4j
+  filename: src\graph\test_neo4j.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\ingestion\fetch
+  filename: src\ingestion\fetch.py
+  metadata: {}
+  components:
+  - name: ArxivClient
+    type: class
+    filename: src\ingestion\fetch.py
+    metadata: {}
+    dependencies:
+    - ET.fromstring
+    - append
+    - element.find
+    - entry.findall
+    - join
+    - len
+    - logger.error
+    - logger.info
+    - query_parts.append
+    - replace
+    - requests.get
+    - results.append
+    - root.findall
+    - self._get_text
+    - self._parse_response
+    - text.strip
+    docstring: Client for fetching papers from arXiv API using Atom XML format.
+    line: 9
+  dependencies:
+  - ET.fromstring
+  - append
+  - element.find
+  - entry.findall
+  - join
+  - len
+  - logger.error
+  - logger.info
+  - query_parts.append
+  - replace
+  - requests.get
+  - results.append
+  - root.findall
+  - self._get_text
+  - self._parse_response
+  - text.strip
+- name: src\llm_eval\evaluate_llm_models
+  filename: src\llm_eval\evaluate_llm_models.py
+  metadata: {}
+  components:
+  - name: main
+    type: function
+    filename: src\llm_eval\evaluate_llm_models.py
+    metadata: {}
+    dependencies:
+    - Path
+    - compare_results
+    - enumerate
+    - evaluate_model
+    - len
+    - model_paths.append
+    - print
+    - results_dir.mkdir
+    - str
+    docstring: ''
+    line: 6
+  dependencies:
+  - Path
+  - compare_results
+  - enumerate
+  - evaluate_model
+  - len
+  - model_paths.append
+  - print
+  - results_dir.mkdir
+  - str
+- name: src\llm_eval\metadata_generator
+  filename: src\llm_eval\metadata_generator.py
+  metadata: {}
+  components:
+  - name: parse_metadata
+    type: function
+    filename: src\llm_eval\metadata_generator.py
+    metadata: {}
+    dependencies:
+    - match.group
+    - re.search
+    - yaml.safe_load
+    docstring: Extract YAML metadata from docstring
+    line: 12
+  - name: parse_python_file
+    type: function
+    filename: src\llm_eval\metadata_generator.py
+    metadata: {}
+    dependencies:
+    - CodeAnalyzer
+    - analyzer.visit
+    - ast.parse
+    - f.read
+    - first_comment.group
+    - open
+    - parse_metadata
+    - re.search
+    docstring: ''
+    line: 105
+  - name: generate_system_metadata
+    type: function
+    filename: src\llm_eval\metadata_generator.py
+    metadata: {}
+    dependencies:
+    - Path
+    - append
+    - component.get
+    - extend
+    - file.endswith
+    - file_data.get
+    - get
+    - list
+    - open
+    - os.path.join
+    - os.walk
+    - parse_python_file
+    - print
+    - relative_file_path.replace
+    - relative_to
+    - replace
+    - set
+    - sorted
+    - str
+    - yaml.dump
+    docstring: ''
+    line: 125
+  - name: CodeAnalyzer
+    type: class
+    filename: src\llm_eval\metadata_generator.py
+    metadata: {}
+    dependencies:
+    - _get_full_name
+    - append
+    - ast.get_docstring
+    - ast.walk
+    - dependencies.add
+    - dependencies.update
+    - docstring.split
+    - isinstance
+    - parse_metadata
+    - self._get_dependencies
+    - self.generic_visit
+    - self.modules.setdefault
+    - set
+    - setdefault
+    - sorted
+    - strip
+    docstring: ''
+    line: 28
+  dependencies:
+  - CodeAnalyzer
+  - Path
+  - _get_full_name
+  - analyzer.visit
+  - append
+  - ast.get_docstring
+  - ast.parse
+  - ast.walk
+  - component.get
+  - dependencies.add
+  - dependencies.update
+  - docstring.split
+  - extend
+  - f.read
+  - file.endswith
+  - file_data.get
+  - first_comment.group
+  - get
+  - isinstance
+  - list
+  - match.group
+  - open
+  - os.path.join
+  - os.walk
+  - parse_metadata
+  - parse_python_file
+  - print
+  - re.search
+  - relative_file_path.replace
+  - relative_to
+  - replace
+  - self._get_dependencies
+  - self.generic_visit
+  - self.modules.setdefault
+  - set
+  - setdefault
+  - sorted
+  - str
+  - strip
+  - yaml.dump
+  - yaml.safe_load
+- name: src\llm_eval\evaluation\compare_results
+  filename: src\llm_eval\evaluation\compare_results.py
+  metadata: {}
+  components:
+  - name: compare_results
+    type: function
+    filename: src\llm_eval\evaluation\compare_results.py
+    metadata: {}
+    dependencies:
+    - f.write
+    - json.load
+    - open
+    - print
+    docstring: ''
+    line: 3
+  dependencies:
+  - f.write
+  - json.load
+  - open
+  - print
+- name: src\llm_eval\evaluation\evaluate
+  filename: src\llm_eval\evaluation\evaluate.py
+  metadata: {}
+  components:
+  - name: evaluate_model
+    type: function
+    filename: src\llm_eval\evaluation\evaluate.py
+    metadata: {}
+    dependencies:
+    - Path
+    - append
+    - calculate_bleu
+    - calculate_distinct_n
+    - calculate_meteor
+    - calculate_rouge
+    - calculate_self_bleu
+    - generated_texts.append
+    - isinstance
+    - json.dump
+    - json.load
+    - len
+    - load_model
+    - model.generate
+    - open
+    - output_path.parent.mkdir
+    - print
+    - to
+    - tokenizer
+    - tokenizer.decode
+    docstring: ''
+    line: 9
+  dependencies:
+  - Path
+  - append
+  - calculate_bleu
+  - calculate_distinct_n
+  - calculate_meteor
+  - calculate_rouge
+  - calculate_self_bleu
+  - generated_texts.append
+  - isinstance
+  - json.dump
+  - json.load
+  - len
+  - load_model
+  - model.generate
+  - open
+  - output_path.parent.mkdir
+  - print
+  - to
+  - tokenizer
+  - tokenizer.decode
+- name: src\llm_eval\evaluation\metrics
+  filename: src\llm_eval\evaluation\metrics.py
+  metadata: {}
+  components:
+  - name: calculate_bleu
+    type: function
+    filename: src\llm_eval\evaluation\metrics.py
+    metadata: {}
+    dependencies:
+    - SmoothingFunction
+    - generated.split
+    - reference.split
+    - sentence_bleu
+    docstring: ''
+    line: 22
+  - name: calculate_bleu
+    type: function
+    filename: src\llm_eval\evaluation\metrics.py
+    metadata: {}
+    dependencies:
+    - SmoothingFunction
+    - generated.split
+    - reference.split
+    - sentence_bleu
+    docstring: ''
+    line: 32
+  - name: calculate_meteor
+    type: function
+    filename: src\llm_eval\evaluation\metrics.py
+    metadata: {}
+    dependencies:
+    - generated.split
+    - meteor_score
+    - reference.split
+    docstring: ''
+    line: 37
+  - name: calculate_rouge
+    type: function
+    filename: src\llm_eval\evaluation\metrics.py
+    metadata: {}
+    dependencies:
+    - rouge_scorer.RougeScorer
+    - scorer.score
+    docstring: ''
+    line: 41
+  - name: calculate_distinct_n
+    type: function
+    filename: src\llm_eval\evaluation\metrics.py
+    metadata: {}
+    dependencies:
+    - len
+    - ngrams.extend
+    - range
+    - set
+    - text.split
+    - zip
+    docstring: ''
+    line: 46
+  - name: calculate_self_bleu
+    type: function
+    filename: src\llm_eval\evaluation\metrics.py
+    metadata: {}
+    dependencies:
+    - enumerate
+    - len
+    - range
+    - scores.append
+    - sentence_bleu
+    - split
+    - sum
+    - text.split
+    docstring: ''
+    line: 54
+  dependencies:
+  - SmoothingFunction
+  - enumerate
+  - generated.split
+  - len
+  - meteor_score
+  - ngrams.extend
+  - range
+  - reference.split
+  - rouge_scorer.RougeScorer
+  - scorer.score
+  - scores.append
+  - sentence_bleu
+  - set
+  - split
+  - sum
+  - text.split
+  - zip
+- name: src\llm_eval\models\hf_model_filter
+  filename: src\llm_eval\models\hf_model_filter.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\llm_eval\models\hf_model_list
+  filename: src\llm_eval\models\hf_model_list.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\llm_eval\models\load_model
+  filename: src\llm_eval\models\load_model.py
+  metadata: {}
+  components:
+  - name: load_model
+    type: function
+    filename: src\llm_eval\models\load_model.py
+    metadata:
+      developer: Tom Hanks
+      movie_reference: Forrest Gump
+      fun_fact: Loves typewriters
+    dependencies:
+    - AutoModelForCausalLM.from_pretrained
+    - AutoTokenizer.from_pretrained
+    - model.to
+    - torch.cuda.is_available
+    docstring: ''
+    line: 4
+  dependencies:
+  - AutoModelForCausalLM.from_pretrained
+  - AutoTokenizer.from_pretrained
+  - model.to
+  - torch.cuda.is_available
+- name: src\llm_eval\models\models_to_compare
+  filename: src\llm_eval\models\models_to_compare.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\llm_eval\utils\helpers
+  filename: src\llm_eval\utils\helpers.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\pipeline\download_kaggle_arxiv
+  filename: src\pipeline\download_kaggle_arxiv.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\pipeline\download_kaggle_arxiv.py
+    metadata: {}
+    dependencies:
+    - ConfigError
+    - Path
+    - creds_path.exists
+    - getattr
+    - json.load
+    - logger.error
+    - logger.setLevel
+    - open
+    - str
+    - update
+    - upper
+    - yaml.safe_load
+    docstring: "Load configuration from default.yaml and kaggle.json.\n\nReturns:\n\
+      \    Dict containing the merged configuration."
+    line: 40
+  - name: setup_environment
+    type: function
+    filename: src\pipeline\download_kaggle_arxiv.py
+    metadata: {}
+    dependencies:
+    - Path
+    - Path.home
+    - creds_path.exists
+    - dest_file.chmod
+    - kaggle_dir.mkdir
+    - load_dotenv
+    - logger.error
+    - logger.info
+    - logger.warning
+    - shutil
+    - shutil.copy2
+    - str
+    docstring: "Set up environment variables and Kaggle credentials.\n\nArgs:\n  \
+      \  config: Configuration dictionary"
+    line: 74
+  - name: ensure_directory_exists
+    type: function
+    filename: src\pipeline\download_kaggle_arxiv.py
+    metadata: {}
+    dependencies:
+    - Path
+    - logger.error
+    - logger.info
+    - path.absolute
+    - path.mkdir
+    - str
+    docstring: "Ensure the download directory exists, create it if it doesn't.\n\n\
+      Args:\n    directory: Path to the directory\n    \nReturns:\n    Path: Path\
+      \ object for the directory"
+    line: 115
+  - name: download_dataset
+    type: function
+    filename: src\pipeline\download_kaggle_arxiv.py
+    metadata: {}
+    dependencies:
+    - FileNotFoundError
+    - KaggleApi
+    - RuntimeError
+    - api.authenticate
+    - api.dataset_download_files
+    - dataset_name.split
+    - download_path.glob
+    - download_path.mkdir
+    - list
+    - logger.error
+    - logger.info
+    - str
+    - zip_path.exists
+    - zip_path.unlink
+    - zip_ref.extractall
+    - zipfile.ZipFile
+    docstring: "Download and extract the arXiv dataset from Kaggle.\n\nArgs:\n   \
+      \ dataset_name: Name of the Kaggle dataset (e.g., \"Cornell-University/arxiv\"\
+      )\n    download_path: Directory where the dataset will be saved\n    version:\
+      \ Dataset version (default: \"1\")\n    \nReturns:\n    Path: Path to the downloaded\
+      \ dataset directory\n    \nRaises:\n    RuntimeError: If the dataset download\
+      \ or extraction fails"
+    line: 134
+  - name: main
+    type: function
+    filename: src\pipeline\download_kaggle_arxiv.py
+    metadata: {}
+    dependencies:
+    - Path
+    - argparse.ArgumentParser
+    - download_dataset
+    - ensure_directory_exists
+    - get
+    - load_config
+    - logger.error
+    - logger.info
+    - parser.add_argument
+    - parser.parse_args
+    - setup_environment
+    - str
+    - sys.exit
+    docstring: Main function to handle the download process.
+    line: 201
+  - name: ConfigError
+    type: class
+    filename: src\pipeline\download_kaggle_arxiv.py
+    metadata: {}
+    dependencies: []
+    docstring: Raised when there is an error in the configuration.
+    line: 36
+  dependencies:
+  - ConfigError
+  - FileNotFoundError
+  - KaggleApi
+  - Path
+  - Path.home
+  - RuntimeError
+  - api.authenticate
+  - api.dataset_download_files
+  - argparse.ArgumentParser
+  - creds_path.exists
+  - dataset_name.split
+  - dest_file.chmod
+  - download_dataset
+  - download_path.glob
+  - download_path.mkdir
+  - ensure_directory_exists
+  - get
+  - getattr
+  - json.load
+  - kaggle_dir.mkdir
+  - list
+  - load_config
+  - load_dotenv
+  - logger.error
+  - logger.info
+  - logger.setLevel
+  - logger.warning
+  - open
+  - parser.add_argument
+  - parser.parse_args
+  - path.absolute
+  - path.mkdir
+  - setup_environment
+  - shutil
+  - shutil.copy2
+  - str
+  - sys.exit
+  - update
+  - upper
+  - yaml.safe_load
+  - zip_path.exists
+  - zip_path.unlink
+  - zip_ref.extractall
+  - zipfile.ZipFile
+- name: src\pipeline\insert_bertopic_mongodb
+  filename: src\pipeline\insert_bertopic_mongodb.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\pipeline\insert_bertopic_mongodb.py
+    metadata: {}
+    dependencies:
+    - open
+    - yaml.safe_load
+    docstring: "Load configuration settings from a YAML file.\n\nArgs:\n    config_path\
+      \ (str): Path to the YAML configuration file.\n    \nReturns:\n    Dict[str,\
+      \ Any]: Dictionary containing configuration settings.\n    \nRaises:\n    FileNotFoundError:\
+      \ If the config file doesn't exist.\n    yaml.YAMLError: If the YAML file is\
+      \ malformed."
+    line: 20
+  - name: is_docker
+    type: function
+    filename: src\pipeline\insert_bertopic_mongodb.py
+    metadata: {}
+    dependencies:
+    - f.read
+    - open
+    docstring: "Detect if the current environment is running inside a Docker container.\n\
+      \nThis function checks for the presence of Docker-specific information in the\n\
+      Linux cgroup file. This is a reliable way to detect if we're running in a\n\
+      Docker container on Linux systems.\n\nReturns:\n    bool: True if running in\
+      \ Docker, False otherwise.\n\nNote:\n    Always returns False on non-Linux systems\
+      \ where /proc/1/cgroup doesn't exist."
+    line: 36
+  - name: get_mongo_uri
+    type: function
+    filename: src\pipeline\insert_bertopic_mongodb.py
+    metadata: {}
+    dependencies:
+    - is_docker
+    - os.environ.get
+    docstring: "Get the appropriate MongoDB URI based on environment and configuration.\n\
+      \nThis function determines the correct MongoDB connection URI using the following\n\
+      priority order:\n1. MONGO_URI environment variable if set\n2. Docker connection\
+      \ string if running in Docker\n3. Local connection string if running locally\n\
+      \nArgs:\n    config (Dict[str, Any]): Configuration dictionary containing MongoDB\
+      \ settings\n        under the 'bertopic.mongo' section.\n    \nReturns:\n  \
+      \  str: MongoDB connection URI to use.\n    \nNote:\n    The function expects\
+      \ the config to have the following structure:\n    bertopic:\n      mongo:\n\
+      \        connection_string: \"mongodb://mongodb:27017/\"  # For Docker\n   \
+      \     connection_string_local: \"mongodb://localhost:27017/\"  # For local"
+    line: 55
+  - name: build_mongo_query
+    type: function
+    filename: src\pipeline\insert_bertopic_mongodb.py
+    metadata: {}
+    dependencies: []
+    docstring: "Build a MongoDB query based on configuration filters.\n\nConstructs\
+      \ a MongoDB query dictionary that filters papers based on:\n1. Categories -\
+      \ matches papers in any of the specified categories\n2. Date range - filters\
+      \ papers within the specified date range\n\nArgs:\n    config (Dict[str, Any]):\
+      \ Configuration dictionary containing filter settings\n        under the 'bertopic'\
+      \ section.\n    \nReturns:\n    Dict: MongoDB query dictionary with the following\
+      \ possible structure:\n        {\n            'categories': {'$in': ['cs.AI',\
+      \ 'cs.LG', ...]},\n            'published': {\n                '$gte': '2023-01-01',\n\
+      \                '$lte': '2025-05-20'\n            }\n        }\n\nNote:\n \
+      \   - Category filter is only added if categories are specified in config\n\
+      \    - Date filter is only added if date_filter.enabled is True and\n      at\
+      \ least one of start_date or end_date is specified"
+    line: 88
+  - name: process_batch
+    type: function
+    filename: src\pipeline\insert_bertopic_mongodb.py
+    metadata: {}
+    dependencies:
+    - UpdateOne
+    - datetime.now
+    - doc.get
+    - enumerate
+    - float
+    - get
+    - int
+    - logger.error
+    - logger.warning
+    - mongo_collection.bulk_write
+    - str
+    - topic_docs.append
+    - topic_info.iterrows
+    - topic_model.get_topic_info
+    - topic_model.transform
+    - topics_dict.get
+    - zip
+    docstring: "Process a batch of papers and store topics in MongoDB.\n\nArgs:\n\
+      \    papers: List of paper documents from MongoDB\n    topic_model: Trained\
+      \ BERTopic model\n    mongo_collection: MongoDB collection to store results\n\
+      \nReturns:\n    int: Number of papers successfully processed"
+    line: 132
+  - name: process_data
+    type: function
+    filename: src\pipeline\insert_bertopic_mongodb.py
+    metadata: {}
+    dependencies:
+    - BERTopic
+    - MongoClient
+    - build_mongo_query
+    - doc.get
+    - get_mongo_uri
+    - len
+    - limit
+    - list
+    - logger.error
+    - logger.info
+    - logger.warning
+    - min
+    - papers_collection.count_documents
+    - papers_collection.find
+    - process_batch
+    - range
+    - skip
+    - sort
+    - str
+    - topic_model.fit
+    - tqdm
+    docstring: "Main processing function for extracting topics from paper summaries.\n\
+      \nThis function handles the complete pipeline for topic extraction:\n1. Connects\
+      \ to MongoDB using environment-appropriate connection string\n2. Applies category\
+      \ and date filters from config\n3. Initializes BERTopic model\n4. Processes\
+      \ papers in batches:\n   - First batch is used to fit the model\n   - Subsequent\
+      \ batches use the fitted model\n5. Stores results in a separate MongoDB collection\n\
+      \nArgs:\n    config (Dict[str, Any]): Configuration dictionary containing all\
+      \ settings:\n        - MongoDB connection details\n        - Batch processing\
+      \ settings\n        - Category filters\n        - Date filters\n        - Collection\
+      \ names\n\nRaises:\n    pymongo.errors.ConnectionError: If MongoDB connection\
+      \ fails\n    Exception: For any other processing errors\n\nNote:\n    - Uses\
+      \ consistent sorting (_id) for reliable pagination\n    - Supports both Docker\
+      \ and local environments\n    - Implements batch processing for memory efficiency\n\
+      \    - Provides progress tracking via tqdm\n    - Respects max_papers limit\
+      \ if configured"
+    line: 191
+  - name: main
+    type: function
+    filename: src\pipeline\insert_bertopic_mongodb.py
+    metadata: {}
+    dependencies:
+    - argparse.ArgumentParser
+    - datetime.now
+    - load_config
+    - logger.error
+    - logger.info
+    - parser.add_argument
+    - parser.parse_args
+    - process_data
+    - str
+    docstring: "Main entry point for the BERTopic extraction pipeline.\n\nThis function\
+      \ handles:\n1. Command line argument parsing\n2. Configuration loading\n3. Pipeline\
+      \ execution with timing\n4. Error handling and logging\n\nCommand Line Arguments:\n\
+      \    --config: Path to YAML configuration file (default: config/default.yaml)\n\
+      \nThe function measures and logs the total execution time of the pipeline.\n\
+      Any unhandled exceptions are caught, logged, and result in a non-zero\nexit\
+      \ status.\n\nExample Usage:\n    python -m src.pipeline.insert_bertopic_mongodb\
+      \ --config config/default.yaml"
+    line: 301
+  dependencies:
+  - BERTopic
+  - MongoClient
+  - UpdateOne
+  - argparse.ArgumentParser
+  - build_mongo_query
+  - datetime.now
+  - doc.get
+  - enumerate
+  - f.read
+  - float
+  - get
+  - get_mongo_uri
+  - int
+  - is_docker
+  - len
+  - limit
+  - list
+  - load_config
+  - logger.error
+  - logger.info
+  - logger.warning
+  - min
+  - mongo_collection.bulk_write
+  - open
+  - os.environ.get
+  - papers_collection.count_documents
+  - papers_collection.find
+  - parser.add_argument
+  - parser.parse_args
+  - process_batch
+  - process_data
+  - range
+  - skip
+  - sort
+  - str
+  - topic_docs.append
+  - topic_info.iterrows
+  - topic_model.fit
+  - topic_model.get_topic_info
+  - topic_model.transform
+  - topics_dict.get
+  - tqdm
+  - yaml.safe_load
+  - zip
+- name: src\pipeline\insert_top2vec_mongodb
+  filename: src\pipeline\insert_top2vec_mongodb.py
+  metadata: {}
+  components:
+  - name: preprocess_text
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - len
+    - re.sub
+    - strip
+    - text.lower
+    - text.replace
+    - text.split
+    docstring: Preprocess text for better topic modeling
+    line: 38
+  - name: classify_papers
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - Counter
+    - Top2Vec
+    - enumerate
+    - len
+    - list
+    - model.get_documents_topics
+    - model.get_topic
+    - model.get_topic_sizes
+    - np.mean
+    - preprocess_text
+    - print
+    - range
+    - report_data.append
+    - round
+    - sorted
+    - summary.split
+    - topic_counter.keys
+    docstring: "Classify research papers into topics using Top2Vec\n\nArgs:\n    summaries:\
+      \ List of paper summaries\n    doc_ids: Optional document IDs\n    \nReturns:\n\
+      \    Dictionary with model and results"
+    line: 78
+  - name: get_topic_hierarchy
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - enumerate
+    - int
+    - len
+    - max
+    - min
+    - model.get_topic
+    - model.get_topic_reduction
+    - model.hierarchical_topic_reduction
+    - np.sqrt
+    - print
+    docstring: "Get hierarchical topic representation to improve interpretability\n\
+      \nArgs:\n    model: Trained Top2Vec model\n    num_topics: Number of topics\
+      \ to reduce to (None for auto-determination)"
+    line: 191
+  - name: plot_topic_distribution
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - bar.get_height
+    - bar.get_width
+    - bar.get_x
+    - join
+    - len
+    - plt.bar
+    - plt.figure
+    - plt.show
+    - plt.text
+    - plt.tight_layout
+    - plt.title
+    - plt.xlabel
+    - plt.xticks
+    - plt.ylabel
+    - range
+    - split
+    docstring: Plot topic distribution as a bar chart
+    line: 227
+  - name: evaluate_topic_quality
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - coherence_scores.append
+    - len
+    - model.get_num_topics
+    - model.get_topic
+    - np.mean
+    - print
+    - range
+    - sum
+    docstring: Evaluate topic quality using various metrics
+    line: 251
+  - name: load_config
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - open
+    - yaml.safe_load
+    docstring: "Load configuration settings from a YAML file.\n\nArgs:\n    config_path\
+      \ (str): Path to the YAML configuration file.\n    \nReturns:\n    Dict[str,\
+      \ Any]: Dictionary containing configuration settings.\n    \nRaises:\n    FileNotFoundError:\
+      \ If the config file doesn't exist.\n    yaml.YAMLError: If the YAML file is\
+      \ malformed."
+    line: 283
+  - name: is_docker
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - f.read
+    - open
+    docstring: Detect if running inside a Docker container.
+    line: 299
+  - name: get_mongo_uri
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - is_docker
+    - os.environ.get
+    docstring: Get the appropriate MongoDB URI based on environment and configuration.
+    line: 307
+  - name: build_mongo_query
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - date_filter.get
+    - get
+    docstring: Build a MongoDB query based on configuration filters.
+    line: 317
+  - name: process_batch
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - UpdateOne
+    - datetime.now
+    - doc.get
+    - enumerate
+    - float
+    - get
+    - hasattr
+    - int
+    - isinstance
+    - len
+    - list
+    - logger.error
+    - logger.info
+    - logger.warning
+    - min
+    - mongo_collection.bulk_write
+    - scores.tolist
+    - str
+    - topic_model.get_document_topics
+    - updates.append
+    - words.tolist
+    - zip
+    docstring: "Process a batch of papers and store topics in MongoDB.\n\nArgs:\n\
+      \    papers: List of paper documents from MongoDB\n    topic_model: Trained\
+      \ Top2Vec model\n    mongo_collection: MongoDB collection to store results\n\
+      \nReturns:\n    int: Number of papers successfully processed"
+    line: 340
+  - name: process_data
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - EnhancedTopicModeler
+    - MongoClient
+    - build_mongo_query
+    - doc.get
+    - get_mongo_uri
+    - len
+    - limit
+    - list
+    - logger.error
+    - logger.info
+    - logger.warning
+    - min
+    - papers_collection.count_documents
+    - papers_collection.find
+    - process_batch
+    - range
+    - skip
+    - sort
+    - str
+    - topic_model.fit
+    - tqdm
+    docstring: Main processing function for extracting topics from paper summaries.
+    line: 447
+  - name: main
+    type: function
+    filename: src\pipeline\insert_top2vec_mongodb.py
+    metadata: {}
+    dependencies:
+    - argparse.ArgumentParser
+    - datetime.now
+    - load_config
+    - logger.error
+    - logger.info
+    - parser.add_argument
+    - parser.parse_args
+    - process_data
+    - str
+    docstring: Main entry point for the Top2Vec extraction pipeline.
+    line: 525
+  dependencies:
+  - Counter
+  - EnhancedTopicModeler
+  - MongoClient
+  - Top2Vec
+  - UpdateOne
+  - argparse.ArgumentParser
+  - bar.get_height
+  - bar.get_width
+  - bar.get_x
+  - build_mongo_query
+  - coherence_scores.append
+  - date_filter.get
+  - datetime.now
+  - doc.get
+  - enumerate
+  - f.read
+  - float
+  - get
+  - get_mongo_uri
+  - hasattr
+  - int
+  - is_docker
+  - isinstance
+  - join
+  - len
+  - limit
+  - list
+  - load_config
+  - logger.error
+  - logger.info
+  - logger.warning
+  - max
+  - min
+  - model.get_documents_topics
+  - model.get_num_topics
+  - model.get_topic
+  - model.get_topic_reduction
+  - model.get_topic_sizes
+  - model.hierarchical_topic_reduction
+  - mongo_collection.bulk_write
+  - np.mean
+  - np.sqrt
+  - open
+  - os.environ.get
+  - papers_collection.count_documents
+  - papers_collection.find
+  - parser.add_argument
+  - parser.parse_args
+  - plt.bar
+  - plt.figure
+  - plt.show
+  - plt.text
+  - plt.tight_layout
+  - plt.title
+  - plt.xlabel
+  - plt.xticks
+  - plt.ylabel
+  - preprocess_text
+  - print
+  - process_batch
+  - process_data
+  - range
+  - re.sub
+  - report_data.append
+  - round
+  - scores.tolist
+  - skip
+  - sort
+  - sorted
+  - split
+  - str
+  - strip
+  - sum
+  - summary.split
+  - text.lower
+  - text.replace
+  - text.split
+  - topic_counter.keys
+  - topic_model.fit
+  - topic_model.get_document_topics
+  - tqdm
+  - updates.append
+  - words.tolist
+  - yaml.safe_load
+  - zip
+- name: src\pipeline\kaggle_sample_code
+  filename: src\pipeline\kaggle_sample_code.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\pipeline\run_pipeline
+  filename: src\pipeline\run_pipeline.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\pipeline\run_pipeline.py
+    metadata: {}
+    dependencies:
+    - open
+    - yaml.safe_load
+    docstring: Load configuration from YAML file.
+    line: 17
+  - name: filter_papers_by_date
+    type: function
+    filename: src\pipeline\run_pipeline.py
+    metadata: {}
+    dependencies:
+    - datetime.datetime
+    - datetime.fromisoformat
+    docstring: 'Filter papers by published date (ISO format: YYYY-MM-DD).'
+    line: 22
+  - name: run_ingestion_pipeline
+    type: function
+    filename: src\pipeline\run_pipeline.py
+    metadata: {}
+    dependencies:
+    - ArxivClient
+    - MongoStorage
+    - arxiv_client.fetch_papers
+    - filter_papers_by_date
+    - get
+    - len
+    - logger.info
+    - mongo_storage.store_papers
+    - range
+    - time
+    - time.sleep
+    docstring: Run the arXiv ingestion pipeline.
+    line: 32
+  - name: main
+    type: function
+    filename: src\pipeline\run_pipeline.py
+    metadata: {}
+    dependencies:
+    - argparse.ArgumentParser
+    - datetime.now
+    - load_config
+    - logger.error
+    - logger.info
+    - parser.add_argument
+    - parser.parse_args
+    - range
+    - run_ingestion_pipeline
+    - str
+    docstring: Main entry point with command line argument parsing.
+    line: 104
+  dependencies:
+  - ArxivClient
+  - MongoStorage
+  - argparse.ArgumentParser
+  - arxiv_client.fetch_papers
+  - datetime.datetime
+  - datetime.fromisoformat
+  - datetime.now
+  - filter_papers_by_date
+  - get
+  - len
+  - load_config
+  - logger.error
+  - logger.info
+  - mongo_storage.store_papers
+  - open
+  - parser.add_argument
+  - parser.parse_args
+  - range
+  - run_ingestion_pipeline
+  - str
+  - time
+  - time.sleep
+  - yaml.safe_load
+- name: src\pipeline\sync_mongodb
+  filename: src\pipeline\sync_mongodb.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\pipeline\sync_mongodb.py
+    metadata: {}
+    dependencies:
+    - open
+    - yaml.safe_load
+    docstring: Load configuration from YAML file.
+    line: 17
+  - name: filter_papers_by_date
+    type: function
+    filename: src\pipeline\sync_mongodb.py
+    metadata: {}
+    dependencies:
+    - datetime.datetime
+    - datetime.fromisoformat
+    docstring: 'Filter papers by published date (ISO format: YYYY-MM-DD).'
+    line: 22
+  - name: run_ingestion_pipeline
+    type: function
+    filename: src\pipeline\sync_mongodb.py
+    metadata: {}
+    dependencies:
+    - ArxivClient
+    - MongoStorage
+    - arxiv_client.fetch_papers
+    - filter_papers_by_date
+    - get
+    - len
+    - logger.info
+    - mongo_storage.store_papers
+    - os
+    - os.environ.get
+    - range
+    - time
+    - time.sleep
+    docstring: Run the arXiv ingestion pipeline.
+    line: 32
+  - name: main
+    type: function
+    filename: src\pipeline\sync_mongodb.py
+    metadata: {}
+    dependencies:
+    - argparse.ArgumentParser
+    - datetime.now
+    - load_config
+    - logger.error
+    - logger.info
+    - parser.add_argument
+    - parser.parse_args
+    - range
+    - run_ingestion_pipeline
+    - str
+    docstring: Main entry point with command line argument parsing.
+    line: 111
+  dependencies:
+  - ArxivClient
+  - MongoStorage
+  - argparse.ArgumentParser
+  - arxiv_client.fetch_papers
+  - datetime.datetime
+  - datetime.fromisoformat
+  - datetime.now
+  - filter_papers_by_date
+  - get
+  - len
+  - load_config
+  - logger.error
+  - logger.info
+  - mongo_storage.store_papers
+  - open
+  - os
+  - os.environ.get
+  - parser.add_argument
+  - parser.parse_args
+  - range
+  - run_ingestion_pipeline
+  - str
+  - time
+  - time.sleep
+  - yaml.safe_load
+- name: src\pipeline\sync_qdrant
+  filename: src\pipeline\sync_qdrant.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\pipeline\sync_qdrant.py
+    metadata: {}
+    dependencies:
+    - open
+    - os.path.dirname
+    - os.path.join
+    - yaml.safe_load
+    docstring: ''
+    line: 19
+  - name: calculate_file_hash
+    type: function
+    filename: src\pipeline\sync_qdrant.py
+    metadata: {}
+    dependencies:
+    - f.read
+    - hashlib.sha256
+    - iter
+    - open
+    - sha256.hexdigest
+    - sha256.update
+    docstring: Calculate SHA-256 hash of a file for unique identification.
+    line: 72
+  - name: is_pdf_processed
+    type: function
+    filename: src\pipeline\sync_qdrant.py
+    metadata: {}
+    dependencies:
+    - os.path.basename
+    - tracking_collection.find_one
+    docstring: Check if a PDF has already been processed and stored in Qdrant.
+    line: 80
+  - name: mark_pdf_as_processed
+    type: function
+    filename: src\pipeline\sync_qdrant.py
+    metadata: {}
+    dependencies:
+    - calculate_file_hash
+    - datetime.datetime.now
+    - os.path.basename
+    - tracking_collection.update_one
+    docstring: Mark a PDF as processed in the tracking database.
+    line: 92
+  - name: sync_qdrant_with_tracking
+    type: function
+    filename: src\pipeline\sync_qdrant.py
+    metadata: {}
+    dependencies:
+    - QdrantClient
+    - len
+    - print
+    - qdrant_client.get_collection
+    - qdrant_client.get_collections
+    - set
+    - str
+    - tracked_files.add
+    - tracking_collection.find
+    docstring: Synchronize MongoDB tracking with actual Qdrant contents.
+    line: 118
+  - name: extract_images_from_pdf
+    type: function
+    filename: src\pipeline\sync_qdrant.py
+    metadata: {}
+    dependencies:
+    - doc.get_page_images
+    - enumerate
+    - fitz.Pixmap
+    - fitz.open
+    - image_paths.append
+    - len
+    - os.path.join
+    - pix.save
+    - range
+    docstring: Extract images from PDF and save to output_dir. Returns list of image
+      file paths.
+    line: 157
+  - name: process_pdf
+    type: function
+    filename: src\pipeline\sync_qdrant.py
+    metadata: {}
+    dependencies:
+    - LLMChain
+    - Ollama
+    - PromptTemplate
+    - PyPDFLoader
+    - QdrantClient
+    - RecursiveCharacterTextSplitter
+    - SentenceTransformer
+    - enumerate
+    - extract_images_from_pdf
+    - get
+    - get_embeddings
+    - hash
+    - image_chain.run
+    - image_descriptions.append
+    - len
+    - loader.load
+    - model.encode
+    - os.makedirs
+    - os.path.dirname
+    - os.path.join
+    - os.path.splitext
+    - print
+    - qdrant.create_collection
+    - qdrant.get_collection
+    - qdrant.upsert
+    - qdrant_client.QdrantClient
+    - qdrant_client.http.models
+    - rest.PointStruct
+    - rest.VectorParams
+    - sentence_transformers.SentenceTransformer
+    - str
+    - text_splitter.split_documents
+    - tolist
+    - torch
+    - torch.cuda.device_count
+    - torch.cuda.is_available
+    docstring: ''
+    line: 172
+  - name: get_embeddings
+    type: function
+    filename: src\pipeline\sync_qdrant.py
+    metadata: {}
+    dependencies:
+    - model.encode
+    - tolist
+    docstring: ''
+    line: 216
+  - name: process_all_categories
+    type: function
+    filename: src\pipeline\sync_qdrant.py
+    metadata: {}
+    dependencies:
+    - category_results.append
+    - f.endswith
+    - is_pdf_processed
+    - len
+    - mark_pdf_as_processed
+    - os.listdir
+    - os.makedirs
+    - os.path.exists
+    - os.path.join
+    - print
+    - process_pdf
+    - root_results.append
+    - str
+    - sync_qdrant_with_tracking
+    - unprocessed_files.append
+    docstring: Process PDFs from all specified categories in the config.
+    line: 315
+  dependencies:
+  - LLMChain
+  - Ollama
+  - PromptTemplate
+  - PyPDFLoader
+  - QdrantClient
+  - RecursiveCharacterTextSplitter
+  - SentenceTransformer
+  - calculate_file_hash
+  - category_results.append
+  - datetime.datetime.now
+  - doc.get_page_images
+  - enumerate
+  - extract_images_from_pdf
+  - f.endswith
+  - f.read
+  - fitz.Pixmap
+  - fitz.open
+  - get
+  - get_embeddings
+  - hash
+  - hashlib.sha256
+  - image_chain.run
+  - image_descriptions.append
+  - image_paths.append
+  - is_pdf_processed
+  - iter
+  - len
+  - loader.load
+  - mark_pdf_as_processed
+  - model.encode
+  - open
+  - os.listdir
+  - os.makedirs
+  - os.path.basename
+  - os.path.dirname
+  - os.path.exists
+  - os.path.join
+  - os.path.splitext
+  - pix.save
+  - print
+  - process_pdf
+  - qdrant.create_collection
+  - qdrant.get_collection
+  - qdrant.upsert
+  - qdrant_client.QdrantClient
+  - qdrant_client.get_collection
+  - qdrant_client.get_collections
+  - qdrant_client.http.models
+  - range
+  - rest.PointStruct
+  - rest.VectorParams
+  - root_results.append
+  - sentence_transformers.SentenceTransformer
+  - set
+  - sha256.hexdigest
+  - sha256.update
+  - str
+  - sync_qdrant_with_tracking
+  - text_splitter.split_documents
+  - tolist
+  - torch
+  - torch.cuda.device_count
+  - torch.cuda.is_available
+  - tracked_files.add
+  - tracking_collection.find
+  - tracking_collection.find_one
+  - tracking_collection.update_one
+  - unprocessed_files.append
+  - yaml.safe_load
+- name: src\pipeline\sync_summary_vectors
+  filename: src\pipeline\sync_summary_vectors.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\pipeline\sync_summary_vectors.py
+    metadata: {}
+    dependencies:
+    - open
+    - os.path.dirname
+    - os.path.join
+    - yaml.safe_load
+    docstring: ''
+    line: 13
+  - name: is_paper_processed
+    type: function
+    filename: src\pipeline\sync_summary_vectors.py
+    metadata: {}
+    dependencies:
+    - tracking_collection.find_one
+    docstring: Check if a paper has already been processed and stored in Qdrant.
+    line: 89
+  - name: mark_paper_as_processed
+    type: function
+    filename: src\pipeline\sync_summary_vectors.py
+    metadata: {}
+    dependencies:
+    - datetime.datetime.now
+    - print
+    - tracking_collection.update_one
+    docstring: Mark a paper as processed in the tracking database.
+    line: 102
+  - name: sync_qdrant_with_tracking
+    type: function
+    filename: src\pipeline\sync_summary_vectors.py
+    metadata: {}
+    dependencies:
+    - QdrantClient
+    - bulk_operations.append
+    - client.create_collection
+    - client.get_collections
+    - client.scroll
+    - datetime.datetime.now
+    - isinstance
+    - len
+    - list
+    - paper.get
+    - papers_collection.find_one
+    - print
+    - pymongo.UpdateOne
+    - qdrant_paper_ids.add
+    - record.payload.get
+    - set
+    - str
+    - tracking_collection.bulk_write
+    - tracking_collection.delete_many
+    - tracking_collection.find
+    docstring: Synchronize MongoDB tracking with actual Qdrant contents.
+    line: 124
+  - name: create_query_filter
+    type: function
+    filename: src\pipeline\sync_summary_vectors.py
+    metadata: {}
+    dependencies: []
+    docstring: Create a MongoDB query filter based on configuration settings.
+    line: 268
+  - name: process_papers
+    type: function
+    filename: src\pipeline\sync_summary_vectors.py
+    metadata: {}
+    dependencies:
+    - HuggingFaceEmbeddings
+    - QdrantClient
+    - batch_categories.append
+    - batch_paper_ids.append
+    - batch_summary_lengths.append
+    - bulk_tracking_operations.append
+    - client.create_collection
+    - client.delete_collection
+    - client.get_collections
+    - client.upsert
+    - create_query_filter
+    - datetime.datetime.now
+    - documents.append
+    - embeddings.embed_documents
+    - enumerate
+    - hash
+    - ids.append
+    - int
+    - isinstance
+    - len
+    - limit
+    - list
+    - metadata_list.append
+    - paper.get
+    - papers_collection.count_documents
+    - papers_collection.find
+    - payloads.append
+    - print
+    - pymongo.UpdateOne
+    - range
+    - reset_qdrant_collection
+    - set
+    - sort
+    - str
+    - sync_qdrant_with_tracking
+    - traceback
+    - traceback.print_exc
+    - tracking_collection.bulk_write
+    - tracking_collection.find
+    - vectors.append
+    - zip
+    docstring: Process papers from MongoDB and store their summaries in Qdrant.
+    line: 291
+  - name: reset_qdrant_collection
+    type: function
+    filename: src\pipeline\sync_summary_vectors.py
+    metadata: {}
+    dependencies:
+    - client.create_collection
+    - client.delete_collection
+    - client.get_collections
+    - print
+    - str
+    docstring: ''
+    line: 307
+  dependencies:
+  - HuggingFaceEmbeddings
+  - QdrantClient
+  - batch_categories.append
+  - batch_paper_ids.append
+  - batch_summary_lengths.append
+  - bulk_operations.append
+  - bulk_tracking_operations.append
+  - client.create_collection
+  - client.delete_collection
+  - client.get_collections
+  - client.scroll
+  - client.upsert
+  - create_query_filter
+  - datetime.datetime.now
+  - documents.append
+  - embeddings.embed_documents
+  - enumerate
+  - hash
+  - ids.append
+  - int
+  - isinstance
+  - len
+  - limit
+  - list
+  - metadata_list.append
+  - open
+  - os.path.dirname
+  - os.path.join
+  - paper.get
+  - papers_collection.count_documents
+  - papers_collection.find
+  - papers_collection.find_one
+  - payloads.append
+  - print
+  - pymongo.UpdateOne
+  - qdrant_paper_ids.add
+  - range
+  - record.payload.get
+  - reset_qdrant_collection
+  - set
+  - sort
+  - str
+  - sync_qdrant_with_tracking
+  - traceback
+  - traceback.print_exc
+  - tracking_collection.bulk_write
+  - tracking_collection.delete_many
+  - tracking_collection.find
+  - tracking_collection.find_one
+  - tracking_collection.update_one
+  - vectors.append
+  - yaml.safe_load
+  - zip
+- name: src\pipeline\top2vec
+  filename: src\pipeline\top2vec.py
+  metadata: {}
+  components:
+  - name: example_classification
+    type: function
+    filename: src\pipeline\top2vec.py
+    metadata: {}
+    dependencies:
+    - EnhancedTopicModeler
+    - print
+    - topic_model.fit
+    - topic_model.print_topic_report
+    - topic_model.reassign_outliers
+    - topic_model.topic_keywords_table
+    - topic_model.visualize_topics
+    docstring: Example classification workflow
+    line: 495
+  - name: EnhancedTopicModeler
+    type: class
+    filename: src\pipeline\top2vec.py
+    metadata: {}
+    dependencies:
+    - Top2Vec
+    - ValueError
+    - all_words.update
+    - df.iterrows
+    - doc_probs.append
+    - doc_topic_matrix.sum
+    - doc_topics.append
+    - enumerate
+    - float
+    - hasattr
+    - int
+    - isinstance
+    - join
+    - len
+    - list
+    - logging.getLogger
+    - max
+    - min
+    - new_assignments.append
+    - new_probs.append
+    - np.argmax
+    - np.dot
+    - np.linalg.norm
+    - np.mean
+    - np.sqrt
+    - np.zeros
+    - pd.DataFrame
+    - plt.annotate
+    - plt.figure
+    - plt.scatter
+    - plt.show
+    - plt.tight_layout
+    - plt.title
+    - plt.xlabel
+    - plt.ylabel
+    - print
+    - range
+    - re.sub
+    - report_data.append
+    - round
+    - self._clean_text
+    - self.get_document_topics
+    - self.logger.error
+    - self.logger.info
+    - self.logger.warning
+    - self.model.embed
+    - self.model.get_documents_topics
+    - self.model.get_num_topics
+    - self.model.get_topic_sizes
+    - self.model.get_topics
+    - self.model.hierarchical_topic_reduction
+    - set
+    - similarities.append
+    - sorted
+    - str
+    - strip
+    - sum
+    - text.lower
+    - text.split
+    - topic_avg_probs.get
+    - topic_counts.get
+    - topic_counts.keys
+    - topic_counts.values
+    - type
+    - umap_model.transform
+    - zip
+    docstring: 'Enhanced topic modeling for research papers using Top2Vec with better
+
+      topic naming and evaluation metrics. Designed to work with ArXiv papers.
+
+
+      This class provides:
+
+      1. Enhanced preprocessing for scientific text
+
+      2. Better topic naming using domain-specific heuristics
+
+      3. Topic hierarchy generation
+
+      4. Quality metrics and visualization
+
+      5. MongoDB integration support'
+    line: 17
+  dependencies:
+  - EnhancedTopicModeler
+  - Top2Vec
+  - ValueError
+  - all_words.update
+  - df.iterrows
+  - doc_probs.append
+  - doc_topic_matrix.sum
+  - doc_topics.append
+  - enumerate
+  - float
+  - hasattr
+  - int
+  - isinstance
+  - join
+  - len
+  - list
+  - logging.getLogger
+  - max
+  - min
+  - new_assignments.append
+  - new_probs.append
+  - np.argmax
+  - np.dot
+  - np.linalg.norm
+  - np.mean
+  - np.sqrt
+  - np.zeros
+  - pd.DataFrame
+  - plt.annotate
+  - plt.figure
+  - plt.scatter
+  - plt.show
+  - plt.tight_layout
+  - plt.title
+  - plt.xlabel
+  - plt.ylabel
+  - print
+  - range
+  - re.sub
+  - report_data.append
+  - round
+  - self._clean_text
+  - self.get_document_topics
+  - self.logger.error
+  - self.logger.info
+  - self.logger.warning
+  - self.model.embed
+  - self.model.get_documents_topics
+  - self.model.get_num_topics
+  - self.model.get_topic_sizes
+  - self.model.get_topics
+  - self.model.hierarchical_topic_reduction
+  - set
+  - similarities.append
+  - sorted
+  - str
+  - strip
+  - sum
+  - text.lower
+  - text.split
+  - topic_avg_probs.get
+  - topic_counts.get
+  - topic_counts.keys
+  - topic_counts.values
+  - topic_model.fit
+  - topic_model.print_topic_report
+  - topic_model.reassign_outliers
+  - topic_model.topic_keywords_table
+  - topic_model.visualize_topics
+  - type
+  - umap_model.transform
+  - zip
+- name: src\pubmed\config
+  filename: src\pubmed\config.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: src\pubmed\db_client
+  filename: src\pubmed\db_client.py
+  metadata: {}
+  components:
+  - name: article_exists
+    type: function
+    filename: src\pubmed\db_client.py
+    metadata: {}
+    dependencies:
+    - collection.find_one
+    docstring: ''
+    line: 9
+  - name: save_article
+    type: function
+    filename: src\pubmed\db_client.py
+    metadata: {}
+    dependencies:
+    - collection.insert_one
+    - isinstance
+    docstring: ''
+    line: 12
+  - name: save_articles
+    type: function
+    filename: src\pubmed\db_client.py
+    metadata: {}
+    dependencies:
+    - collection.insert_many
+    docstring: ''
+    line: 16
+  - name: get_article
+    type: function
+    filename: src\pubmed\db_client.py
+    metadata: {}
+    dependencies:
+    - collection.find_one
+    docstring: ''
+    line: 20
+  dependencies:
+  - collection.find_one
+  - collection.insert_many
+  - collection.insert_one
+  - isinstance
+- name: src\pubmed\main
+  filename: src\pubmed\main.py
+  metadata: {}
+  components:
+  - name: main
+    type: function
+    filename: src\pubmed\main.py
+    metadata: {}
+    dependencies:
+    - argparse.ArgumentParser
+    - article_exists
+    - fetch_details
+    - len
+    - parser.add_argument
+    - parser.parse_args
+    - print
+    - save_articles
+    - search_pubmed
+    docstring: ''
+    line: 6
+  dependencies:
+  - argparse.ArgumentParser
+  - article_exists
+  - fetch_details
+  - len
+  - parser.add_argument
+  - parser.parse_args
+  - print
+  - save_articles
+  - search_pubmed
+- name: src\pubmed\pubmed_client
+  filename: src\pubmed\pubmed_client.py
+  metadata: {}
+  components:
+  - name: search_pubmed
+    type: function
+    filename: src\pubmed\pubmed_client.py
+    metadata: {}
+    dependencies:
+    - Entrez.esearch
+    - Entrez.read
+    - handle.close
+    docstring: ''
+    line: 8
+  - name: fetch_details
+    type: function
+    filename: src\pubmed\pubmed_client.py
+    metadata: {}
+    dependencies:
+    - Entrez.efetch
+    - handle.close
+    - handle.read
+    - join
+    - parse_pubmed_xml
+    docstring: ''
+    line: 14
+  - name: parse_pubmed_xml
+    type: function
+    filename: src\pubmed\pubmed_client.py
+    metadata: {}
+    dependencies:
+    - ET.fromstring
+    - a.find
+    - a.findtext
+    - article.findall
+    - article.findtext
+    - articles.append
+    - print
+    - root.findall
+    - strip
+    docstring: ''
+    line: 20
+  dependencies:
+  - ET.fromstring
+  - Entrez.efetch
+  - Entrez.esearch
+  - Entrez.read
+  - a.find
+  - a.findtext
+  - article.findall
+  - article.findtext
+  - articles.append
+  - handle.close
+  - handle.read
+  - join
+  - parse_pubmed_xml
+  - print
+  - root.findall
+  - strip
+- name: src\storage\mongo
+  filename: src\storage\mongo.py
+  metadata: {}
+  components:
+  - name: MongoStorage
+    type: class
+    filename: src\storage\mongo.py
+    metadata: {}
+    dependencies:
+    - MongodbLoader
+    - UpdateOne
+    - datetime.utcnow
+    - len
+    - limit
+    - list
+    - logger.error
+    - logger.exception
+    - logger.info
+    - logger.warning
+    - operations.append
+    - paper.get
+    - pymongo.MongoClient
+    - pymongo.UpdateOne
+    - pymongo.errors.BulkWriteError
+    - pymongo.errors.PyMongoError
+    - self._setup_indexes
+    - self.client.close
+    - self.close
+    - self.loader.load
+    - self.papers.bulk_write
+    - self.papers.create_index
+    - self.papers.update_one
+    - self.stats.find
+    - self.stats.insert_one
+    - sort
+    - str
+    docstring: MongoDB storage for arXiv papers, using LangChain.
+    line: 12
+  dependencies:
+  - MongodbLoader
+  - UpdateOne
+  - datetime.utcnow
+  - len
+  - limit
+  - list
+  - logger.error
+  - logger.exception
+  - logger.info
+  - logger.warning
+  - operations.append
+  - paper.get
+  - pymongo.MongoClient
+  - pymongo.UpdateOne
+  - pymongo.errors.BulkWriteError
+  - pymongo.errors.PyMongoError
+  - self._setup_indexes
+  - self.client.close
+  - self.close
+  - self.loader.load
+  - self.papers.bulk_write
+  - self.papers.create_index
+  - self.papers.update_one
+  - self.stats.find
+  - self.stats.insert_one
+  - sort
+  - str
+- name: src\utils\analyze_papers_by_year_month_day
+  filename: src\utils\analyze_papers_by_year_month_day.py
+  metadata: {}
+  components:
+  - name: analyze_papers_by_year_month_day
+    type: function
+    filename: src\utils\analyze_papers_by_year_month_day.py
+    metadata: {}
+    dependencies:
+    - MongoStorage
+    - OrderedDict
+    - daily_data.items
+    - defaultdict
+    - doc.get
+    - get
+    - logger.error
+    - logger.info
+    - mongo.papers.aggregate
+    - mongo.papers.count_documents
+    - monthly_data.items
+    - os.environ.get
+    - sorted
+    - str
+    - yearly_data.items
+    docstring: "Query MongoDB and analyze papers hierarchically by year, month, and\
+      \ day.\n\nArgs:\n    connection_string: MongoDB connection URI (if None, uses\
+      \ MONGO_URI env var or default)\n    db_name: MongoDB database name\n    start_date:\
+      \ Optional start date filter (format: YYYY-MM-DD)\n    end_date: Optional end\
+      \ date filter (format: YYYY-MM-DD)\n    year_filter: Optional year to filter\
+      \ results (e.g., 2024)\n    category: Optional category filter (e.g., 'cs.AI'\
+      \ or 'math.ST')\n    \nReturns:\n    Tuple of (yearly_data, monthly_data, daily_data,\
+      \ total_papers, categories_list)"
+    line: 27
+  - name: display_yearly_summary
+    type: function
+    filename: src\utils\analyze_papers_by_year_month_day.py
+    metadata: {}
+    dependencies:
+    - int
+    - max
+    - print
+    - yearly_data.items
+    - yearly_data.values
+    docstring: Display paper counts by year with visualization.
+    line: 130
+  - name: display_monthly_summary
+    type: function
+    filename: src\utils\analyze_papers_by_year_month_day.py
+    metadata: {}
+    dependencies:
+    - OrderedDict
+    - filtered_data.items
+    - filtered_data.values
+    - int
+    - max
+    - monthly_data.items
+    - print
+    - year_month.startswith
+    docstring: Display paper counts by year-month with visualization.
+    line: 152
+  - name: display_daily_summary
+    type: function
+    filename: src\utils\analyze_papers_by_year_month_day.py
+    metadata: {}
+    dependencies:
+    - OrderedDict
+    - daily_data.items
+    - date.startswith
+    - date_obj.strftime
+    - datetime.strptime
+    - filtered_data.items
+    - filtered_data.values
+    - int
+    - len
+    - list
+    - max
+    - print
+    docstring: Display paper counts by full date with visualization.
+    line: 185
+  - name: calculate_day_of_week_stats
+    type: function
+    filename: src\utils\analyze_papers_by_year_month_day.py
+    metadata: {}
+    dependencies:
+    - OrderedDict
+    - daily_data.items
+    - date_obj.weekday
+    - datetime.strptime
+    - defaultdict
+    - range
+    docstring: Calculate paper counts by day of week.
+    line: 230
+  - name: display_day_of_week_stats
+    type: function
+    filename: src\utils\analyze_papers_by_year_month_day.py
+    metadata: {}
+    dependencies:
+    - day_of_week_data.items
+    - day_of_week_data.values
+    - int
+    - max
+    - print
+    docstring: Display paper counts by day of week with visualization.
+    line: 258
+  - name: main
+    type: function
+    filename: src\utils\analyze_papers_by_year_month_day.py
+    metadata: {}
+    dependencies:
+    - analyze_papers_by_year_month_day
+    - argparse.ArgumentParser
+    - calculate_day_of_week_stats
+    - display_daily_summary
+    - display_day_of_week_stats
+    - display_monthly_summary
+    - display_yearly_summary
+    - len
+    - logger.error
+    - os.environ.get
+    - parser.add_argument
+    - parser.parse_args
+    - print
+    - str
+    docstring: Main entry point for the script.
+    line: 280
+  dependencies:
+  - MongoStorage
+  - OrderedDict
+  - analyze_papers_by_year_month_day
+  - argparse.ArgumentParser
+  - calculate_day_of_week_stats
+  - daily_data.items
+  - date.startswith
+  - date_obj.strftime
+  - date_obj.weekday
+  - datetime.strptime
+  - day_of_week_data.items
+  - day_of_week_data.values
+  - defaultdict
+  - display_daily_summary
+  - display_day_of_week_stats
+  - display_monthly_summary
+  - display_yearly_summary
+  - doc.get
+  - filtered_data.items
+  - filtered_data.values
+  - get
+  - int
+  - len
+  - list
+  - logger.error
+  - logger.info
+  - max
+  - mongo.papers.aggregate
+  - mongo.papers.count_documents
+  - monthly_data.items
+  - os.environ.get
+  - parser.add_argument
+  - parser.parse_args
+  - print
+  - range
+  - sorted
+  - str
+  - year_month.startswith
+  - yearly_data.items
+  - yearly_data.values
+- name: src\utils\check_mongodb
+  filename: src\utils\check_mongodb.py
+  metadata: {}
+  components:
+  - name: main
+    type: function
+    filename: src\utils\check_mongodb.py
+    metadata: {}
+    dependencies:
+    - MongoClient
+    - db.papers.count_documents
+    - db.papers.find_one
+    - print
+    - sample.get
+    docstring: ''
+    line: 3
+  dependencies:
+  - MongoClient
+  - db.papers.count_documents
+  - db.papers.find_one
+  - print
+  - sample.get
+- name: src\utils\check_pdf_urls
+  filename: src\utils\check_pdf_urls.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\utils\check_pdf_urls.py
+    metadata: {}
+    dependencies:
+    - open
+    - os.path.dirname
+    - os.path.join
+    - yaml.safe_load
+    docstring: Load configuration from default.yaml file.
+    line: 10
+  - name: check_pdf_urls
+    type: function
+    filename: src\utils\check_pdf_urls.py
+    metadata: {}
+    dependencies:
+    - MongoClient
+    - client.close
+    - downloaded_pdfs_collection.find
+    - downloaded_with_pattern.append
+    - enumerate
+    - join
+    - len
+    - list
+    - load_config
+    - logger.info
+    - not_downloaded_with_pattern.append
+    - os.getenv
+    - os.path.exists
+    - os.path.join
+    - paper.get
+    - papers_collection.find
+    - pdf_url.rstrip
+    - split
+    docstring: Check MongoDB for papers with /pdf/ in the pdf_url and analyze downloaded
+      files.
+    line: 16
+  dependencies:
+  - MongoClient
+  - client.close
+  - downloaded_pdfs_collection.find
+  - downloaded_with_pattern.append
+  - enumerate
+  - join
+  - len
+  - list
+  - load_config
+  - logger.info
+  - not_downloaded_with_pattern.append
+  - open
+  - os.getenv
+  - os.path.dirname
+  - os.path.exists
+  - os.path.join
+  - paper.get
+  - papers_collection.find
+  - pdf_url.rstrip
+  - split
+  - yaml.safe_load
+- name: src\utils\check_topics
+  filename: src\utils\check_topics.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\utils\check_topics.py
+    metadata: {}
+    dependencies:
+    - open
+    - yaml.safe_load
+    docstring: ''
+    line: 6
+  - name: main
+    type: function
+    filename: src\utils\check_topics.py
+    metadata: {}
+    dependencies:
+    - MongoClient
+    - list
+    - load_config
+    - print
+    - topics_collection.aggregate
+    - topics_collection.count_documents
+    docstring: ''
+    line: 10
+  dependencies:
+  - MongoClient
+  - list
+  - load_config
+  - open
+  - print
+  - topics_collection.aggregate
+  - topics_collection.count_documents
+  - yaml.safe_load
+- name: src\utils\clear_neo4j
+  filename: src\utils\clear_neo4j.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\utils\clear_neo4j.py
+    metadata: {}
+    dependencies:
+    - logger.error
+    - open
+    - yaml.safe_load
+    docstring: Load configuration from YAML file
+    line: 43
+  - name: clear_neo4j
+    type: function
+    filename: src\utils\clear_neo4j.py
+    metadata: {}
+    dependencies:
+    - GraphDatabase.driver
+    - driver.close
+    - driver.session
+    - locals
+    - logger.error
+    - logger.info
+    - result.single
+    - session.run
+    docstring: "Clear all data from Neo4j database\n\nArgs:\n    uri: Neo4j connection\
+      \ URI\n    user: Neo4j username\n    password: Neo4j password\n    dry_run:\
+      \ If True, only show what would be deleted without actually deleting"
+    line: 52
+  - name: main
+    type: function
+    filename: src\utils\clear_neo4j.py
+    metadata: {}
+    dependencies:
+    - argparse.ArgumentParser
+    - clear_neo4j
+    - load_config
+    - parser.add_argument
+    - parser.parse_args
+    docstring: ''
+    line: 99
+  dependencies:
+  - GraphDatabase.driver
+  - argparse.ArgumentParser
+  - clear_neo4j
+  - driver.close
+  - driver.session
+  - load_config
+  - locals
+  - logger.error
+  - logger.info
+  - open
+  - parser.add_argument
+  - parser.parse_args
+  - result.single
+  - session.run
+  - yaml.safe_load
+- name: src\utils\count_papers_by_date
+  filename: src\utils\count_papers_by_date.py
+  metadata: {}
+  components:
+  - name: count_papers_by_published_date
+    type: function
+    filename: src\utils\count_papers_by_date.py
+    metadata: {}
+    dependencies:
+    - MongoStorage
+    - OrderedDict
+    - len
+    - logger.error
+    - logger.info
+    - mongo.papers.aggregate
+    - os.environ.get
+    - str
+    docstring: "Query MongoDB and count papers grouped by published date.\n\nArgs:\n\
+      \    connection_string: MongoDB connection URI (if None, uses MONGO_URI env\
+      \ var or default)\n    db_name: MongoDB database name\n    \nReturns:\n    Ordered\
+      \ dictionary of publication dates and paper counts"
+    line: 28
+  - name: display_results
+    type: function
+    filename: src\utils\count_papers_by_date.py
+    metadata: {}
+    dependencies:
+    - counts.items
+    - counts.values
+    - list
+    - print
+    - reversed
+    - sum
+    docstring: "Display paper counts in a formatted way.\n\nArgs:\n    counts: Ordered\
+      \ dictionary of dates and counts"
+    line: 73
+  - name: main
+    type: function
+    filename: src\utils\count_papers_by_date.py
+    metadata: {}
+    dependencies:
+    - OrderedDict
+    - count_papers_by_published_date
+    - counts.items
+    - display_results
+    - len
+    - list
+    - logger.error
+    - logger.info
+    - monthly.get
+    - monthly.items
+    - monthly.values
+    - os.environ.get
+    - print
+    - reversed
+    - str
+    - sum
+    docstring: Main entry point for the script.
+    line: 99
+  dependencies:
+  - MongoStorage
+  - OrderedDict
+  - count_papers_by_published_date
+  - counts.items
+  - counts.values
+  - display_results
+  - len
+  - list
+  - logger.error
+  - logger.info
+  - mongo.papers.aggregate
+  - monthly.get
+  - monthly.items
+  - monthly.values
+  - os.environ.get
+  - print
+  - reversed
+  - str
+  - sum
+- name: src\utils\download_pdfs
+  filename: src\utils\download_pdfs.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\utils\download_pdfs.py
+    metadata: {}
+    dependencies:
+    - open
+    - os.path.dirname
+    - os.path.join
+    - yaml.safe_load
+    docstring: ''
+    line: 9
+  - name: ensure_dir
+    type: function
+    filename: src\utils\download_pdfs.py
+    metadata: {}
+    dependencies:
+    - os.makedirs
+    - os.path.exists
+    docstring: ''
+    line: 42
+  - name: extract_arxiv_id
+    type: function
+    filename: src\utils\download_pdfs.py
+    metadata: {}
+    dependencies:
+    - pdf_url.rstrip
+    - split
+    docstring: 'Extract arXiv ID from a PDF URL.
+
+      Example: http://arxiv.org/pdf/2504.18538v1 -> 2504.18538v1'
+    line: 46
+  - name: get_pdf_filename
+    type: function
+    filename: src\utils\download_pdfs.py
+    metadata: {}
+    dependencies:
+    - extract_arxiv_id
+    - paper.get
+    docstring: ''
+    line: 55
+  - name: download_pdf
+    type: function
+    filename: src\utils\download_pdfs.py
+    metadata: {}
+    dependencies:
+    - datetime.utcnow
+    - extract_arxiv_id
+    - f.write
+    - invalid_pdfs.find_one
+    - invalid_pdfs.insert_one
+    - open
+    - print
+    - requests.get
+    - response.iter_content
+    - response.raise_for_status
+    docstring: ''
+    line: 61
+  - name: filter_papers_by_date
+    type: function
+    filename: src\utils\download_pdfs.py
+    metadata: {}
+    dependencies:
+    - datetime.datetime
+    - datetime.fromisoformat
+    - filtered_papers.append
+    docstring: 'Filter papers by published date (ISO format: YYYY-MM-DD).'
+    line: 87
+  - name: sort_papers_by_date
+    type: function
+    filename: src\utils\download_pdfs.py
+    metadata: {}
+    dependencies:
+    - datetime.datetime
+    - datetime.fromisoformat
+    - paper.get
+    - sorted
+    docstring: Sort papers by published date.
+    line: 122
+  - name: get_date
+    type: function
+    filename: src\utils\download_pdfs.py
+    metadata: {}
+    dependencies:
+    - datetime.fromisoformat
+    - paper.get
+    docstring: ''
+    line: 126
+  - name: get_downloaded_papers_from_db
+    type: function
+    filename: src\utils\download_pdfs.py
+    metadata: {}
+    dependencies:
+    - db.get_collection
+    - db.list_collection_names
+    - downloaded_ids.update
+    - downloaded_pdfs_collection.find
+    - invalid_pdfs_collection.find
+    - print
+    - set
+    docstring: 'Fetch previously downloaded papers from both downloaded_pdfs and invalid_pdfs
+      collections.
+
+      Returns a set of arXiv IDs that should be skipped.'
+    line: 134
+  - name: main
+    type: function
+    filename: src\utils\download_pdfs.py
+    metadata: {}
+    dependencies:
+    - MongoClient
+    - categories_found.add
+    - category_counts.items
+    - download_pdf
+    - ensure_dir
+    - extract_arxiv_id
+    - filter_papers_by_date
+    - find
+    - get_downloaded_papers_from_db
+    - get_pdf_filename
+    - len
+    - list
+    - os.path.exists
+    - os.path.join
+    - paper.get
+    - print
+    - set
+    - sort
+    - sort_papers_by_date
+    - tqdm
+    docstring: Main function to download PDFs from arXiv.
+    line: 157
+  dependencies:
+  - MongoClient
+  - categories_found.add
+  - category_counts.items
+  - datetime.datetime
+  - datetime.fromisoformat
+  - datetime.utcnow
+  - db.get_collection
+  - db.list_collection_names
+  - download_pdf
+  - downloaded_ids.update
+  - downloaded_pdfs_collection.find
+  - ensure_dir
+  - extract_arxiv_id
+  - f.write
+  - filter_papers_by_date
+  - filtered_papers.append
+  - find
+  - get_downloaded_papers_from_db
+  - get_pdf_filename
+  - invalid_pdfs.find_one
+  - invalid_pdfs.insert_one
+  - invalid_pdfs_collection.find
+  - len
+  - list
+  - open
+  - os.makedirs
+  - os.path.dirname
+  - os.path.exists
+  - os.path.join
+  - paper.get
+  - pdf_url.rstrip
+  - print
+  - requests.get
+  - response.iter_content
+  - response.raise_for_status
+  - set
+  - sort
+  - sort_papers_by_date
+  - sorted
+  - split
+  - tqdm
+  - yaml.safe_load
+- name: src\utils\inspect_paper_schema
+  filename: src\utils\inspect_paper_schema.py
+  metadata: {}
+  components:
+  - name: inspect_paper_schema
+    type: function
+    filename: src\utils\inspect_paper_schema.py
+    metadata: {}
+    dependencies:
+    - MongoStorage
+    - isinstance
+    - json.dumps
+    - len
+    - list
+    - os.environ.get
+    - paper.get
+    - paper.items
+    - print
+    - storage.close
+    - storage.papers.aggregate
+    - storage.papers.count_documents
+    - storage.papers.find_one
+    - str
+    - type
+    docstring: Examine the structure of a paper document in MongoDB.
+    line: 18
+  dependencies:
+  - MongoStorage
+  - isinstance
+  - json.dumps
+  - len
+  - list
+  - os.environ.get
+  - paper.get
+  - paper.items
+  - print
+  - storage.close
+  - storage.papers.aggregate
+  - storage.papers.count_documents
+  - storage.papers.find_one
+  - str
+  - type
+- name: src\utils\load_huggingface_metadata
+  filename: src\utils\load_huggingface_metadata.py
+  metadata: {}
+  components:
+  - name: fetch_models
+    type: function
+    filename: src\utils\load_huggingface_metadata.py
+    metadata: {}
+    dependencies:
+    - params.update
+    - requests.get
+    - response.json
+    - response.raise_for_status
+    docstring: ''
+    line: 16
+  - name: extract_model_info
+    type: function
+    filename: src\utils\load_huggingface_metadata.py
+    metadata: {}
+    dependencies:
+    - card_data.get
+    - extracted.append
+    - model.get
+    docstring: ''
+    line: 27
+  - name: save_to_json
+    type: function
+    filename: src\utils\load_huggingface_metadata.py
+    metadata: {}
+    dependencies:
+    - datetime.utcnow
+    - isoformat
+    - json.dump
+    - open
+    docstring: ''
+    line: 45
+  - name: main
+    type: function
+    filename: src\utils\load_huggingface_metadata.py
+    metadata: {}
+    dependencies:
+    - extract_model_info
+    - fetch_models
+    - len
+    - print
+    - save_to_json
+    docstring: ''
+    line: 49
+  dependencies:
+  - card_data.get
+  - datetime.utcnow
+  - extract_model_info
+  - extracted.append
+  - fetch_models
+  - isoformat
+  - json.dump
+  - len
+  - model.get
+  - open
+  - params.update
+  - print
+  - requests.get
+  - response.json
+  - response.raise_for_status
+  - save_to_json
+- name: src\utils\load_ollama_all_metadata
+  filename: src\utils\load_ollama_all_metadata.py
+  metadata: {}
+  components:
+  - name: fetch_ollama_available_models
+    type: function
+    filename: src\utils\load_ollama_all_metadata.py
+    metadata: {}
+    dependencies:
+    - BeautifulSoup
+    - Exception
+    - card.text.strip
+    - models.append
+    - requests.get
+    - soup.select
+    - split
+    - strip
+    docstring: ''
+    line: 5
+  dependencies:
+  - BeautifulSoup
+  - Exception
+  - card.text.strip
+  - models.append
+  - requests.get
+  - soup.select
+  - split
+  - strip
+- name: src\utils\load_ollama_metadata
+  filename: src\utils\load_ollama_metadata.py
+  metadata: {}
+  components:
+  - name: fetch_ollama_models
+    type: function
+    filename: src\utils\load_ollama_metadata.py
+    metadata: {}
+    dependencies:
+    - Exception
+    - get
+    - model.get
+    - models.append
+    - requests.get
+    - response.json
+    docstring: ''
+    line: 4
+  dependencies:
+  - Exception
+  - get
+  - model.get
+  - models.append
+  - requests.get
+  - response.json
+- name: src\utils\logger
+  filename: src\utils\logger.py
+  metadata: {}
+  components:
+  - name: setup_logger
+    type: function
+    filename: src\utils\logger.py
+    metadata: {}
+    dependencies:
+    - RotatingFileHandler
+    - console_handler.setFormatter
+    - console_handler.setLevel
+    - file_handler.setFormatter
+    - file_handler.setLevel
+    - logger.addHandler
+    - logger.setLevel
+    - logging.Formatter
+    - logging.StreamHandler
+    - logging.getLogger
+    - os.makedirs
+    - os.path.dirname
+    - os.path.exists
+    - os.path.join
+    docstring: ''
+    line: 5
+  dependencies:
+  - RotatingFileHandler
+  - console_handler.setFormatter
+  - console_handler.setLevel
+  - file_handler.setFormatter
+  - file_handler.setLevel
+  - logger.addHandler
+  - logger.setLevel
+  - logging.Formatter
+  - logging.StreamHandler
+  - logging.getLogger
+  - os.makedirs
+  - os.path.dirname
+  - os.path.exists
+  - os.path.join
+- name: src\utils\query_top2vec_topics
+  filename: src\utils\query_top2vec_topics.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\utils\query_top2vec_topics.py
+    metadata: {}
+    dependencies:
+    - open
+    - yaml.safe_load
+    docstring: Load configuration settings from a YAML file.
+    line: 25
+  - name: is_docker
+    type: function
+    filename: src\utils\query_top2vec_topics.py
+    metadata: {}
+    dependencies:
+    - f.read
+    - open
+    docstring: Detect if running inside a Docker container.
+    line: 30
+  - name: get_mongo_uri
+    type: function
+    filename: src\utils\query_top2vec_topics.py
+    metadata: {}
+    dependencies:
+    - is_docker
+    - os.environ.get
+    docstring: Get the appropriate MongoDB URI based on environment and configuration.
+    line: 38
+  - name: query_topics
+    type: function
+    filename: src\utils\query_top2vec_topics.py
+    metadata: {}
+    dependencies:
+    - MongoClient
+    - defaultdict
+    - get_mongo_uri
+    - join
+    - len
+    - list
+    - logger.error
+    - logger.info
+    - logger.warning
+    - max
+    - mean
+    - min
+    - pd.DataFrame
+    - print
+    - rows.append
+    - str
+    - tabulate
+    - topic_words_dict.get
+    - topics_collection.aggregate
+    - topics_collection.count_documents
+    - topics_collection.find_one
+    docstring: Query the top2vec topics collection and display statistics.
+    line: 50
+  - name: main
+    type: function
+    filename: src\utils\query_top2vec_topics.py
+    metadata: {}
+    dependencies:
+    - argparse.ArgumentParser
+    - load_config
+    - logger.info
+    - parser.add_argument
+    - parser.parse_args
+    - query_topics
+    docstring: Main entry point for the query script.
+    line: 115
+  dependencies:
+  - MongoClient
+  - argparse.ArgumentParser
+  - defaultdict
+  - f.read
+  - get_mongo_uri
+  - is_docker
+  - join
+  - len
+  - list
+  - load_config
+  - logger.error
+  - logger.info
+  - logger.warning
+  - max
+  - mean
+  - min
+  - open
+  - os.environ.get
+  - parser.add_argument
+  - parser.parse_args
+  - pd.DataFrame
+  - print
+  - query_topics
+  - rows.append
+  - str
+  - tabulate
+  - topic_words_dict.get
+  - topics_collection.aggregate
+  - topics_collection.count_documents
+  - topics_collection.find_one
+  - yaml.safe_load
+- name: src\utils\track_downloaded_pdfs
+  filename: src\utils\track_downloaded_pdfs.py
+  metadata: {}
+  components:
+  - name: load_config
+    type: function
+    filename: src\utils\track_downloaded_pdfs.py
+    metadata: {}
+    dependencies:
+    - open
+    - os.path.dirname
+    - os.path.join
+    - yaml.safe_load
+    docstring: Load configuration from default.yaml file.
+    line: 13
+  - name: ensure_collection
+    type: function
+    filename: src\utils\track_downloaded_pdfs.py
+    metadata: {}
+    dependencies:
+    - db.create_collection
+    - db.list_collection_names
+    - logger.info
+    docstring: Ensure collection exists in MongoDB.
+    line: 19
+  - name: get_arxiv_id_from_filename
+    type: function
+    filename: src\utils\track_downloaded_pdfs.py
+    metadata: {}
+    dependencies:
+    - filename.endswith
+    docstring: 'Extract arXiv ID from filename.
+
+      Example: 2504.18538v1.pdf -> 2504.18538v1'
+    line: 25
+  - name: scan_download_directory
+    type: function
+    filename: src\utils\track_downloaded_pdfs.py
+    metadata: {}
+    dependencies:
+    - f.endswith
+    - get_arxiv_id_from_filename
+    - logger.error
+    - logger.warning
+    - os.listdir
+    - os.path.exists
+    - os.path.isdir
+    - os.path.join
+    docstring: 'Scan the download directory for PDF files.
+
+      Returns a dictionary mapping arXiv IDs to their categories.'
+    line: 33
+  - name: update_mongodb
+    type: function
+    filename: src\utils\track_downloaded_pdfs.py
+    metadata: {}
+    dependencies:
+    - bulk_operations.append
+    - collection.bulk_write
+    - collection.find
+    - collection.update_many
+    - datetime.utcnow
+    - downloaded_pdfs.items
+    - ensure_collection
+    - isoformat
+    - len
+    - list
+    - logger.error
+    - logger.info
+    - min
+    - pymongo.InsertOne
+    - pymongo.UpdateOne
+    - range
+    - record.get
+    - to_mark_as_removed.append
+    docstring: 'Update MongoDB collection with downloaded PDFs information.
+
+      - Adds entries for new downloads
+
+      - Updates entries for existing downloads
+
+      - Marks entries as not downloaded if PDF is no longer present'
+    line: 70
+  - name: main
+    type: function
+    filename: src\utils\track_downloaded_pdfs.py
+    metadata: {}
+    dependencies:
+    - MongoClient
+    - client.admin.command
+    - client.close
+    - get
+    - join
+    - len
+    - load_config
+    - locals
+    - logger.error
+    - logger.info
+    - os.getenv
+    - scan_download_directory
+    - update_mongodb
+    docstring: Main function to track downloaded PDFs.
+    line: 192
+  dependencies:
+  - MongoClient
+  - bulk_operations.append
+  - client.admin.command
+  - client.close
+  - collection.bulk_write
+  - collection.find
+  - collection.update_many
+  - datetime.utcnow
+  - db.create_collection
+  - db.list_collection_names
+  - downloaded_pdfs.items
+  - ensure_collection
+  - f.endswith
+  - filename.endswith
+  - get
+  - get_arxiv_id_from_filename
+  - isoformat
+  - join
+  - len
+  - list
+  - load_config
+  - locals
+  - logger.error
+  - logger.info
+  - logger.warning
+  - min
+  - open
+  - os.getenv
+  - os.listdir
+  - os.path.dirname
+  - os.path.exists
+  - os.path.isdir
+  - os.path.join
+  - pymongo.InsertOne
+  - pymongo.UpdateOne
+  - range
+  - record.get
+  - scan_download_directory
+  - to_mark_as_removed.append
+  - update_mongodb
+  - yaml.safe_load
+- name: src\utils\validate_mongodb_data
+  filename: src\utils\validate_mongodb_data.py
+  metadata: {}
+  components:
+  - name: run_validation
+    type: function
+    filename: src\utils\validate_mongodb_data.py
+    metadata: {}
+    dependencies:
+    - MongoStorage
+    - analyze_mongodb_collection
+    - check_data_integrity
+    - count_papers_by_date
+    - dict
+    - enumerate
+    - generate_date_distribution_report
+    - integrity_checks.get
+    - items
+    - join
+    - keys
+    - len
+    - list
+    - logger.info
+    - monthly_counts.items
+    - os.environ.get
+    - print
+    - sorted
+    - validate_mongodb_data
+    docstring: "Run comprehensive data validation and analysis on the MongoDB papers\
+      \ collection.\n\nArgs:\n    connection_string: MongoDB connection URI (if None,\
+      \ uses MONGO_URI env var or default)\n    db_name: MongoDB database name (if\
+      \ None, uses MONGO_DB env var or default)\n    sample_size: Number of documents\
+      \ to validate\n    date_range: Optional tuple of (start_date, end_date) strings"
+    line: 33
+  - name: main
+    type: function
+    filename: src\utils\validate_mongodb_data.py
+    metadata: {}
+    dependencies:
+    - argparse.ArgumentParser
+    - parser.add_argument
+    - parser.parse_args
+    - run_validation
+    docstring: Main entry point for the script.
+    line: 153
+  dependencies:
+  - MongoStorage
+  - analyze_mongodb_collection
+  - argparse.ArgumentParser
+  - check_data_integrity
+  - count_papers_by_date
+  - dict
+  - enumerate
+  - generate_date_distribution_report
+  - integrity_checks.get
+  - items
+  - join
+  - keys
+  - len
+  - list
+  - logger.info
+  - monthly_counts.items
+  - os.environ.get
+  - parser.add_argument
+  - parser.parse_args
+  - print
+  - run_validation
+  - sorted
+  - validate_mongodb_data
+- name: src\web-ui\node_modules\flatted\python\flatted
+  filename: src\web-ui\node_modules\flatted\python\flatted.py
+  metadata: {}
+  components:
+  - name: _array_keys
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - keys.append
+    docstring: ''
+    line: 29
+  - name: _object_keys
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - keys.append
+    docstring: ''
+    line: 37
+  - name: _is_array
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - isinstance
+    docstring: ''
+    line: 43
+  - name: _is_object
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - isinstance
+    docstring: ''
+    line: 46
+  - name: _is_string
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - isinstance
+    docstring: ''
+    line: 49
+  - name: _index
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - input.append
+    - known.key.append
+    - known.value.append
+    - len
+    - str
+    docstring: ''
+    line: 52
+  - name: _loop
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - _ref
+    - int
+    - isinstance
+    docstring: ''
+    line: 59
+  - name: _ref
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - _array_keys
+    - _is_array
+    - _is_object
+    - _loop
+    - _object_keys
+    - known.append
+    docstring: ''
+    line: 67
+  - name: _relate
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - _index
+    - _is_array
+    - _is_object
+    - _is_string
+    - known.key.index
+    docstring: ''
+    line: 77
+  - name: _transform
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - _is_array
+    - _is_object
+    - _relate
+    - output.append
+    docstring: ''
+    line: 86
+  - name: _wrap
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - _String
+    - _is_array
+    - _is_object
+    - _is_string
+    - _wrap
+    docstring: ''
+    line: 101
+  - name: parse
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - _array_keys
+    - _is_array
+    - _is_object
+    - _json.loads
+    - _loop
+    - _object_keys
+    - _wrap
+    - input.append
+    - isinstance
+    - wrapped.append
+    docstring: ''
+    line: 117
+  - name: stringify
+    type: function
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies:
+    - _Known
+    - _index
+    - _json.dumps
+    - _transform
+    - int
+    - len
+    - output.append
+    docstring: ''
+    line: 141
+  - name: _Known
+    type: class
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies: []
+    docstring: ''
+    line: 19
+  - name: _String
+    type: class
+    filename: src\web-ui\node_modules\flatted\python\flatted.py
+    metadata: {}
+    dependencies: []
+    docstring: ''
+    line: 24
+  dependencies:
+  - _Known
+  - _String
+  - _array_keys
+  - _index
+  - _is_array
+  - _is_object
+  - _is_string
+  - _json.dumps
+  - _json.loads
+  - _loop
+  - _object_keys
+  - _ref
+  - _relate
+  - _transform
+  - _wrap
+  - input.append
+  - int
+  - isinstance
+  - keys.append
+  - known.append
+  - known.key.append
+  - known.key.index
+  - known.value.append
+  - len
+  - output.append
+  - str
+  - wrapped.append
+- name: tests\test_ingestion
+  filename: tests\test_ingestion.py
+  metadata: {}
+  components: []
+  dependencies: []
+- name: tests\test_storage
+  filename: tests\test_storage.py
+  metadata: {}
+  components: []
+  dependencies: []
+entry_points: []
+external_connections: []

@@ -1,38 +1,83 @@
 {
     "model_name": "microsoft/DialoGPT-large",
-    "avg_bleu": 0.15881828579275759,
-    "avg_meteor": 0.6405448309421634,
-    "avg_rouge1": 0.8358308358308357,
-    "avg_rougeL": 0.7369297369297368,
-    "distinct_2": 0.875,
-    "self_bleu": 3.5971829134979824e-78,
+    "avg_bleu": 0.13598196389276204,
+    "avg_meteor": 0.2845206775260812,
+    "avg_rouge1": 0.42765979370513063,
+    "avg_rougeL": 0.38584260291882194,
+    "distinct_2": 0.9090909090909091,
+    "self_bleu": 1.630821865934936e-78,
     "samples": [
         {
-            "input": "What is the capital of France?",
-            "reference": "The capital of France is Paris.",
-            "generated": "What is the capital of France? Paris.",
-            "bleu": 0.08307018474412793,
-            "meteor": 0.7311475409836065,
-            "rouge1": 0.923076923076923,
-            "rougeL": 0.7692307692307692
+            "input": "What is the largest planet in our solar system?",
+            "reference": "Jupiter is the largest planet in our solar system.",
+            "generated": "What is the largest planet in our solar system?",
+            "bleu": 0.7259795291154771,
+            "meteor": 0.7766439909297052,
+            "rouge1": 0.8888888888888888,
+            "rougeL": 0.8888888888888888
         },
         {
-            "input": "Who wrote 'Pride and Prejudice'?",
-            "reference": "Jane Austen wrote 'Pride and Prejudice'.",
-            "generated": "Who wrote 'Pride and Prejudice'?.",
-            "bleu": 0.21771262023986562,
-            "meteor": 0.4990583804143125,
-            "rouge1": 0.7272727272727272,
-            "rougeL": 0.7272727272727272
+            "input": "Who painted the Mona Lisa?",
+            "reference": "Leonardo da Vinci painted the Mona Lisa.",
+            "generated": "Who painted the Mona Lisa?",
+            "bleu": 0.17824801752356584,
+            "meteor": 0.43300653594771243,
+            "rouge1": 0.6666666666666666,
+            "rougeL": 0.6666666666666666
         },
         {
-            "input": "What is the square root of 64?",
-            "reference": "The square root of 64 is 8.",
-            "generated": "What is the square root of 64?",
+            "input": "What is the chemical symbol for gold?",
+            "reference": "The chemical symbol for gold is Au.",
+            "generated": "What is the chemical symbol for gold?",
             "bleu": 0.17567205239427922,
             "meteor": 0.6914285714285714,
             "rouge1": 0.8571428571428571,
             "rougeL": 0.7142857142857143
+        },
+        {
+            "input": "Explain the concept of quantum entanglement.",
+            "reference": "Quantum entanglement is a physical phenomenon where pairs or groups of particles interact in ways such that the quantum state of each particle cannot be described independently of the state of the others, even when the particles are separated by large distances.",
+            "generated": "Explain the concept of quantum entanglement.com",
+            "bleu": 0.00013317962787439124,
+            "meteor": 0.0390625,
+            "rouge1": 0.16326530612244897,
+            "rougeL": 0.08163265306122448
+        },
+        {
+            "input": "What are the main principles of object-oriented programming?",
+            "reference": "The main principles of object-oriented programming are: 1) Encapsulation - bundling data with methods, 2) Inheritance - creating new classes from existing ones, 3) Polymorphism - using a single symbol to represent different types, and 4) Abstraction - hiding complex implementation details.",
+            "generated": "What are the main principles of object-oriented programming?",
+            "bleu": 0.004931442139335404,
+            "meteor": 0.15256188831318365,
+            "rouge1": 0.3333333333333333,
+            "rougeL": 0.29166666666666663
+        },
+        {
+            "input": "Describe the theory of relativity in simple terms.",
+            "reference": "The theory of relativity, developed by Albert Einstein, consists of two parts: 1) Special Relativity - which states that the laws of physics are the same for all non-accelerating observers, and 2) General Relativity - which describes gravity as a curvature of spacetime caused by mass and energy.",
+            "generated": "Describe the theory of relativity in simple terms.It is a theory.",
+            "bleu": 0.001640684180262956,
+            "meteor": 0.06772009029345372,
+            "rouge1": 0.20338983050847456,
+            "rougeL": 0.1694915254237288
+        },
+        {
+            "input": "What is the difference between machine learning and deep learning?",
+            "reference": "Machine learning is a subset of artificial intelligence that uses algorithms to parse data, learn from it, and make decisions. Deep learning is a specialized form of machine learning that uses neural networks with many layers (deep neural networks) to model complex patterns in large amounts of data.",
+            "generated": "What is the difference between machine learning and deep learning?",
+            "bleu": 0.0011873761805725508,
+            "meteor": 0.08416289592760182,
+            "rouge1": 0.20689655172413793,
+            "rougeL": 0.1724137931034483
+        },
+        {
+            "input": "How does photosynthesis work?",
+            "reference": "Photosynthesis is the process by which green plants, algae, and some bacteria convert light energy, usually from the sun, into chemical energy. This process uses carbon dioxide and water to produce glucose and releases oxygen as a byproduct. The overall reaction is: 6CO\u2082 + 6H\u2082O + light energy \u2192 C\u2086H\u2081\u2082O\u2086 + 6O\u2082.",
+            "generated": "How does photosynthesis work?photosynthesis is a thing.",
+            "bleu": 6.342998072883684e-05,
+            "meteor": 0.031578947368421054,
+            "rouge1": 0.10169491525423728,
+            "rougeL": 0.10169491525423728
         }
     ]
 }

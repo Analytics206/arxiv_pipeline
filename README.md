@@ -3,6 +3,48 @@
 ## Overview
 A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. This system enables offline graph-based and semantic search through an integrated architecture of MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker containers for easy, consistent local deployment.
 
+## 🔍 Project Analysis
+
+The project includes a metadata generator that helps analyze and document the codebase structure. This tool is particularly useful for understanding module dependencies and system architecture.
+
+### Generating System Metadata
+
+```bash
+# Generate metadata for the entire project
+python metadata_generator.py . -o system_metadata.yaml
+
+# Generate metadata for a specific module (e.g., llm_eval)
+python metadata_generator.py src/llm_eval -o llm_eval_metadata.yaml
+```
+
+### Metadata Includes
+- Complete module structure and dependencies
+- Function and class definitions
+- Entry points and their relationships
+- External library dependencies
+- Code documentation strings
+
+### Usage Examples
+
+1. **Documentation Generation**:
+   ```bash
+   # Generate comprehensive project documentation
+   python metadata_generator.py . -o docs/system_architecture.yaml
+   ```
+
+2. **Dependency Analysis**:
+   ```bash
+   # Analyze dependencies for a specific component
+   python metadata_generator.py src/ingestion -o ingestion_dependencies.yaml
+   ```
+
+The generated YAML files can be used for:
+- System architecture visualization
+- Codebase documentation
+- Dependency analysis
+- Onboarding new developers
+- Code quality assessment
+
 ## 🚀 Key Features
 | Feature                  | Description |
 | ------------------------ |-------------|

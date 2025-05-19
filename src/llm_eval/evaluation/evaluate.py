@@ -1,16 +1,30 @@
 import json
+from pathlib import Path
 from models.load_model import load_model
 from evaluation.metrics import (
     calculate_bleu, calculate_meteor, calculate_rouge,
     calculate_distinct_n, calculate_self_bleu
 )
 
-def evaluate_model(model_name, test_data_path="data/test_data.json", output_path="results/model_results.json"):
+def evaluate_model(model_name, test_data_path=None, output_path=None):
+    # Convert paths to Path objects if they're not already
+    if test_data_path is None:
+        test_data_path = Path(__file__).parent.parent / "test_data" / "test_data.json"
+    elif isinstance(test_data_path, str):
+        test_data_path = Path(test_data_path)
+        
+    if output_path is None:
+        output_path = Path(__file__).parent.parent / "results" / "model_results.json"
+    elif isinstance(output_path, str):
+        output_path = Path(output_path)
+    
+    # Create results directory if it doesn't exist
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     # Load the model, tokenizer, and device
     model, tokenizer, device = load_model(model_name)
 
-    # Load the test data
-    with open(test_data_path, "r") as f:
+    # Load the test data with UTF-8 encoding to handle special characters
+    with open(test_data_path, "r", encoding='utf-8') as f:
         test_data = json.load(f)
 
     results = {

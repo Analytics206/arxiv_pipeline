@@ -28,6 +28,9 @@
 cd c:\Users\mad_p\OneDrive\Desktop\arxiv_pipeline
 python src/utils/track_downloaded_pdfs.py
 
+python metadata_generator.py . -o system_metadata.yaml
+python metadata_generator.py src/llm_eval -o llm_eval_metadata.yaml
+
 docker image prune -a
 
 docker-compose --profile manual build --no-cache sync-top2vec

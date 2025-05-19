@@ -1,8 +1,20 @@
+import nltk
+import os
+from pathlib import Path
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from nltk.translate.meteor_score import meteor_score
 from rouge_score import rouge_scorer
 from collections import Counter
 import warnings
+
+# Download required NLTK data
+try:
+    nltk.data.find('corpora/wordnet')
+    nltk.data.find('corpora/omw-1.4')
+except LookupError:
+    print("Downloading NLTK data (wordnet, omw-1.4)...")
+    nltk.download('wordnet', quiet=True)
+    nltk.download('omw-1.4', quiet=True)
 
 # Suppress the BLEU score warning
 warnings.filterwarnings("ignore", message="The hypothesis contains 0 counts of 4-gram overlaps.")

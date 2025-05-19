@@ -1,9 +1,43 @@
 # ArXiv Deep Research Pipeline Release Notes
 
 ---
-## Version 0.5.4 (May 18, 2025)
+## Version 0.6.0 (May 18, 2025)
 
 ### Major Features
+
+#### Codebase Metadata Generator
+- **Project Analysis Tool** - Added a new metadata generator for comprehensive codebase analysis and documentation
+- **Features**:
+  - Automatic module and dependency detection
+  - Function and class relationship mapping
+  - Support for both full project and module-level analysis
+  - YAML output for easy integration with other tools
+- **Documentation** - Added detailed usage instructions in main README
+- **Use Cases**:
+  - System architecture visualization
+  - Codebase documentation generation
+  - Dependency analysis
+  - Developer onboarding
+  - Code quality assessment
+
+#### LLM Evaluation Module
+- **Comprehensive Evaluation Framework** - Added a new module for evaluating Large Language Models (LLMs) with multiple metrics
+- **Evaluation Metrics** - Implemented support for:
+  - BLEU (Bilingual Evaluation Understudy)
+  - ROUGE (Recall-Oriented Understudy for Gisting Evaluation)
+  - BERTScore (Semantic Similarity)
+  - Perplexity
+- **Modular Architecture** - Created a clean, maintainable codebase with separate modules for model loading, evaluation, and metrics
+- **Standardized Data Format** - Implemented consistent JSON-based input/output for evaluation results
+- **Documentation** - Added comprehensive README with usage examples and metric explanations
+- **Dependencies** - Integrated required packages (transformers, datasets, torch, rouge-score, nltk, pycocoevalcap)
+
+### Technical Improvements
+- **Code Organization** - Structured project with clear separation of concerns
+- **Error Handling** - Added robust error handling for model loading and evaluation
+- **Configuration** - Integrated with project's configuration system
+- **Performance** - Optimized batch processing for efficient evaluation
+- **Documentation** - Added detailed docstrings and type hints
 
 #### Model Metadata Viewer
 - **Multi-source Integration** - Added support for viewing models from Hugging Face and Ollama in a single interface

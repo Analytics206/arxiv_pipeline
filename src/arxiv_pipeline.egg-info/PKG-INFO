@@ -5,10 +5,12 @@ Summary: Local pipeline for processing ArXiv papers with graph and vector repres
 License: MIT
 Requires-Python: >=3.11
 Description-Content-Type: text/markdown
+Requires-Dist: nltk>=3.8.0
 Requires-Dist: requests>=2.28.0
 Requires-Dist: pymongo>=4.3.0
 Requires-Dist: neo4j>=5.5.0
 Requires-Dist: pyyaml>=6.0.1
+Requires-Dist: kaggle>=1.5.12
 Requires-Dist: kagglehub>=0.1.0
 Requires-Dist: qdrant-client>=1.1.0
 Requires-Dist: sentence-transformers>=2.2.0
@@ -26,7 +28,6 @@ Requires-Dist: numpy>=1.24.0
 Requires-Dist: scipy<1.11.0,>=1.9.0
 Requires-Dist: bertopic>=0.15.0
 Requires-Dist: top2vec>=1.0.0
-Requires-Dist: nltk>=3.8.0
 Requires-Dist: pypdf
 Requires-Dist: jupyter>=1.0.0
 Requires-Dist: jupyterlab>=4.0.0
@@ -38,6 +39,23 @@ Requires-Dist: ipywidgets>=8.0.0
 Requires-Dist: python-dotenv>=1.0.0
 Requires-Dist: fastapi>=0.100.0
 Requires-Dist: uvicorn>=0.23.0
+Requires-Dist: datasets>=2.10.0
+Requires-Dist: rouge-score>=0.1.2
+Requires-Dist: pycocoevalcap>=1.2.0
+Requires-Dist: pycocotools>=2.0.0
+Requires-Dist: sentencepiece>=0.1.99
+Requires-Dist: protobuf>=3.20.0
+Requires-Dist: xxhash>=3.0.0
+Requires-Dist: dill>=0.3.0
+Requires-Dist: multiprocess>=0.70.0
+Requires-Dist: absl-py>=0.1.0
+Requires-Dist: fsspec>=2023.1.0
+Requires-Dist: pyarrow>=10.0.0
+Requires-Dist: transformers[torch]>=4.30.0
+Requires-Dist: torch>=2.0.0
+Requires-Dist: evaluate>=0.4.0
+Requires-Dist: sacrebleu>=2.0.0
+Requires-Dist: sentence-transformers>=2.2.0
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0.0; extra == "dev"
 Requires-Dist: black>=23.0.0; extra == "dev"
@@ -122,6 +140,10 @@ For more deep dive into project and status, see the `docs/` directory.
 - **Research Benchmarking**: Track performance improvements in specific algorithms or methods over time
 
 ### AI-Assisted Research
+- **Model Metadata Viewer**: Explore and compare machine learning models from Hugging Face and Ollama in a unified interface
+  - View detailed metadata for local and available models
+  - Filter and search models by name, type, and capabilities
+  - Compare model architectures and performance metrics
 - **Paper Summarization**: Generate concise summaries of complex research papers
 - **Similar Papers Discovery**: Use vector similarity to find related work not linked by citations
 - **Research Idea Generation**: Use paper combinations with LLMs to explore novel research directions

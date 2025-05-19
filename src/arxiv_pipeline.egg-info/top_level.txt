@@ -5,6 +5,7 @@ api
 embedding
 graph
 ingestion
+llm_eval
 mcp_agent
 pipeline
 pubmed

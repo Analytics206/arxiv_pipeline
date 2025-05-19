@@ -3,10 +3,10 @@
     
     Metric              microsoft/DialoGPT-large     microsoft/DialoGPT-medium
     ----------------------------------------------------------
-    BLEU Score          0.1360          0.1370
-    METEOR Score        0.2845          0.2954
-    ROUGE-1 Score       0.4277          0.4350
-    ROUGE-L Score       0.3858          0.3898
-    Distinct-2 Score    0.9091          0.9310
+    BLEU Score          0.3600          0.3600
+    METEOR Score        0.6337          0.6337
+    ROUGE-1 Score       0.8042          0.8042
+    ROUGE-L Score       0.7566          0.7566
+    Distinct-2 Score    0.8889          0.8889
     Self-BLEU Score     0.0000          0.0000
     

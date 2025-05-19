@@ -24,7 +24,7 @@ The goal of this project is to:
 ## Folder Structure
 llm-evaluation/
 │
-├── data/
+├── test_data/
 │ └── test_data.json # Test dataset (input prompts and reference responses)
 │
 ├── models/
@@ -40,7 +40,7 @@ llm-evaluation/
 ├── utils/
 │ └── helpers.py # Helper functions (e.g., preprocessing)
 │
-├── main.py # Main script to run the entire pipeline
+├── evaluate_llm_models.py # Main script to run the entire pipeline
 │
 └── requirements.txt # List of dependencies
 
@@ -53,15 +53,74 @@ llm-evaluation/
 python3 -m venv myenv
 source myenv/bin/activate
 
+# windows
+python -m venv myenv
+.\myenv\Scripts\Activate.ps1
+
 pip install -r requirements.txt
 
+python -c "import nltk; nltk.download('wordnet'); nltk.download('omw-1.4')"
+
 ## Usage
-Prepare Test Data:
-Add your input prompts and reference responses to data/test_data.json.
-Run the Evaluation Pipeline:
-python main.py
-Check Results:
-The evaluation results will be saved in results/evaluation_results.json.
+
+### Changing Models to Evaluate
+To change which models are evaluated, edit the `MODELS_TO_COMPARE` list in `models/models_to_compare.py`. You can add or remove model identifiers as needed. For example:
+
+```python
+MODELS_TO_COMPARE = [
+    "microsoft/DialoGPT-large",  # Default large model
+    "microsoft/DialoGPT-medium", # Default medium model
+    "gpt2",                    # Example: Adding GPT-2
+    "facebook/opt-350m"         # Example: Adding OPT-350M
+]
+```
+
+Supported models are those available in the Hugging Face model hub or local paths to pre-downloaded models.
+
+### Preparing Test Data
+Add your input prompts and reference responses to `test_data/test_data.json`.
+
+### Running the Evaluation Pipeline
+```bash
+python evaluate_llm_models.py
+```
+
+### Checking Results
+The evaluation results will be saved in the `results/` directory:
+- Individual model results: `model1_results.json`, `model2_results.json`, etc.
+- Comparison results: `comparison_results.txt` (when comparing 2+ models)
+
+## System Metadata
+
+The project includes a metadata generator that creates documentation about the system's structure and dependencies. This is useful for understanding the codebase architecture and module relationships.
+
+### Generating Metadata
+
+To generate system metadata for the entire project:
+
+```bash
+# From the project root directory
+python metadata_generator.py . -o system_metadata.yaml
+
+# Or for just the llm_eval module:
+python metadata_generator.py src/llm_eval -o llm_eval_metadata.yaml
+```
+
+### Metadata Contents
+
+The generated `system_metadata.yaml` file includes:
+- List of all Python modules
+- Entry points and their dependencies
+- External library dependencies
+- Module relationships and component structure
+
+### Usage
+
+The metadata is primarily used for:
+- Documentation generation
+- System architecture analysis
+- Dependency visualization
+- Codebase understanding and onboarding
 
 ## Evaluation Metrics
 This project uses the following metrics to evaluate the model:
@@ -72,8 +131,8 @@ ROUGE	Measures word sequence overlap between generated and reference texts.	0 to
 BERTScore	Measures semantic similarity using embeddings from models like BERT.	0 to 1 (higher is better)
 Perplexity	Measures how well the model predicts the next word in a sequence.	0 to ∞ (lower is better)
 Limitations
-Reference Quality:
 
+Reference Quality:
 Metrics assume the reference text is perfect. If the reference is flawed, the scores may be misleading.
 
 Semantic Understanding:

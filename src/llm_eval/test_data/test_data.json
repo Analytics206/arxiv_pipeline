@@ -1,0 +1,34 @@
+[
+    {
+        "input": "What is the largest planet in our solar system?",
+        "response": "Jupiter is the largest planet in our solar system."
+    },
+    {
+        "input": "Who painted the Mona Lisa?",
+        "response": "Leonardo da Vinci painted the Mona Lisa."
+    },
+    {
+        "input": "What is the chemical symbol for gold?",
+        "response": "The chemical symbol for gold is Au."
+    },
+    {
+        "input": "Explain the concept of quantum entanglement.",
+        "response": "Quantum entanglement is a physical phenomenon where pairs or groups of particles interact in ways such that the quantum state of each particle cannot be described independently of the state of the others, even when the particles are separated by large distances."
+    },
+    {
+        "input": "What are the main principles of object-oriented programming?",
+        "response": "The main principles of object-oriented programming are: 1) Encapsulation - bundling data with methods, 2) Inheritance - creating new classes from existing ones, 3) Polymorphism - using a single symbol to represent different types, and 4) Abstraction - hiding complex implementation details."
+    },
+    {
+        "input": "Describe the theory of relativity in simple terms.",
+        "response": "The theory of relativity, developed by Albert Einstein, consists of two parts: 1) Special Relativity - which states that the laws of physics are the same for all non-accelerating observers, and 2) General Relativity - which describes gravity as a curvature of spacetime caused by mass and energy."
+    },
+    {
+        "input": "What is the difference between machine learning and deep learning?",
+        "response": "Machine learning is a subset of artificial intelligence that uses algorithms to parse data, learn from it, and make decisions. Deep learning is a specialized form of machine learning that uses neural networks with many layers (deep neural networks) to model complex patterns in large amounts of data."
+    },
+    {
+        "input": "How does photosynthesis work?",
+        "response": "Photosynthesis is the process by which green plants, algae, and some bacteria convert light energy, usually from the sun, into chemical energy. This process uses carbon dioxide and water to produce glucose and releases oxygen as a byproduct. The overall reaction is: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂."
+    }
+]
