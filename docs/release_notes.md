@@ -5,6 +5,37 @@
 
 ### Major Features
 
+#### Model Metadata Viewer
+- **Multi-source Integration** - Added support for viewing models from Hugging Face and Ollama in a single interface
+- **Interactive Web Interface** - Created a responsive web viewer with search and filtering capabilities
+- **Metadata Collection** - Implemented scripts to fetch model metadata from multiple sources:
+  - `load_huggingface_metadata.py` - Fetches public models from Hugging Face Hub
+  - `load_ollama_metadata.py` - Retrieves locally installed Ollama models
+  - `load_ollama_all_metadata.py` - Gets all available models from Ollama library
+- **Client-side Processing** - All filtering and searching happens in the browser for fast interaction
+- **Offline Support** - Once data is loaded, works without internet connection
+
+### Technical Improvements
+- **Unified Data Format** - Standardized model metadata across different sources
+- **Responsive Design** - Works on both desktop and mobile devices
+- **Documentation** - Added comprehensive README with setup and usage instructions
+- **Error Handling** - Graceful handling of missing data and connection issues
+
+#### Kaggle Dataset Integration
+- **Bulk Download** - Added support for downloading the complete arXiv dataset from Kaggle
+- **Configuration Management** - Centralized configuration in `default.yaml`
+- **Secure Authentication** - Credentials stored in `secure/kaggle.json` (gitignored)
+- **Flexible Paths** - Configurable download directory with default at `X:/kaggle_arxiv`
+- **Robust Error Handling** - Comprehensive validation and error recovery
+- **Detailed Logging** - Configurable log levels and progress tracking
+
+### Technical Improvements
+- **Configuration System** - Integrated with project's YAML configuration
+- **Security** - Sensitive credentials excluded from version control
+- **Error Handling** - Clear error messages for common issues
+- **Documentation** - Added configuration examples and usage instructions
+- **Template File** - Included `kaggle.json.example` for easy setup
+
 #### Top2Vec Topic Processing
 - **Alternative Topic Modeling** - Integrated Top2Vec for additional topic modeling capabilities
 - **Docker Integration** - Added new `sync-top2vec` service to docker-compose.yml

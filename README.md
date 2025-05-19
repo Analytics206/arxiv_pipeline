@@ -76,6 +76,10 @@ For more deep dive into project and status, see the `docs/` directory.
 - **Research Benchmarking**: Track performance improvements in specific algorithms or methods over time
 
 ### AI-Assisted Research
+- **Model Metadata Viewer**: Explore and compare machine learning models from Hugging Face and Ollama in a unified interface
+  - View detailed metadata for local and available models
+  - Filter and search models by name, type, and capabilities
+  - Compare model architectures and performance metrics
 - **Paper Summarization**: Generate concise summaries of complex research papers
 - **Similar Papers Discovery**: Use vector similarity to find related work not linked by citations
 - **Research Idea Generation**: Use paper combinations with LLMs to explore novel research directions
@@ -158,6 +162,50 @@ chmod +x scripts/setup_uv.sh
    * pipelines do not have to run in order if you have previously run them or starting where you left off
    * recommended to run them in order for processing new papers
    * manual services (Jupyter, Kafka, etc.) are only started when needed with the `--profile manual` flag
+   
+  ### a. Download arXiv dataset from Kaggle (optional):
+  
+  The pipeline includes a script to download the complete arXiv dataset from Kaggle. This is useful for bulk processing or offline analysis.
+  
+  #### Prerequisites
+  1. Install the required package:
+     ```bash
+     pip install kagglehub
+     ```
+  
+  2. Set up Kaggle credentials:
+     - Create a `secure` directory in your project root (if it doesn't exist)
+     - Copy `kaggle.json.example` to `secure/kaggle.json`
+     - Update the file with your Kaggle API credentials:
+       ```json
+       {
+           "username": "your_kaggle_username",
+           "key": "your_kaggle_api_key"
+       }
+       ```
+
+  #### Usage
+  ```bash
+  # Basic usage with default settings
+  python -m src.pipeline.download_kaggle_arxiv
+  
+  # Override download path (optional)
+  python -m src.pipeline.download_kaggle_arxiv --path "X:/custom/path"
+  ```
+  
+  #### Configuration
+  The downloader can be configured in `config/default.yaml`:
+  ```yaml
+  kaggle:
+    dataset: "Cornell-University/arxiv"
+    download_path: "X:/kaggle_arxiv"
+    credentials:
+      path: "secure/kaggle.json"
+    logging:
+      level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  ```
+  
+  > **Note**: The `secure` directory is in `.gitignore` to protect your credentials.
   ### a. Run sync_mongodb pipeline to fetch papers from ArXiv API and store in MongoDB:
   ```bash
   # Run the sync-mongodb pipeline container
@@ -178,18 +226,18 @@ chmod +x scripts/setup_uv.sh
    python -m src.graph.sync_mongo_to_neo4j
   ```
 
-  ### c. Run insert-bertopic pipeline for topic creation from paper summaries from mongodb:
+  ### c. Run sync-bertopic pipeline for topic creation from paper summaries from mongodb:
   ```bash
-   docker compose up --build insert-bertopic
+   docker compose up --build sync-bertopic
    or
    echo $env:MONGO_URI
    $env:MONGO_URI="mongodb://localhost:27017/config"
    echo $env:MONGO_URI
    python -m src.pipeline.insert_bertopic_mongodb
   ```
-  ### d. Run insert-top2vec pipeline for topic creation from paper summaries from mongodb:
+  ### d. Run sync-top2vec pipeline for topic creation from paper summaries from mongodb:
   ```bash
-   docker compose up --build insert-top2vec
+   docker compose up --build sync-top2vec
    or
    echo $env:MONGO_URI
    $env:MONGO_URI="mongodb://localhost:27017/config"

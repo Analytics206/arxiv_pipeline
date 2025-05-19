@@ -8,7 +8,8 @@ Description-Content-Type: text/markdown
 Requires-Dist: requests>=2.28.0
 Requires-Dist: pymongo>=4.3.0
 Requires-Dist: neo4j>=5.5.0
-Requires-Dist: pyyaml>=6.0
+Requires-Dist: pyyaml>=6.0.1
+Requires-Dist: kagglehub>=0.1.0
 Requires-Dist: qdrant-client>=1.1.0
 Requires-Dist: sentence-transformers>=2.2.0
 Requires-Dist: pydantic>=2.0.0
@@ -177,11 +178,10 @@ chmod +x scripts/setup_uv.sh
 ## Windows (PowerShell):
 ```powershell
 # Run the setup script
-docker compose up -d
+.\scripts\setup_uv.ps1
 
 # Activate the virtual environment
 .venv\Scripts\Activate.ps1
-```
 
 # Dockerized Deployment - Docker Desktop Running
 ## 0. Suggested run in venv from scripts above for your operating system
@@ -204,6 +204,50 @@ docker compose up -d
    * pipelines do not have to run in order if you have previously run them or starting where you left off
    * recommended to run them in order for processing new papers
    * manual services (Jupyter, Kafka, etc.) are only started when needed with the `--profile manual` flag
+   
+  ### a. Download arXiv dataset from Kaggle (optional):
+  
+  The pipeline includes a script to download the complete arXiv dataset from Kaggle. This is useful for bulk processing or offline analysis.
+  
+  #### Prerequisites
+  1. Install the required package:
+     ```bash
+     pip install kagglehub
+     ```
+  
+  2. Set up Kaggle credentials:
+     - Create a `secure` directory in your project root (if it doesn't exist)
+     - Copy `kaggle.json.example` to `secure/kaggle.json`
+     - Update the file with your Kaggle API credentials:
+       ```json
+       {
+           "username": "your_kaggle_username",
+           "key": "your_kaggle_api_key"
+       }
+       ```
+
+  #### Usage
+  ```bash
+  # Basic usage with default settings
+  python -m src.pipeline.download_kaggle_arxiv
+  
+  # Override download path (optional)
+  python -m src.pipeline.download_kaggle_arxiv --path "X:/custom/path"
+  ```
+  
+  #### Configuration
+  The downloader can be configured in `config/default.yaml`:
+  ```yaml
+  kaggle:
+    dataset: "Cornell-University/arxiv"
+    download_path: "X:/kaggle_arxiv"
+    credentials:
+      path: "secure/kaggle.json"
+    logging:
+      level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  ```
+  
+  > **Note**: The `secure` directory is in `.gitignore` to protect your credentials.
   ### a. Run sync_mongodb pipeline to fetch papers from ArXiv API and store in MongoDB:
   ```bash
   # Run the sync-mongodb pipeline container
@@ -224,24 +268,33 @@ docker compose up -d
    python -m src.graph.sync_mongo_to_neo4j
   ```
 
-  ### c. Run insert-bertopic pipeline for topic creation from paper summaries from mongodb:
+  ### c. Run sync-bertopic pipeline for topic creation from paper summaries from mongodb:
   ```bash
-   docker compose up --build insert-bertopic
+   docker compose up --build sync-bertopic
    or
    echo $env:MONGO_URI
    $env:MONGO_URI="mongodb://localhost:27017/config"
    echo $env:MONGO_URI
    python -m src.pipeline.insert_bertopic_mongodb
   ```
+  ### d. Run sync-top2vec pipeline for topic creation from paper summaries from mongodb:
+  ```bash
+   docker compose up --build sync-top2vec
+   or
+   echo $env:MONGO_URI
+   $env:MONGO_URI="mongodb://localhost:27017/config"
+   echo $env:MONGO_URI
+   python -m src.pipeline.insert_top2vec_mongodb
+  ```
 
-   ### d. Run sync_qdrant pipeline to process downloaded PDFs and store as vector embeddings in Qdrant:
+   ### e. Run sync_qdrant pipeline to process downloaded PDFs and store as vector embeddings in Qdrant:
    ```bash
    docker compose up --build sync-qdrant
    or *Need to uncomment docker-compose.yml sync-qdrant service????
    python -m src.pipeline.sync_qdrant
    ```
 
-   ### e. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
+   ### f. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
   * pdf download does not have a docker container
    ```bash
    echo $env:MONGO_URI
@@ -1035,16 +1088,19 @@ List used is in config/defaults.yaml for reference, more categories available.
 - cs.AI - Artificial Intelligence
 - cs.CL - Computation and Language
 - cs.CV - Computer Vision and Pattern Recognition
+- cs.DB - Databases
 - cs.DS - Data Structures and Algorithms
 - cs.GT - Computer Science and Game Theory
+- cs.IT - Information Theory
 - cs.LG - Machine Learning
 - cs.LO - Logic in Computer Science
 - cs.MA - Multiagent Systems
-- cs.NA - Numerical Analysis
 - cs.NE - Neural and Evolutionary Computing
+- cs.OH - Other Computer Science
+- cs.RO - Robotics
+- cs.SI - Social and Information Networks
 - math.PR - Probability
 - q-bio.NC - Neurons and Cognition
-- stat - Statistics
 - stat.ML - Machine Learning
 - stat.TH - Statistics Theory
 - physics.data-an - Data Analysis, Statistics and Probability

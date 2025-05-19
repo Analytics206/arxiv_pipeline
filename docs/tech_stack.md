@@ -45,8 +45,17 @@ The ArXiv Research Pipeline is built on a microservices architecture using Docke
 - **MongoDB Exporter**: MongoDB-specific metrics collector
 - **Prometheus Client**: Python library for custom application metrics
 
+### Data Sources
+- **ArXiv API**: HTTP-based Atom XML API for research paper retrieval
+- **Kaggle Dataset**: Bulk download of arXiv papers from [Cornell-University/arxiv](https://www.kaggle.com/datasets/Cornell-University/arxiv)
+  - Direct integration with Kaggle's API
+  - Configurable download location (default: `X:\kaggle_arxiv`)
+  - Environment variable based authentication
+  - Automatic directory creation and error handling
+
 ### Ingestion Layer
 - **ArXiv API**: HTTP-based Atom XML API for research paper retrieval
+- **Kaggle API**: Python client for dataset downloads
 - **Requests**: HTTP client library
 - **ElementTree**: XML parsing for ArXiv response data
 - **Rate limiting**: Configurable throttling to respect API constraints

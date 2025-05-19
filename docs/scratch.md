@@ -37,6 +37,7 @@ Remove-Item -Recurse -Force .venv  # or venv, depending on your folder name
 python3.11 -m venv .venv
 .\.venv\Scripts\Activate
 pip install -e .
+python.exe -m pip install --upgrade pip
 
 cd src\web-ui
 $env:PORT=3001

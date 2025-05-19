@@ -1,0 +1,58 @@
+{
+  "models": [
+    {
+      "modelId": "mistral:latest",
+      "digest": "f974a74358d62a017b37c6f424fcdf2744ca02926c4f952513ddf474b2fa5091",
+      "size": 4113301824,
+      "modified_at": "2025-05-12T02:29:25.9185253-05:00",
+      "tags": [],
+      "parameters": {},
+      "benchmark_scores": {}
+    },
+    {
+      "modelId": "deepseek-r1:14b",
+      "digest": "ea35dfe18182f635ee2b214ea30b7520fe1ada68da018f8b395b444b662d4f1a",
+      "size": 8988112040,
+      "modified_at": "2025-05-07T12:34:52.7717761-05:00",
+      "tags": [],
+      "parameters": {},
+      "benchmark_scores": {}
+    },
+    {
+      "modelId": "llama3:latest",
+      "digest": "365c0bd3c000a25d28ddbf732fe1c6add414de7275464c4e4d1c3b5fcb5d8ad1",
+      "size": 4661224676,
+      "modified_at": "2025-04-28T17:28:34.8504563-05:00",
+      "tags": [],
+      "parameters": {},
+      "benchmark_scores": {}
+    },
+    {
+      "modelId": "llama3.2:latest",
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "size": 2019393189,
+      "modified_at": "2025-03-06T00:20:41.4376734-06:00",
+      "tags": [],
+      "parameters": {},
+      "benchmark_scores": {}
+    },
+    {
+      "modelId": "deepseek-r1:latest",
+      "digest": "0a8c266910232fd3291e71e5ba1e058cc5af9d411192cf88b6d30e92b6e73163",
+      "size": 4683075271,
+      "modified_at": "2025-03-05T22:48:03.8470508-06:00",
+      "tags": [],
+      "parameters": {},
+      "benchmark_scores": {}
+    },
+    {
+      "modelId": "llama2:latest",
+      "digest": "78e26419b4469263f75331927a00a0284ef6544c1975b826b15abdaef17bb962",
+      "size": 3826793677,
+      "modified_at": "2025-02-26T11:27:48.3177792-06:00",
+      "tags": [],
+      "parameters": {},
+      "benchmark_scores": {}
+    }
+  ]
+}
