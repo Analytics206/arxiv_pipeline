@@ -5,16 +5,16 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 
 ## 🔍 Project Analysis
 
-The project includes a metadata generator that helps analyze and document the codebase structure. This tool is particularly useful for understanding module dependencies and system architecture.
+The project includes a metadata generator in the `dev_utils` directory that helps analyze and document the codebase structure. This tool is particularly useful for understanding module dependencies and system architecture.
 
 ### Generating System Metadata
 
 ```bash
 # Generate metadata for the entire project
-python metadata_generator.py . -o system_metadata.yaml
+python -m dev_utils.metadata_generator . -o system_metadata.yaml
 
 # Generate metadata for a specific module (e.g., llm_eval)
-python metadata_generator.py src/llm_eval -o llm_eval_metadata.yaml
+python -m dev_utils.metadata_generator src/llm_eval -o llm_eval_metadata.yaml
 ```
 
 ### Metadata Includes
@@ -29,14 +29,16 @@ python metadata_generator.py src/llm_eval -o llm_eval_metadata.yaml
 1. **Documentation Generation**:
    ```bash
    # Generate comprehensive project documentation
-   python metadata_generator.py . -o docs/system_architecture.yaml
+   python -m dev_utils.metadata_generator . -o docs/system_architecture.yaml
    ```
 
 2. **Dependency Analysis**:
    ```bash
    # Analyze dependencies for a specific component
-   python metadata_generator.py src/ingestion -o ingestion_dependencies.yaml
+   python -m dev_utils.metadata_generator src/ingestion -o ingestion_dependencies.yaml
    ```
+
+For more detailed documentation and advanced usage, see the [dev_utils/README.md](dev_utils/README.md) file.
 
 The generated YAML files can be used for:
 - System architecture visualization

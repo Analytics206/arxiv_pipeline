@@ -1,13 +1,41 @@
-# metadata_generator.py
+"""
+Metadata Generator for ArXiv Pipeline
+
+This script generates comprehensive metadata about the project's codebase structure,
+including modules, classes, functions, and their relationships. It can be run from
+the project root or any subdirectory.
+
+Usage:
+    python -m dev_utils.metadata_generator . -o system_metadata.yaml
+    python -m dev_utils.metadata_generator src/llm_eval -o llm_eval_metadata.yaml
+"""
+
 import ast
 import os
 import re
+import sys
 import yaml
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import argparse
 
-EXCLUDE_DIRS = {'.vscode','myenv',  'venv', 'env', '.venv', 'virtualenv', '.idea', '__pycache__', '.git'}
+# Directories to exclude from analysis
+EXCLUDE_DIRS = {
+    '.vscode', 'myenv', 'venv', 'env', '.venv', 'virtualenv',
+    '.idea', '__pycache__', '.git', 'node_modules', 'build', 'dist', '.pytest_cache'
+}
+
+# Get the project root directory (where .git folder is located)
+def find_project_root() -> Path:
+    """Find the project root directory by looking for the .git folder."""
+    current = Path(__file__).resolve().parent
+    while current != current.parent:
+        if (current / '.git').exists():
+            return current
+        current = current.parent
+    return Path.cwd()  # Fallback to current working directory
+
+PROJECT_ROOT = find_project_root()
 
 def parse_metadata(docstring: str) -> Dict:
     """Extract YAML metadata from docstring"""
@@ -102,24 +130,41 @@ class CodeAnalyzer(ast.NodeVisitor):
         
         return sorted([d for d in dependencies if d])
 
-def parse_python_file(file_path: str) -> Dict:
-    with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
+def parse_python_file(file_path: str) -> Optional[Dict]:
+    """Parse a Python file and extract metadata."""
+    try:
+        with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
+            content = f.read()
+    except Exception as e:
+        print(f"Error reading {file_path}: {e}")
+        return None
     
-    # Parse module-level metadata
+    # Extract first comment block for module-level metadata
+    first_comment = re.search(r'^\s*\"\"\"([\s\S]*?)\"\"\"', content, re.MULTILINE)
     module_metadata = {}
-    first_comment = re.search(r'^"""(.*?)"""', content, re.DOTALL)
     if first_comment:
         module_metadata = parse_metadata(first_comment.group(1))
     
-    tree = ast.parse(content)
     analyzer = CodeAnalyzer()
-    analyzer.visit(tree)
+    try:
+        tree = ast.parse(content, filename=file_path)
+        analyzer.visit(tree)
+    except SyntaxError as e:
+        print(f"Syntax error in {file_path}: {e}")
+        return None
+    
+    try:
+        rel_path = str(Path(file_path).relative_to(PROJECT_ROOT))
+    except ValueError:
+        rel_path = str(Path(file_path).resolve())
     
     return {
-        "file": file_path,
-        "modules": analyzer.modules,
-        "metadata": module_metadata
+        'filename': rel_path.replace('\\', '/'),  # Use forward slashes for consistency
+        'metadata': module_metadata,
+        'components': [
+            {**comp, 'filename': rel_path.replace('\\', '/')}
+            for comp in analyzer.modules.values()
+        ]
     }
 
 def generate_system_metadata(project_root: str, output_file: str = "system_metadata.yaml"):
@@ -137,6 +182,9 @@ def generate_system_metadata(project_root: str, output_file: str = "system_metad
                     print(f"Skipping {full_path} due to error: {str(e)}")
                     continue
 
+                if file_data is None:
+                    continue
+
                 relative_file_path = str(Path(full_path).relative_to(project_root))
                 module_path = relative_file_path.replace("/", ".").replace(".py", "")
                 
@@ -144,35 +192,18 @@ def generate_system_metadata(project_root: str, output_file: str = "system_metad
                     "name": module_path,
                     "filename": relative_file_path,
                     "metadata": file_data.get("metadata", {}),
-                    "components": [],
+                    "components": file_data.get("components", []),
                     "dependencies": []
                 }
 
                 # Process functions
-                for component in file_data["modules"].get("global", {}).get("functions", []):
+                for component in file_data.get("components", []):
                     if "name" not in component:
                         continue
                     
                     component_entry = {
                         "name": component["name"],
-                        "type": "function",
-                        "filename": relative_file_path,
-                        "metadata": component.get("metadata", {}),
-                        "dependencies": component.get("dependencies", []),
-                        "docstring": component.get("docstring", ""),
-                        "line": component.get("line", -1)
-                    }
-                    module_entry["components"].append(component_entry)
-                    module_entry["dependencies"].extend(component.get("dependencies", []))
-
-                # Process classes
-                for component in file_data["modules"].get("global", {}).get("classes", []):
-                    if "name" not in component:
-                        continue
-                    
-                    component_entry = {
-                        "name": component["name"],
-                        "type": "class",
+                        "type": component.get("type", "function"),
                         "filename": relative_file_path,
                         "metadata": component.get("metadata", {}),
                         "dependencies": component.get("dependencies", []),
@@ -191,10 +222,34 @@ def generate_system_metadata(project_root: str, output_file: str = "system_metad
     return system_data
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate system metadata YAML from Python project")
-    parser.add_argument("project_root", help="Root directory of the Python project")
-    parser.add_argument("-o", "--output", default="system_metadata.yaml", help="Output YAML file")
+    import datetime
     
-    args = parser.parse_args()
-    generate_system_metadata(args.project_root, args.output)
+    parser = argparse.ArgumentParser(
+        description="Generate system metadata YAML from Python project. "
+                    "Can be run from any directory within the project."
+    )
+    parser.add_argument(
+        "project_root", 
+        nargs='?', 
+        default='.',
+        help="Root directory to analyze (relative to project root or absolute). "
+             "Defaults to current directory."
+    )
+    parser.add_argument(
+        "-o", 
+        "--output", 
+        default=PROJECT_ROOT / "system_metadata.yaml", 
+        help="Output YAML file path (relative to project root or absolute). "
+             f"Defaults to '{PROJECT_ROOT}/system_metadata.yaml'"
+    )
+    
+    try:
+        args = parser.parse_args()
+        generate_system_metadata(args.project_root, args.output)
+    except KeyboardInterrupt:
+        print("\nOperation cancelled by user.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
     print(f"Metadata generated successfully at {args.output}")
