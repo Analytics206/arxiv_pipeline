@@ -10,11 +10,11 @@ The project includes a metadata generator in the `dev_utils` directory that help
 ### Generating System Metadata
 
 ```bash
-# Generate metadata for the entire project
-python -m dev_utils.metadata_generator . -o system_metadata.yaml
+# Generate metadata for the entire project (saved to dev_utils/system_metadata.yaml by default)
+python -m dev_utils.metadata_generator .
 
 # Generate metadata for a specific module (e.g., llm_eval)
-python -m dev_utils.metadata_generator src/llm_eval -o llm_eval_metadata.yaml
+python -m dev_utils.metadata_generator src/llm_eval -o dev_utils/llm_eval_metadata.yaml
 ```
 
 ### Metadata Includes

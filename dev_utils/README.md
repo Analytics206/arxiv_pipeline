@@ -21,14 +21,14 @@ No additional installation is required beyond the project's dependencies.
 ### Usage
 
 ```bash
-# Generate metadata for the entire project
-python -m dev_utils.metadata_generator . -o system_metadata.yaml
+# Generate metadata for the entire project (saved to dev_utils/system_metadata.yaml by default)
+python -m dev_utils.metadata_generator .
 
-# Analyze a specific module
-python -m dev_utils.metadata_generator src/llm_eval -o llm_eval_metadata.yaml
+# Analyze a specific module (save to default location)
+python -m dev_utils.metadata_generator src/llm_eval
 
 # Specify a custom output location
-python -m dev_utils.metadata_generator . -o docs/system_architecture.yaml
+python -m dev_utils.metadata_generator . -o custom_location/metadata.yaml
 ```
 
 ### Output Format

@@ -238,9 +238,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o", 
         "--output", 
-        default=PROJECT_ROOT / "system_metadata.yaml", 
+        default=PROJECT_ROOT / "dev_utils" / "system_metadata.yaml", 
         help="Output YAML file path (relative to project root or absolute). "
-             f"Defaults to '{PROJECT_ROOT}/system_metadata.yaml'"
+             f"Defaults to '{PROJECT_ROOT}/dev_utils/system_metadata.yaml'"
     )
     
     try:
