@@ -52,6 +52,10 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-MON-02   | Collect system metrics with Node Exporter                 | BRD-09        | ✅     | Implemented with Node Exporter |
 | FR-MON-03   | Monitor MongoDB performance                              | BRD-09        | ✅     | Implemented with MongoDB Exporter |
 | FR-MON-04   | Visualize metrics with Grafana dashboards                | BRD-09        | ✅     | Docker containers & system dashboards |
+| FR-LLM-01   | LLM performance evaluation with standard metrics         | BRD-13        | ✅     | Implemented BLEU, ROUGE, METEOR |
+| FR-LLM-02   | Multiple model comparison in single run                  | BRD-13        | ✅     | Implemented in evaluate_llm_models.py |
+| FR-LLM-03   | Configurable test datasets                              | BRD-13        | ✅     | JSON-based test data format |
+| FR-LLM-04   | Generate evaluation reports                             | BRD-13        | ✅     | JSON and text report formats |
 | FR-MON-05   | Support custom application metrics                       | BRD-09        | 🔧     | Basic setup implemented |
 | FR-UI-01    | Local web dashboard                                      | BRD-07        | ⏳     | Web UI to explore graph/search      |
 | FR-UI-02    | Web UI to start/stop pipelines, view logs, database status | BRD-14        | ❌     | Not started yet            |
