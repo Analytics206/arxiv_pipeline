@@ -179,11 +179,16 @@ chmod +x scripts/setup_uv.sh
 
 ## Windows (PowerShell):
 ```powershell
+# if needed to rebuild .venv
+Remove-Item -Recurse -Force .venv
 # Run the setup script
-.\scripts\setup_uv.ps1
+python3.11 -m venv .venv
 
 # Activate the virtual environment
-.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
+pip install -e .
+python.exe -m pip install --upgrade pip
+```
 
 # Dockerized Deployment - Docker Desktop Running
 ## 0. Suggested run in venv from scripts above for your operating system
@@ -192,7 +197,7 @@ chmod +x scripts/setup_uv.sh
    ```bash
     docker compose up -d
     # or to rebuild
-    docker compose up -d --build api
+    docker compose up -d --build
    ```
  - ✔ Network arxiv_pipeline_default         Started     
  - ✔ Container arxiv_pipeline-neo4j-1       Started     
@@ -248,8 +253,8 @@ chmod +x scripts/setup_uv.sh
     logging:
       level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
   ```
-  
   > **Note**: The `secure` directory is in `.gitignore` to protect your credentials.
+
   ### a. Run sync_mongodb pipeline to fetch papers from ArXiv API and store in MongoDB:
   ```bash
   # Run the sync-mongodb pipeline container
@@ -1102,10 +1107,13 @@ List used is in config/defaults.yaml for reference, more categories available.
 - cs.RO - Robotics
 - cs.SI - Social and Information Networks
 - math.PR - Probability
-- q-bio.NC - Neurons and Cognition
-- stat.ML - Machine Learning
-- stat.TH - Statistics Theory
 - physics.data-an - Data Analysis, Statistics and Probability
+- q-bio.NC - Neurons and Cognition
+- stat.AP - Applied Statistics
+- stat.CO - Computation Statistics
+- stat.ME - Methodology
+- stat.ML - Machine Learning
+- stat.OT - Other Statistics
+
 ---
 For more details about project and status, see the `docs/` directory.
-

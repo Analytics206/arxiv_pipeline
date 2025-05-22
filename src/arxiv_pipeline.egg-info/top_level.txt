@@ -7,6 +7,7 @@ graph
 ingestion
 llm_eval
 mcp_agent
+model_metadata_viewer
 pipeline
 pubmed
 storage

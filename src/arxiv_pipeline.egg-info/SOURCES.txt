@@ -36,7 +36,7 @@ src/graph/neo4j_sync.py
 src/graph/sync_mongo_to_neo4j.py
 src/graph/test_neo4j.py
 src/ingestion/fetch.py
-src/llm_eval/main.py
+src/llm_eval/evaluate_llm_models.py
 src/llm_eval/metadata_generator.py
 src/llm_eval/evaluation/compare_results.py
 src/llm_eval/evaluation/evaluate.py
