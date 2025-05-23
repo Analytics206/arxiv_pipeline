@@ -63,20 +63,20 @@
 - **FR-MON-05**: Support custom application metrics for pipeline operations
 
 ### 3.9 Web UI (FR-UI)
-- **FR-UI-01**: Web UI to explore neo4j graph/search
+- **FR-UI-01**: ✅ Web UI to explore neo4j graph/search
 - **FR-UI-02**: Web UI to start/stop pipelines, view logs, and monitor database status
 - **FR-UI-03**: Web UI to manage configurations for pipelines
-- **FR-UI-04**: Extend to MongoDB
-- **FR-UI-05**: Extend to Qdrant
+- **FR-UI-04**: 🔄 Extend to MongoDB (Planned for next release)
+- **FR-UI-05**: 🔄 Extend to Qdrant (Planned for next release)
 
 ### 3.10 Jupyter Notebooks (FR-REP)
-- **FR-REP-01**: Provide sample notebooks for general usage and exploration
+- **FR-REP-01**: ✅ Provide sample notebooks for general usage and exploration (Now required for all database interactions)
 - **FR-REP-02**: Create connectivity testing notebooks for all databases (MongoDB, Neo4j, Qdrant)
 - **FR-REP-03**: Include data visualization capabilities in notebooks
 - **FR-REP-04**: Document notebook usage and setup instructions
 
 ### 3.11 AI Agent Platform (FR-AGT)
-- **FR-AGT-01**: Configurable AI Agent platform for research paper analysis and exploration
+- **FR-AGT-01**: 🔧 Configurable AI Agent platform for research paper analysis and exploration (High priority for next release)
 
 ### 3.12 Data Validation and Analysis (FR-VAL)
 - **FR-VAL-01**: Interactive dashboards for validating data loaded across different systems
@@ -84,7 +84,41 @@
 - **FR-VAL-03**: Multi-dimensional filtering for data validation (date range, year, category)
 - **FR-VAL-04**: Visualization of data integrity and completeness metrics
 
-### 3.13 Advanced Analytics (FR-ANL)
+### 3.13 Event Streaming with Kafka (FR-KAF)
+- **FR-KAF-01**: Implement Kafka as a message broker for event-driven architecture
+- **FR-KAF-02**: Create event producers for paper ingestion and processing events
+- **FR-KAF-03**: Implement event consumers for Neo4j and Qdrant updates
+- **FR-KAF-04**: Support event replay for recovery and debugging
+- **FR-KAF-05**: Implement dead letter queue for failed message processing
+- **FR-KAF-06**: Monitor Kafka cluster health and performance metrics
+
+### 3.15 Data Governance (FR-DGV)
+- **FR-DGV-01**: Implement data retention policies for all stored data
+- **FR-DGV-02**: Ensure GDPR compliance for author and user data
+- **FR-DGV-03**: Implement data quality validation rules and monitoring
+- **FR-DGV-04**: Document schema evolution and versioning strategy
+- **FR-DGV-05**: Implement data access logging and audit trails
+
+### 3.16 Security Requirements (FR-SEC)
+- **FR-SEC-01**: Implement OAuth2/JWT authentication for all API endpoints
+- **FR-SEC-02**: Role-based access control (RBAC) for system operations
+- **FR-SEC-03**: API rate limiting and abuse prevention mechanisms
+- **FR-SEC-04**: Network security controls between services (TLS, mTLS)
+- **FR-SEC-05**: Secure secrets management using HashiCorp Vault or similar
+- **FR-SEC-06**: Container security scanning in CI/CD pipeline
+- **FR-SEC-07**: Regular security audits and penetration testing
+
+### 3.17 Performance Requirements (FR-PER)
+- **FR-PER-01**: API response time < 500ms for 95% of requests
+- **FR-PER-02**: Support for 100 concurrent users with minimal performance degradation
+- **FR-PER-03**: Process 1000+ papers per hour during batch operations
+- **FR-PER-04**: Vector search response time < 1 second for 95% of queries
+- **FR-PER-05**: Support horizontal scaling of stateless services
+- **FR-PER-06**: Implement caching for frequently accessed data (Redis)
+- **FR-PER-07**: Database query optimization for common access patterns
+- **FR-PER-08**: Asynchronous processing for long-running operations
+
+### 3.14 Advanced Analytics (FR-ANL)
 - **FR-ANL-01**: Category-based publication trend analysis with interactive filtering
 - **FR-ANL-02**: Visual representation of publication volume across time dimensions
 

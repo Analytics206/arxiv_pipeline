@@ -30,9 +30,10 @@ A modular, offline-capable pipeline that fetches and stores research papers from
 | BRD-11     | GPU-accelerated vector search with dedicated remote setup | FR-VEC-05, FR-VEC-06, FR-VEC-07 |
 | BRD-12     | PDF download and storage | FR-PDF-01 |
 | BRD-13     | LLM Evaluation Framework | FR-LLM-01 to FR-LLM-04 |
-| BRD-13     | Configurable AI Agent platform | FR-AGT-01 |
+| BRD-19     | Configurable AI Agent platform | FR-AGT-01 |
 | BRD-14     | Web UI to start/stop pipelines, view logs, database status | FR-UI-02 |
 | BRD-15     | Web UI to manage configurations for pipelines | FR-UI-03 |
 | BRD-16     | Standalone deployment of key services on external machines | FR-DCK-04, FR-DCK-05, FR-DCK-06 |
 | BRD-17     | Interactive data validation dashboards | FR-VAL-01, FR-VAL-02, FR-VAL-03, FR-VAL-04 |
 | BRD-18     | Temporal analysis of paper publications with multi-dimensional filtering | FR-VAL-02, FR-VAL-03, FR-ANL-01 |
+| BRD-20     | Data Governance and Compliance | FR-DGV-01 to FR-DGV-05 |
