@@ -9,8 +9,7 @@ This file tracks the implementation status of all PRD requirements, linking them
 - 🔧 = In Progress
 - ⏳ = Planned
 - ❌ = Not Started
-
----
+- ⚠️ = Archive feature
 
 ## Feature Tracking Table
 
@@ -89,7 +88,7 @@ This file tracks the implementation status of all PRD requirements, linking them
 | FR-DGV-05   | Implement data access logging and audit trails           | BRD-20         | ⏳     | Important for security |
 | FR-SEC-01   | Implement OAuth2/JWT authentication for APIs             | BRD-20         | ⏳     | Required for API security |
 | FR-SEC-02   | Role-based access control (RBAC)                         | BRD-20         | ❌     | Needed for user management |
-| FR-SEC-03   | API rate limiting and abuse prevention                   | BRD-20         | ❌     | Important for API protection |
+| FR-SEC-03   | API rate limiting and abuse prevention                   | BRD-20         | ⚠️     | Important for API protection |
 | FR-SEC-04   | Network security controls (TLS, mTLS)                    | BRD-20         | 🔧     | Basic TLS implemented |
 | FR-SEC-05   | Secure secrets management                                | BRD-20         | ⏳     | Required for production |
 | FR-SEC-06   | Container security scanning                              | BRD-20         | ❌     | Part of CI/CD pipeline |
