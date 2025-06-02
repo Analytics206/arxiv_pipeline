@@ -249,7 +249,7 @@ Remove-Item -Recurse -Force .venv
 python3.11 -m venv .venv
 
 # Activate the virtual environment
-.\.venv\Scripts\Activate
+.\.venv\Scripts\Activate.ps1
 pip install -e .
 python.exe -m pip install --upgrade pip
 ```

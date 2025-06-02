@@ -60,19 +60,31 @@ paper_summaries:
 arxiv:
   categories: # used in sync_mongodb.py
     - "cs.AI"
+    # - "cs.AR"
+    # - "cs.CC"
     # - "cs.CL"
+    # - "cs.CE"
+    # - "cs.CR"
     # - "cs.CV"
+    # - "cs.CY"
     # - "cs.DB"
+    # - "cs.DC"
     # - "cs.DS"
+    # - "cs.GR"
     # - "cs.GT" 
+    # - "cs.IR"
     # - "cs.IT"
-    - "cs.LG" 
+    # - "cs.LG" 
     # - "cs.LO"
     # - "cs.MA"
     # - "cs.NE"
     # - "cs.RO"
+    # - "cs.SD"
+    # - "cs.SE"
     # - "cs.SI"
+    # - "math.AP"
     # - "math.PR"
+    # - "math.ST"
     # - "physics.data-an"
     # - "q-bio.NC"
     # - "stat.AP"
@@ -80,39 +92,51 @@ arxiv:
     # - "stat.ME"
     # - "stat.ML"
     # - "stat.OT"
-  max_results: 200 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
+  max_results: 100 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 50 # Number of times to loop the pipeline for each category above
-  rate_limit_seconds: 3
+  max_iterations: 1000 # Number of times to loop the pipeline for each category above
+  rate_limit_seconds: 15
   start_date: "2023-01-01" # start_date is used in arxiv api call and save pdfs filters
   end_date: "2025-05-31" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
-  max_no_papers: 200 # Maximum number of papers to fetch per category loop (0 for unlimited)
+  max_no_papers: 50 # Maximum number of papers to fetch per category loop (0 for unlimited)
 # Embedding model settings
 embedding:
   model_name: "all-MiniLM-L6-v2"  # Smaller model to start with
-  batch_size: 200
+  batch_size: 100
 
 # PDF storage settings
 pdf_storage:
   directory: "X:/AI Research" # where papers are downloaded @download_pdfs.py subdirectory is auto created by category
-  papers_per_category: 1000 # Maximum number of papers to download per category (0 for unlimited)
+  papers_per_category: 200 # Maximum number of papers to download per category (0 for unlimited)
   # Categories to prioritize for PDF downloads - if empty, all papers in MongoDB will be considered
   process_categories: # used in download_pdfs.py - comment out categories you don't want to download
     - "cs.AI"
+    - "cs.AR"
+    - "cs.CC"
     - "cs.CL"
+    - "cs.CE"
+    - "cs.CR"
     - "cs.CV"
+    - "cs.CY"
     - "cs.DB"
+    - "cs.DC"
     - "cs.DS"
+    - "cs.GR"
     - "cs.GT" 
+    - "cs.IR"
     - "cs.IT"
     - "cs.LG" 
     - "cs.LO"
     - "cs.MA"
     - "cs.NE"
     - "cs.RO"
+    - "cs.SD"
+    - "cs.SE"
     - "cs.SI"
+    - "math.AP"
     - "math.PR"
+    - "math.ST"
     - "physics.data-an"
     - "q-bio.NC"
     - "stat.AP"
