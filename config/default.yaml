@@ -97,8 +97,8 @@ arxiv:
   sort_order: "descending"
   max_iterations: 1000 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 15
-  start_date: "2023-01-01" # start_date is used in arxiv api call and save pdfs filters
-  end_date: "2025-05-31" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
+  start_date: "2022-01-01" # start_date is used in arxiv api call and save pdfs filters
+  end_date: "2025-06-30" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
   max_no_papers: 30 # Maximum number of no paper fetches before breaking loop for category
 # Embedding model settings
 embedding:
@@ -147,8 +147,8 @@ pdf_storage:
   # Date filters for downloading PDFs
   download_date_filter:
     enabled: true         # Set to false to disable date filtering
-    start_date: "2023-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2025-05-31"   # Download papers published on or before this date (format: YYYY-MM-DD)
+    start_date: "2022-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
+    end_date: "2025-06-30"   # Download papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
 
 # BERTopic settings
@@ -170,8 +170,8 @@ bertopic:
   # Date filter
   date_filter:
     enabled: true
-    start_date: "2023-01-01"  # Process papers published on or after this date
-    end_date: "2025-05-31"    # Process papers published on or before this date
+    start_date: "2022-01-01"  # Process papers published on or after this date
+    end_date: "2025-06-30"    # Process papers published on or before this date
 
 # Top2Vec settings
 top2vec:
@@ -197,8 +197,8 @@ top2vec:
   # Date filter
   date_filter:
     enabled: true
-    start_date: "2023-01-01"  # Process papers published on or after this date
-    end_date: "2025-05-31"    # Process papers published on or before this date
+    start_date: "2022-01-01"  # Process papers published on or after this date
+    end_date: "2025-06-30"    # Process papers published on or before this date
 
 # Kaggle Dataset Downloader settings
 kaggle:
