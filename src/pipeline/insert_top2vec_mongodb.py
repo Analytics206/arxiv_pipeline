@@ -354,7 +354,7 @@ def process_batch(papers: List[Dict], topic_model: EnhancedTopicModeler, mongo_c
         
     try:    
         # Get summaries and IDs
-        summaries = [doc.get('summary', '') for doc in papers]
+        summaries = [doc.get('title', '') + ' ' + doc.get('summary', '') for doc in papers]
         paper_ids = [str(doc['_id']) for doc in papers]
         
         if len(paper_ids) != len(summaries):

@@ -142,7 +142,7 @@ def process_batch(papers: List[Dict], topic_model: BERTopic, mongo_collection) -
     """
     try:
         # Extract summaries and IDs
-        summaries = [doc.get('summary', '') for doc in papers]
+        summaries = [doc.get('title', '') + ' ' + doc.get('summary', '') for doc in papers]
         paper_ids = [doc.get('_id') for doc in papers]
         
         if not summaries or not paper_ids:
