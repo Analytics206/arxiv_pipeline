@@ -7,5 +7,5 @@ use("arxiv_papers");
 // Find a document in a collection.
 db.papers.aggregate([
     { $match: {} }, // Optional, can filter if needed
-    { $out: "papers_06_01_2025" }
+    { $out: "papers_06_03_2025" }
   ]) ;

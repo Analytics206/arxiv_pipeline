@@ -59,7 +59,7 @@ paper_summaries:
 # ArXiv API settings 
 arxiv:
   categories: # used in sync_mongodb.py
-    # - "cs.AI"
+    - "cs.AI"
     # - "cs.AR"
     # - "cs.CC"
     # - "cs.CL"
@@ -75,9 +75,9 @@ arxiv:
     # - "cs.IR"
     # - "cs.IT"
     - "cs.LG" 
-    - "cs.LO"
-    - "cs.MA"
-    - "cs.NE"
+    # - "cs.LO"
+    # - "cs.MA"
+    # - "cs.NE"
     # - "cs.RO"
     # - "cs.SD"
     # - "cs.SE"
@@ -95,11 +95,11 @@ arxiv:
   max_results: 200 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 500 # Number of times to loop the pipeline for each category above
-  rate_limit_seconds: 6
+  max_iterations: 1000 # Number of times to loop the pipeline for each category above
+  rate_limit_seconds: 5
   start_date: "2022-01-01" # start_date is used in arxiv api call and save pdfs filters
   end_date: "2025-06-30" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
-  max_no_papers: 50 # Maximum number of no paper fetches before breaking loop for category
+  max_no_papers: 55 # Maximum number of no paper fetches before breaking loop for category
 # Embedding model settings
 embedding:
   model_name: "all-MiniLM-L6-v2"  # Smaller model to start with
@@ -108,7 +108,7 @@ embedding:
 # PDF storage settings
 pdf_storage:
   directory: "X:/AI Research" # where papers are downloaded @download_pdfs.py subdirectory is auto created by category
-  papers_per_category: 200 # Maximum number of papers to download per category (0 for unlimited)
+  papers_per_category: 5000 # Maximum number of papers to download per category (0 for unlimited)
   # Categories to prioritize for PDF downloads - if empty, all papers in MongoDB will be considered
   process_categories: # used in download_pdfs.py - comment out categories you don't want to download
     - "cs.AI"
