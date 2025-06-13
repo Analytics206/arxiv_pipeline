@@ -3,50 +3,6 @@
 ## Overview
 A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. This system enables offline graph-based and semantic search through an integrated architecture of MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker containers for easy, consistent local deployment.
 
-## 🔍 Project Analysis
-
-The project includes a metadata generator in the `dev_utils` directory that helps analyze and document the codebase structure. This tool is particularly useful for understanding module dependencies and system architecture.
-
-### Generating System Metadata
-
-```bash
-# Generate metadata for the entire project (saved to dev_utils/system_metadata.yaml by default)
-python -m dev_utils.metadata_generator .
-
-# Generate metadata for a specific module (e.g., llm_eval)
-python -m dev_utils.metadata_generator src/llm_eval -o dev_utils/llm_eval_metadata.yaml
-```
-
-### Metadata Includes
-- Complete module structure and dependencies
-- Function and class definitions
-- Entry points and their relationships
-- External library dependencies
-- Code documentation strings
-
-### Usage Examples
-
-1. **Documentation Generation**:
-   ```bash
-   # Generate comprehensive project documentation
-   python -m dev_utils.metadata_generator . -o docs/system_architecture.yaml
-   ```
-
-2. **Dependency Analysis**:
-   ```bash
-   # Analyze dependencies for a specific component
-   python -m dev_utils.metadata_generator src/ingestion -o ingestion_dependencies.yaml
-   ```
-
-For more detailed documentation and advanced usage, see the [dev_utils/README.md](dev_utils/README.md) file.
-
-The generated YAML files can be used for:
-- System architecture visualization
-- Codebase documentation
-- Dependency analysis
-- Onboarding new developers
-- Code quality assessment
-
 ## 🚀 Key Features
 | Feature                  | Description |
 | ------------------------ |-------------|
@@ -696,8 +652,6 @@ qdrant:
 
 * **New Feature:** The sync_qdrant pipeline now includes **MongoDB tracking** to prevent duplicate processing of PDFs. Each processed PDF is recorded in the `vector_processed_pdfs` collection with metadata including file hash, processing date, and chunk count.
 
-
-
 ---
 
 ### Configuration
@@ -809,8 +763,6 @@ If you change your PDF storage location, make sure to update both:
 
    - arxiv.end_date: Only process papers published before this date
 
-
-
    ## sync_neo4j pipeline
 
    - arxiv.process_categories: Categories to prioritize for vector storage into qdrant
@@ -823,8 +775,6 @@ If you change your PDF storage location, make sure to update both:
 
    - arxiv.sort_order: Sort papers in this order
 
-
-
    ## sync_qdrant pipeline
 
    - arxiv.max_papers: Maximum number of papers to process
@@ -834,8 +784,6 @@ If you change your PDF storage location, make sure to update both:
    - arxiv.sort_by: Sort papers by this field
 
    - arxiv.sort_order: Sort papers in this order
-
-
 
    ## download_pdfs pipeline
 
@@ -847,8 +795,51 @@ If you change your PDF storage location, make sure to update both:
 
    - arxiv.sort_order: Sort papers in this order
 
-
 Config changes take effect when services are restarted. See `docs/system_design.md` for detailed information about configuration impact on system behavior.
+
+## 🔍 Project Analysis
+
+The project includes a metadata generator in the `dev_utils` directory that helps analyze and document the codebase structure. This tool is particularly useful for understanding module dependencies and system architecture.
+
+### Generating System Metadata
+
+```bash
+# Generate metadata for the entire project (saved to dev_utils/system_metadata.yaml by default)
+python -m dev_utils.metadata_generator .
+
+# Generate metadata for a specific module (e.g., llm_eval)
+python -m dev_utils.metadata_generator src/llm_eval -o dev_utils/llm_eval_metadata.yaml
+```
+
+### Metadata Includes
+- Complete module structure and dependencies
+- Function and class definitions
+- Entry points and their relationships
+- External library dependencies
+- Code documentation strings
+
+### Usage Examples
+
+1. **Documentation Generation**:
+   ```bash
+   # Generate comprehensive project documentation
+   python -m dev_utils.metadata_generator . -o docs/system_architecture.yaml
+   ```
+
+2. **Dependency Analysis**:
+   ```bash
+   # Analyze dependencies for a specific component
+   python -m dev_utils.metadata_generator src/ingestion -o ingestion_dependencies.yaml
+   ```
+
+For more detailed documentation and advanced usage, see the [dev_utils/README.md](dev_utils/README.md) file.
+
+The generated YAML files can be used for:
+- System architecture visualization
+- Codebase documentation
+- Dependency analysis
+- Onboarding new developers
+- Code quality assessment
 
 ## Qdrant Deployment Options
 
@@ -1093,9 +1084,15 @@ List used is in config/defaults.yaml for reference, more categories available.
 ---
 
 - cs.AI - Artificial Intelligence
+- cs.AR - Computer Architecture
+- cs.CC - Computational Complexity
+- cs.CE - Computational Engineering, Finance, and Science
 - cs.CL - Computation and Language
+- cs.CR - Cryptography and Security
 - cs.CV - Computer Vision and Pattern Recognition
+- cs.CY - Cybersecurity and Privacy
 - cs.DB - Databases
+- cs.DC - Distributed, Parallel, and Cluster Computing
 - cs.DS - Data Structures and Algorithms
 - cs.GT - Computer Science and Game Theory
 - cs.IT - Information Theory
@@ -1106,7 +1103,9 @@ List used is in config/defaults.yaml for reference, more categories available.
 - cs.OH - Other Computer Science
 - cs.RO - Robotics
 - cs.SI - Social and Information Networks
+- math.AP - Analysis of Partial Differential Equations
 - math.PR - Probability
+- math.ST - Statistics
 - physics.data-an - Data Analysis, Statistics and Probability
 - q-bio.NC - Neurons and Cognition
 - stat.AP - Applied Statistics
