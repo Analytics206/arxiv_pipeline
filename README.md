@@ -18,7 +18,6 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 ---
 
 ### Neo4j Graph Database
-
 ![alt text](<images/neo4j-graph.png>)
 ### Dashboard reporting
 ![alt text](<images/web-ui-home.png>)
@@ -61,7 +60,6 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 For more deep dive into project and status, see the `docs/` directory.
 
 ---
-
 ## 💡 Use Cases
 ### Research & Knowledge Management
 - **Build Personal Research Libraries**: Create customized collections of AI papers organized by category and relevance
@@ -107,7 +105,6 @@ For more deep dive into project and status, see the `docs/` directory.
   * Project works on both Windows and Ubuntu/Linux environments.
 
 ---
-
 # ⚠️ Prerequisites
 - Git
 - Python 3.9+ (Python 3.11 recommended)
@@ -118,7 +115,6 @@ For more deep dive into project and status, see the `docs/` directory.
 - Prometheus and Grafana (included in docker-compose.monitoring.yml)
 
 ---
-
 ### Installation (Local)
 * Note: installs all dependencies in a virtual environment 
 ## Linux/macOS/WSL:
@@ -499,40 +495,27 @@ These utilities help maintain data quality and provide insights into the ArXiv p
 ```bash
 # Start MongoDB
 docker compose start mongodb
-
 # Start Neo4j
 docker compose start neo4j
-
 # Start Qdrant
 docker compose start qdrant
-
 # Start Web UI
 docker compose start web-ui
-
 # Start API
 docker compose start api
-
 # Start APP
 docker compose start app
 ```
 
 ### b. Restarting Individual Containers
-
 ```bash
 # Restart MongoDB
-
 docker compose restart mongodb
-
 # Restart Neo4j
-
 docker compose restart neo4j
-
 # Restart Qdrant
-
 docker compose restart qdrant
-
 # Restart Web UI
-
 docker compose restart web-ui
 ```
 
@@ -541,29 +524,18 @@ docker compose restart web-ui
 ```bash
 
 # View MongoDB logs
-
 docker compose logs mongodb
-
 # View Neo4j logs
-
 docker compose logs neo4j
-
 # View Qdrant logs
-
 docker compose logs qdrant
-
 # View Web UI logs
-
 docker compose logs web-ui
-
 # Follow logs (real-time updates)
-
 docker compose logs --follow mongodb
-
 ```
 
 ### d. Inspecting Container Status
-
 ```bash
 # Check status of all containers
 
@@ -575,16 +547,13 @@ docker inspect arxiv_pipeline-mongodb-1
 ```
 
 ## 6. Optional: GPU-Accelerated Qdrant Setup on Remote Windows Machine
-
 * For enhanced vector search performance, you can set up Qdrant with GPU acceleration on a separate Windows machine within the same network. This configuration is beneficial for:
 - Processing large volumes of papers with faster embedding searches
 - Leveraging dedicated GPU resources for vector operations
 - Scaling the vector database independently from other components
 
 ### Quick Overview
-
 a. **Hardware Requirements**:
-
    - Windows 11 with WSL2 enabled
    - NVIDIA GPU with CUDA 12.x support (8GB VRAM minimum)
    - 16GB RAM (32GB recommended)
@@ -592,20 +561,14 @@ a. **Hardware Requirements**:
 
 
 b. **Setup Approach**:
-
    - Install WSL2 with Ubuntu
-
    - Configure CUDA in WSL2
-
    - Build Qdrant from source with GPU support
-
    - Configure for optimal performance with research paper embeddings
 
 
 c. **Integration with ArXiv Pipeline**:
-
    - After setup, update the Qdrant connection settings in your config/default.yaml
-
    - Run the pipeline as usual, with vector operations now GPU-accelerated
 
 ### Detailed Instructions
@@ -621,15 +584,10 @@ cat qdrant_setup/README.md
 ```
 
 #### The guide includes:
-
 - Full installation procedures
-
 - Configuration optimized for 768-dimensional embeddings (typical for research papers)
-
 - Testing and benchmarking tools
-
 - Maintenance and backup procedures
-
 - Security recommendations
 
 ## Updating Configuration
@@ -641,11 +599,8 @@ cat qdrant_setup/README.md
 # In config/default.yaml
 
 qdrant:
-
   host: "192.168.1.x"  # Replace with your Qdrant server's IP
-
   port: 6333
-
   collection_name: "arxiv_papers"
 
 ```
@@ -655,7 +610,6 @@ qdrant:
 ---
 
 ### Configuration
-
 ![Image](https://github.com/user-attachments/assets/7d68b38e-b4a1-49d9-acf4-17b74fb05e22)
 
 The application is configured using YAML files in the `config/` directory. The default configuration is in `config/default.yaml`.
@@ -663,9 +617,7 @@ The application is configured using YAML files in the `config/` directory. The d
 Key configuration options:
 
 ## Recent Feature Additions
-
 ### 1. MongoDB Tracking for Qdrant Vector Processing
-
 * The sync_qdrant pipeline now includes a tracking system to prevent duplicate processing and provide synchronization with Qdrant:
 
 ```yaml
@@ -673,11 +625,9 @@ Key configuration options:
 # In config/default.yaml
 
 qdrant:
-
   # ... other settings ...
 
   tracking:
-
     enabled: true # Whether to track processed PDFs
 
     collection_name: "vector_processed_pdfs" # MongoDB collection to store tracking information
@@ -687,13 +637,9 @@ qdrant:
 ```
 
 ### This system:
-
 - Tracks each processed PDF in a MongoDB collection
-
 - Prevents duplicate processing of the same document
-
 - Stores metadata including file hash, processing date, and chunk count
-
 - Maintains consistency between MongoDB tracking and Qdrant vector storage
 
 ### 2. GPU Acceleration for Vector Operations
@@ -716,7 +662,6 @@ For better performance with large vector collections, you can run Qdrant as a st
 ---
 
 ## Ollama Integration (Optional)
-
 The `sync_qdrant` pipeline uses [Ollama](https://ollama.ai/) app for analyzing images extracted from PDFs if available:
 - **What Ollama does**: Enhances the vector database by adding AI-generated descriptions of diagrams and figures in papers
 - **Installation Options**:
@@ -726,11 +671,9 @@ The `sync_qdrant` pipeline uses [Ollama](https://ollama.ai/) app for analyzing i
 - **Without Ollama**: The pipeline still functions normally without Ollama, but image descriptions will be placeholders
 
 ## ArXiv Pipeline Configuration Settings
-
 The system is configured through `config/default.yaml`. Key configuration sections included
 
 ### Important Note About PDF Paths in Docker
-
 When running the `sync_qdrant` service in Docker, the PDF directory path specified in `config/default.yaml` is overridden by the volume mapping in `docker-compose.yml`:
 
 ```yaml
@@ -750,59 +693,38 @@ If you change your PDF storage location, make sure to update both:
 1. The `pdf_storage.directory` in `config/default.yaml` (for local runs)
 2. The volume mapping in `docker-compose.yml` (for Docker runs)
    ## sync_mongodb pipeline
-
    - arxiv.categories: Research categories to fetch papers from api into mongodb
-
    - arxiv.max_results: Number of papers to fetch per API call
-
    - arxiv.rate_limit_seconds: Number of seconds to wait between API calls
-
    - arxiv.max_iterations: Number of API calls per category
-
    - arxiv.start_date: Only process papers published after this date
-
    - arxiv.end_date: Only process papers published before this date
 
    ## sync_neo4j pipeline
-
    - arxiv.process_categories: Categories to prioritize for vector storage into qdrant
-
    - arxiv.max_papers: Maximum number of papers to process
-
    - arxiv.max_papers_per_category: Maximum number of papers to insert per category
-
    - arxiv.sort_by: Sort papers by this field
-
    - arxiv.sort_order: Sort papers in this order
 
    ## sync_qdrant pipeline
-
    - arxiv.max_papers: Maximum number of papers to process
-
    - arxiv.max_papers_per_category: Maximum number of papers to insert per category
-
    - arxiv.sort_by: Sort papers by this field
-
    - arxiv.sort_order: Sort papers in this order
 
    ## download_pdfs pipeline
-
    - arxiv.max_papers: Maximum number of papers to process
-
    - arxiv.max_papers_per_category: Maximum number of papers to download per category
-
    - arxiv.sort_by: Sort papers by this field
-
    - arxiv.sort_order: Sort papers in this order
 
 Config changes take effect when services are restarted. See `docs/system_design.md` for detailed information about configuration impact on system behavior.
 
 ## 🔍 Project Analysis
-
 The project includes a metadata generator in the `dev_utils` directory that helps analyze and document the codebase structure. This tool is particularly useful for understanding module dependencies and system architecture.
 
 ### Generating System Metadata
-
 ```bash
 # Generate metadata for the entire project (saved to dev_utils/system_metadata.yaml by default)
 python -m dev_utils.metadata_generator .
@@ -819,7 +741,6 @@ python -m dev_utils.metadata_generator src/llm_eval -o dev_utils/llm_eval_metada
 - Code documentation strings
 
 ### Usage Examples
-
 1. **Documentation Generation**:
    ```bash
    # Generate comprehensive project documentation
@@ -842,7 +763,6 @@ The generated YAML files can be used for:
 - Code quality assessment
 
 ## Qdrant Deployment Options
-
 This pipeline supports two options for running Qdrant (vector database):
 
 ### Option 1: Running Qdrant in Docker (Default)
@@ -880,7 +800,6 @@ storage:
 ```
 
 3. **Run Qdrant with the config**:
-
 ```
 qdrant.exe --config-path config/qdrant_config.yaml
 ```
@@ -898,7 +817,6 @@ app:
 ```
 
 ## GPU Support for Embeddings Generation
-
 * The pipeline can use GPU acceleration for generating embeddings in the `sync_qdrant.py` script:
 
 1. **Install PyTorch with CUDA support**:
@@ -944,7 +862,6 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
    ```
 
 ### Neo4j Installation
-
 #### Option 1: With Docker (recommended)
 * The Docker setup includes Neo4j, so no additional installation is needed if using Docker Compose.
 * Neo4j Desktop is recommended for local development and data exploration.
@@ -959,7 +876,6 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
    ```
 
 4. **Test your connection**:
-
    ```python
    from neo4j import GraphDatabase
    uri = "bolt://localhost:7687"
@@ -973,7 +889,6 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
 ---
 
 ## Notes
-
 - **Python Versions**: 
   - Docker containers use `python:3.11-slim`
   - Local development 'requires' Python ≥3.11 as specified in pyproject.toml
@@ -992,18 +907,15 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
 ---
 
 ## Troubleshooting
-
 - If you see `ModuleNotFoundError: No module named 'pymongo'`, ensure you have activated your virtual environment and installed dependencies.
 - For Docker issues, ensure Docker Desktop is running and you have sufficient permissions.
 
 ---
 
 ## External Tools for Data Exploration
-
 * The following tools are recommended for exploring the data outside the pipeline:
 
 ### MongoDB
-
 - **MongoDB Compass** - A GUI for MongoDB that allows you to explore databases, collections, and documents
 - Download: [https://www.mongodb.com/products/compass](https://www.mongodb.com/products/compass)
 - Connection string: `mongodb://localhost:27017/onfig` (when connecting to the Docker container)
