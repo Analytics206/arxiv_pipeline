@@ -26,9 +26,8 @@ qdrant:
     # - "cs.LG"
   papers_per_category: 3 # Maximum number of papers to process into vectors per category (0 for unlimited)
   default_pdf_path: "X:/AI Research" # Base directory where PDFs are loaded from for vector processing
-  gpu_enabled: true # Enable GPU for vector operations
+  gpu_enabled: false # Disable GPU for vector operations
   gpu_device: 1 # Use the second GPU (index 1)
-  # Tracking settings for processed PDFs
   tracking:
     enabled: true # Whether to track processed PDFs
     collection_name: "vector_processed_pdfs" # MongoDB collection to store tracking information
@@ -92,14 +91,15 @@ arxiv:
     - "stat.ME"
     - "stat.ML"
     - "stat.OT"
+    # 306,828 papers in arxiv_papers.papers
   max_results: 200 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 10 # Number of times to loop the pipeline for each category above
+  max_iterations: 50 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 6 # seconds to wait between api calls
   start_date: "2022-01-01" # start_date is used in arxiv api call and save pdfs filters
-  end_date: "2025-06-30" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
-  max_no_papers: 10 # Maximum number of no paper fetches before breaking loop for category
+  end_date: "2025-07-31" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
+  max_no_papers: 25 # Maximum number of no paper fetches before breaking loop for category
 # Embedding model settings
 embedding:
   model_name: "all-MiniLM-L6-v2"  # Smaller model to start with
@@ -149,7 +149,7 @@ pdf_storage:
   download_date_filter:
     enabled: true         # Set to false to disable date filtering
     start_date: "2022-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2025-06-30"   # Download papers published on or before this date (format: YYYY-MM-DD)
+    end_date: "2025-07-31"   # Download papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
 
 # BERTopic settings
@@ -172,7 +172,7 @@ bertopic:
   date_filter:
     enabled: true
     start_date: "2022-01-01"  # Process papers published on or after this date
-    end_date: "2025-06-30"    # Process papers published on or before this date
+    end_date: "2025-07-31"    # Process papers published on or before this date
 
 # Top2Vec settings
 top2vec:
@@ -199,7 +199,7 @@ top2vec:
   date_filter:
     enabled: true
     start_date: "2022-01-01"  # Process papers published on or after this date
-    end_date: "2025-06-30"    # Process papers published on or before this date
+    end_date: "2025-07-31"    # Process papers published on or before this date
 
 # Kaggle Dataset Downloader settings
 kaggle:

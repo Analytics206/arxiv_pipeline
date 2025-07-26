@@ -51,17 +51,17 @@ services:
    volumes:
      - qdrant_data:/qdrant/storage
    restart: unless-stopped
-   # GPU Support configuration
-   deploy:
-     resources:
-       reservations:
-         devices:
-           - driver: nvidia
-             count: 1
-             capabilities: [gpu]
+   # GPU Support configuration - commented out due to WSL GPU compatibility issues
+   # deploy:
+   #   resources:
+   #     reservations:
+   #       devices:
+   #         - driver: nvidia
+   #           count: 1
+   #           capabilities: [gpu]
    environment:
-     - CUDA_VISIBLE_DEVICES=1  # Use second GPU
-     - QDRANT_ENABLE_CUDA=true # Enable CUDA support
+   #   - CUDA_VISIBLE_DEVICES=1  # Use second GPU
+     - QDRANT_ENABLE_CUDA=false # Disable CUDA support
 
   app:
     build: .
@@ -240,8 +240,66 @@ services:
 
 volumes:
   mongo_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./docker_volumes/mongo_data
+      o: bind
+    name: arxiv_pipeline_mongo_data
+    labels:
+      - "project=arxiv_pipeline"
+      - "database=mongodb"
   neo4j_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./docker_volumes/neo4j_data
+      o: bind
+    name: arxiv_pipeline_neo4j_data
+    labels:
+      - "project=arxiv_pipeline"
+      - "database=neo4j"
   qdrant_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./docker_volumes/qdrant_data
+      o: bind
+    name: arxiv_pipeline_qdrant_data
+    labels:
+      - "project=arxiv_pipeline"
+      - "database=qdrant"
+      - "vector=embeddings"
   zookeeper_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./docker_volumes/zookeeper_data
+      o: bind
+    name: arxiv_pipeline_zookeeper_data
+    labels:
+      - "project=arxiv_pipeline"
+      - "service=kafka"
+      - "component=zookeeper"
   zookeeper_log:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./docker_volumes/zookeeper_log
+      o: bind
+    name: arxiv_pipeline_zookeeper_log
+    labels:
+      - "project=arxiv_pipeline"
+      - "service=kafka"
+      - "component=zookeeper"
+      - "type=logs"
   kafka_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./docker_volumes/kafka_data
+      o: bind
+    name: arxiv_pipeline_kafka_data
+    labels:
+      - "project=arxiv_pipeline"
+      - "service=kafka"

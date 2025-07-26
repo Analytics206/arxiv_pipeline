@@ -12,6 +12,7 @@ venv/
 # Data
 data/
 secure/
+docker_volumes/
 
 # Docker
 **/data/
