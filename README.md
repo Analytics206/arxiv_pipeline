@@ -1,20 +1,30 @@
 # [<img src="src/web-ui/public/images/drp_logo_blue.png" width="250"/>](src/web-ui/public/images/drp_logo_blue.png)
 🧠 Deep Research Pipeline  
 ## Overview
-A modular, fully local, open-source pipeline for fetching, structuring, and exploring AI research papers from arXiv.org. This system enables offline graph-based and semantic search through an integrated architecture of MongoDB, Neo4j, and Qdrant using Hugging Face embeddings. All services run in Docker containers for easy, consistent local deployment.
+A local, open-source research-intelligence system optimized for AI and coding
+agents. It turns AI papers into structured, evidence-backed knowledge that an
+agent can retrieve, cite, compare, and apply to software projects. Humans use
+the same underlying research service through the web interface.
+
+MongoDB is the source of truth for paper metadata and versioned analyses.
+Qdrant provides the active rebuildable hybrid dense/lexical index. Neo4j is an optional
+experiment and is no longer required by the API, UI, or processing workflow.
+BERTopic and Top2Vec are retired from the active architecture and retained only
+under the `legacy` profile. See
+[`docs/14-agent_research_system_plan.md`](docs/14-agent_research_system_plan.md)
+for the current product direction and phased implementation plan.
 
 ## 🚀 Key Features
 | Feature                  | Description |
 | ------------------------ |-------------|
-| 🏠 **Local-first** | Everything runs offline with no cloud dependencies on local network with multi machine support. |
-| 💾 **ArXiv Ingestion** | Fetches non-duplicate papers from configurable categories (e.g., cs.AI) with smart date filtering. |
-| 🗒 **MongoDB Storage** | Stores structured metadata, paper information, and download statuses. |
-| 🐙 **Graph Representation** | Neo4j graph database captures relationships between papers, authors, and categories. |
-| 🤖 **LLM Category Summary** | Uses LLMs to categorize papers by subject, architecture, and mathematical models. |
-| 💡 **Semantic Embeddings** | Creates vector embeddings using Hugging Face models, stored in Qdrant for similarity search. |
-| 🔧 **Configurable & Modular** | Centralized settings allow switching categories, models, and components. |
-| 👀 **User Interface** | User-friendly interface for exploring datasets, knowledge graphs, and similarity search. |
-| 📦 **Containerized** | Mostly Dockerized with persistent volumes for reliable data storage and consistent execution. |
+| **Local-first** | Runs on personally controlled infrastructure and serves trusted computers on the LAN. |
+| **Evidence-backed analysis** | Produces structured methods, findings, limitations, and implementation ideas with verified page quotes. |
+| **ArXiv ingestion** | Fetches normalized metadata and exact PDF versions from configurable categories/date ranges. |
+| **Canonical MongoDB storage** | Stores paper state and immutable, versioned analyses with full provenance. |
+| **Agent hybrid retrieval** | Combines shared-Ollama embeddings, lexical IDF retrieval, weighted RRF, and paper-diversity reranking. |
+| **Agent interfaces** | Publishes the same read-only capability, catalog, search, token-budgeted context, and evidence contracts through REST/OpenAPI and MCP. |
+| **Human research workspace** | Searches the same curated knowledge and opens complete evidence-aware paper context. |
+| **Reproducible containers** | Separates the small core runtime from optional historical ML/topic-modeling tools. |
 ---
 
 ### Neo4j Graph Database
@@ -30,31 +40,27 @@ A modular, fully local, open-source pipeline for fetching, structuring, and expl
 ## 📦 System Components
 | Component                  | Purpose                                      |
 | -------------------------- | -------------------------------------------- |
-| **Ingestion Service**      | Fetches papers(metadata) using arXiv Atom XML API      |
-| **MongoDB**                | Stores normalized paper metadata and paper processing tracking    |
-| **Neo4j**                  | Stores the author-paper-category graph       |
-| **Qdrant**                 | Stores paper vector embeddings for semantic search with metrics tracking |
-| **Config Manager**         | Central config for category, limits, model   |
-| **User Interface**         | Web UI for interaction with graphs           |
-| **Logger**                 | Tracks events, errors, and skipped entries   |
-| **Docker Compose**         | Brings it all together for local use         |
-| **Prometheus**             | Time series database for system metrics collection  |
-| **Grafana**                | Visualization platform for system metrics dashboards |
-| **Kafka**                  | Distributed event streaming platform for messaging |
-| **Zookeeper**              | Coordinates the Kafka cluster                |
-| **Kafka UI**               | Web interface for Kafka management and monitoring |
+| **Ingestion and PDF pipeline** | Fetches metadata, validates exact PDFs, analyzes, and indexes papers |
+| **MongoDB** | Stores canonical metadata, PDF state, and versioned analyses |
+| **Qdrant** | Stores the rebuildable `research_knowledge_hybrid_v1` dense/lexical index |
+| **Shared Ollama** | Runs configurable analysis and embedding models from the separate `ai-services` project |
+| **Research API** | Serves stable read-only REST/OpenAPI tools to UI and external agents |
+| **MCP adapter** | Maps the five evaluated GET contracts and stable resources to MCP over Streamable HTTP or stdio |
+| **Web UI** | Provides human semantic search, paper context, evidence, and provenance |
+| **Neo4j** | Optional manual relationship experiment; not a default dependency |
+| **Legacy runtime** | Isolates BERTopic, Top2Vec, historical local-Hugging-Face work, notebooks, and evaluation tools |
 
 ---
 ## 🧵 High Level Overview
  - Fetch metadata of papers from arXiv.org using arXiv Atom XML API
  - Store normalized metadata in MongoDB with pdf_url for pdf download
  - Download PDFs from arXiv.org and store in local directory
- - Store the author-paper-category graph in Neo4j
- - Store vector embeddings for semantic search in Qdrant
+ - Create structured, page-cited analyses through shared Ollama
+ - Store evidence, claims, limitations, and implementation ideas in Qdrant
  - Manage paper processing tracking in MongoDB
  - Dynamic configuration for paper category, paper limits, models, and pdf save directory
- - Web UI for interaction with graphs
- - Jupyter notebook for interactive analysis
+ - Serve the curated research through a read-only LAN API and human web UI
+ - Keep Neo4j, topic modeling, notebooks, and monitoring as optional profiles
  - Tracks events, errors, and skipped entries  
 
 For more deep dive into project and status, see the `docs/` directory.
@@ -94,22 +100,26 @@ For more deep dive into project and status, see the `docs/` directory.
 
 # 🛠️ Setup Instructions
   ### This system runs on a single machine but recommend a multiple machine setup.*
-  - System minimum requirements: 16GB RAM, 8GB GPU, 512GB SSD
-  - Developer runs on laptop with 16GB RAM, 16GB GPU, 1TB SSD *Not recommended!
+  - Current development machine: RTX 2070 Mobile with 8 GB VRAM
+  - Qwen 3.5 4B is the default analysis model and
+    `mxbai-embed-large:latest` is the initial dense-retrieval baseline
+  - Stateless AI inference is provided by the shared `ai-services` project
+    rather than an Ollama instance owned by this Compose stack
   - Most components run in docker containers that can be move to own/shared docker machines
   - Qdrant recommend setup on a separate machine with nvidia GPU for faster vector operations
   - Default Qdrant running locally with out docker *see below Qdrant Setup*
-  - External storage for PDFs recommended *see below PDF Storage*
-  * pdf save directory is set to E:\AI Research\ in "config/default.yaml"
+  - PDFs default to ignored project runtime storage under `data/pdfs`
+  - Set `PDF_STORAGE_DIR` only when a larger external drive is actually needed
   * edit config/default.yaml before running the pipelines
   * Project works on both Windows and Ubuntu/Linux environments.
 
 ---
 # ⚠️ Prerequisites
 - Git
-- Python 3.9+ (Python 3.11 recommended)
+- Python 3.13
 - [UV](https://github.com/astral-sh/uv) (for fast Python dependency management)
-- [Ollama](https://ollama.ai/) (optional, for enhanced image analysis)
+- A reachable shared `ai-services` Ollama server (required for paper analysis;
+  optional for metadata-only ingestion)
 - Docker and Docker Compose (for containerized deployment)
 - NVIDIA GPU with CUDA support (optional, for faster vector operations)
 - Prometheus and Grafana (included in docker-compose.monitoring.yml)
@@ -122,42 +132,377 @@ For more deep dive into project and status, see the `docs/` directory.
 # Make the setup script executable
 chmod +x scripts/setup_uv.sh
 
-# Run the setup script
-.\scripts\setup_uv.ps1
+# Install Python 3.13 and the locked project dependencies
+./scripts/setup_uv.sh
 
 # Activate the virtual environment
-.venv\Scripts\Activate.ps1
+source .venv/bin/activate
 ```
 
 ## Windows (PowerShell):
+
+### Recommended: build `.venv` from the lockfile
+
 ```powershell
-# if needed to rebuild .venv
-Remove-Item -Recurse -Force .venv
-# Run the setup script
-python3.11 -m venv .venv
+# Install Python 3.13 and the locked project dependencies
+.\scripts\setup_uv.ps1
+
+# If PowerShell reports that running scripts is disabled, allow scripts only
+# for this PowerShell process (the setting disappears when the window closes)
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 # Activate the virtual environment
 .\.venv\Scripts\Activate.ps1
-pip install -e .
-python.exe -m pip install --upgrade pip
+```
+
+### Manual: build or rebuild `.venv`
+
+Use this when you want to recreate the environment yourself. The removal step
+intentionally discards only the existing project `.venv`.
+
+```powershell
+# If needed, remove the existing project environment
+Remove-Item -LiteralPath .venv -Recurse -Force
+
+# Create .venv with Python 3.13
+uv venv --python 3.13 .venv
+
+# If PowerShell reports that running scripts is disabled
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# Activate the virtual environment
+.\.venv\Scripts\Activate.ps1
+
+# Install the exact locked dependencies, including legacy research tools and
+# development tools
+uv sync --python 3.13 --extra agent --extra legacy --extra dev --frozen
+```
+
+If you use a separately installed Python 3.13 instead of `uv`, the original
+standard-library workflow is still supported:
+
+```powershell
+Remove-Item -LiteralPath .venv -Recurse -Force
+py -3.13 -m venv .venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e ".[agent,legacy,dev]"
+```
+
+Both setup scripts install a uv-managed Python 3.13 runtime and synchronize
+the full local environment from `uv.lock`, including legacy research tools and
+development tools. For a smaller agent/API-only environment, omit
+`--extra legacy`.
+
+## Process a paper end to end (recommended)
+
+The canonical agent-first process fetches exact arXiv metadata, downloads and
+validates the versioned PDF, stores its portable path in MongoDB, creates an
+evidence-backed analysis, and idempotently indexes it in Qdrant:
+
+```powershell
+# Create the consumer configuration once.
+Copy-Item .env.example .env
+
+# Start the persistent services. The app itself is an on-demand command.
+docker compose up -d mongodb qdrant api mcp web-ui
+
+# Process one exact paper version from arXiv through semantic search.
+docker compose run --rm --no-deps app python -m src.pipeline.process_paper `
+  --paper-id 2607.02134v1
+```
+
+PDFs are stored at
+`data/pdfs/<primary-arxiv-category>/<versioned-arxiv-id>.pdf`. The entire
+`data/` directory is ignored by Git and mounted at `/app/data` for project
+containers, so the same relative location works on Windows and in Docker.
+
+Rerunning the command is safe: existing PDFs are reused, a matching immutable
+analysis skips model generation, and Qdrant receives the same stable point
+identities. Useful overrides include:
+
+```powershell
+# Use another host directory without editing YAML.
+$env:PDF_STORAGE_DIR = "D:\AI Research\arxiv-pdfs"
+
+# Intentionally download or regenerate again.
+docker compose run --rm --no-deps app python -m src.pipeline.process_paper `
+  --paper-id 2607.02134v1 `
+  --force-download `
+  --force-analysis
+```
+
+When using an external directory, add an explicit Docker bind mount for that
+directory or run the command from the host virtual environment. The portable
+project-local default requires no extra mapping.
+
+## Analyze an existing local PDF manually
+
+Phase 1 accepts an explicit local PDF and uses the shared `ai-services` Ollama
+server to create a versioned, page-cited analysis in MongoDB.
+
+```powershell
+# One-time fallback if ai-services is not configured to pull these models
+docker exec ai-ollama ollama pull qwen3.5:4b
+docker exec ai-ollama ollama pull mxbai-embed-large:latest
+
+# Analyze one PDF. The paper ID can also be an arXiv abs/pdf URL.
+python -m src.pipeline.summarize_paper `
+  --paper-id 2504.18538v1 `
+  --pdf "C:\path\to\2504.18538v1.pdf"
+```
+
+The 4B Q4 model is approximately 3.4 GB and the analyzer requests a 12K context,
+which fits fully on the current 8 GB GPU. If that changes after a model or driver
+upgrade, reduce `analysis.context_length` before changing models.
+
+Measured on the RTX 2070 Mobile after a structured-output request:
+
+| Model | Context | Offload | Total GPU memory in use |
+| --- | ---: | ---: | ---: |
+| `qwen3.5:4b` | 8,192 tested; 12,288 configured | 100% GPU | ~4.16 GB / 8 GB at 8K |
+
+For Windows commands, `AI_SERVICES_HOST=localhost`. Project containers receive
+`host.docker.internal` automatically. If Ollama moves to another computer, set
+`AI_SERVICES_HOST` and `AI_SERVICES_DOCKER_HOST` to that machine's LAN or
+Tailscale hostname; application code does not change.
+
+The command is idempotent for the same document hash, schema, prompt, and
+model. Add `--force` only when you intentionally want to rerun that exact
+analysis.
+
+With the API running, agents and the web UI can discover and read the canonical
+research contracts:
+
+```text
+GET http://localhost:8000/research/capabilities
+GET http://localhost:8000/research/papers?limit=20
+GET http://localhost:8000/research/papers/agent-context?paper_id=2504.18538
+GET http://localhost:8000/research/papers/context-package?paper_id=2504.18538&profile=standard
+GET http://localhost:8000/research/papers/context-package?paper_id=2504.18538&token_budget=2500
+GET http://localhost:8000/research/papers/analysis?paper_id=2504.18538
+GET http://localhost:8000/research/evidence/<evidence-id>
+GET http://localhost:8000/openapi.json
+```
+
+Use `agent-context` when a human or large-context process needs the complete
+canonical analysis. Agent harnesses should normally use `context-package`.
+Its `brief`, `standard`, and `deep` profiles target 1,500, 4,000, and 8,000
+estimated JSON tokens; `token_budget` accepts a custom 512-32,768 budget.
+Every package reports the estimator, realized estimate, selection policy,
+included/omitted counts, and whether it was truncated. Claims and
+implementation ideas are included only with all of their verified evidence
+records. The provider-neutral estimator is intentionally approximate, so a
+harness can perform an exact final count with its target model tokenizer. If a
+custom budget cannot hold the mandatory TLDR, evidence, and provenance, the API
+returns 422 with the minimum estimated budget for that paper.
+
+An AI harness can generate tools from `/openapi.json` or connect to the MCP
+adapter at `http://<research-host>:8001/mcp`. MCP exposes the same five names:
+
+- `search_research`
+- `list_curated_papers`
+- `get_paper_context`
+- `get_paper_context_package`
+- `get_evidence`
+
+Every MCP tool advertises `readOnlyHint=true`, `destructiveHint=false`, and
+`idempotentHint=true`. The adapter has no MongoDB or Qdrant credentials and
+calls only the canonical GET-only research API.
+
+For a network-capable MCP harness, configure the Streamable HTTP URL:
+
+```json
+{
+  "mcpServers": {
+    "arxiv-research": {
+      "type": "http",
+      "url": "http://<research-host>:8001/mcp"
+    }
+  }
+}
+```
+
+For a local stdio client, run the same server without publishing a port:
+
+```json
+{
+  "mcpServers": {
+    "arxiv-research": {
+      "command": "C:\\path\\to\\arxiv_pipeline\\.venv\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "src.mcp_server.server",
+        "--transport",
+        "stdio"
+      ],
+      "cwd": "C:\\path\\to\\arxiv_pipeline",
+      "env": {
+        "RESEARCH_API_URL": "http://localhost:8000"
+      }
+    }
+  }
+}
+```
+
+Client configuration field names vary slightly by harness, but the command,
+environment variable, and MCP URL are transport-standard inputs.
+
+The complete cross-computer handoff for the separate AI harness project,
+including architecture, agent usage guidance, firewall diagnostics, and a
+standalone test with observed data, is
+[`docs/15-external_ai_harness_mcp_handoff.md`](docs/15-external_ai_harness_mcp_handoff.md).
+
+Validate a running Streamable HTTP adapter end to end:
+
+```powershell
+python -m src.pipeline.validate_mcp `
+  --url http://localhost:8001/mcp `
+  --paper-id 2607.02134
+```
+
+Evaluate package invariants over the current corpus:
+
+```powershell
+python -m src.pipeline.evaluate_context_packages
+```
+
+This checks budget compliance, evidence closure, deterministic output,
+provenance retention, and monotonic selection across all three profiles. The
+default detailed report is written to
+`data/context_evals/agent_context_packages_v1.json`.
+
+Index the newest canonical analysis in the agent-facing research collection:
+
+```powershell
+docker compose run --rm --no-deps app python -m src.pipeline.index_research `
+  --paper-id 2504.18538v1
+```
+
+The command uses shared Ollama for embeddings and idempotently upserts
+page-cited evidence, claims, and implementation ideas into
+`research_knowledge_hybrid_v1`. MongoDB remains the source of truth; this Qdrant
+collection can be rebuilt. Changing the embedding model requires a new
+versioned collection name because vector dimensions and embedding spaces are
+not interchangeable.
+
+Search from an agent, browser, or PowerShell:
+
+```text
+GET http://localhost:8000/research/search?query=How%20does%20the%20harness%20record%20RL%20training%20data%3F&limit=8
+GET http://localhost:8000/research/search?query=lightweight%20GUI%20containers&paper_id=2607.21557&kind=implementation_idea
+```
+
+Every hit includes its stable paper URI, analysis/model provenance, evidence
+IDs, exact quotes, and source pages. `retrieval_mode` identifies dense versus
+hybrid retrieval, and `score_semantics` distinguishes cosine similarity from
+RRF rank scores.
+
+### Evaluate retrieval and embedding models
+
+The reviewed retrieval suite covers 38 coding-agent questions across five
+immutable paper analyses, including paper-scoped paraphrases, corpus discovery,
+cross-paper synthesis, and unanswerable controls. The benchmark validates its
+document hashes and evidence judgments, then indexes each embedding model into
+an isolated Qdrant collection using that model's documented query/document
+format.
+
+Ensure these exact tags are installed in the shared Ollama service:
+
+```powershell
+docker exec ai-ollama ollama pull mxbai-embed-large:latest
+docker exec ai-ollama ollama pull qwen3-embedding:0.6b
+docker exec ai-ollama ollama pull embeddinggemma:latest
+docker exec ai-ollama ollama pull nomic-embed-text:v1.5
+```
+
+Add the same exact tags to the `ai-services` project's
+`OLLAMA_PULL_MODELS` setting if they should be restored automatically on a new
+machine or fresh Ollama volume.
+
+Run or resume the complete comparison:
+
+```powershell
+docker compose run --rm --no-deps app `
+  python -m src.pipeline.benchmark_embeddings `
+  --resume `
+  --summary-only
+```
+
+The detailed runtime report is saved under
+`data/retrieval_evals/embedding_benchmark_v2.json`. The July 2026 result keeps
+`mxbai-embed-large:latest` in production and identifies Nomic v1.5 as the best
+small/fast fallback. See
+[`docs/evaluations/embedding_benchmark_v2.md`](docs/evaluations/embedding_benchmark_v2.md)
+for the model metrics and limitations.
+
+Evaluate the promoted hybrid retrieval strategy against the dense baseline:
+
+```powershell
+docker compose run --rm --no-deps app `
+  python -m src.pipeline.benchmark_retrieval_strategies `
+  --skip-index `
+  --summary-only
+```
+
+The selected strategy combines hashed lexical IDF retrieval with the existing
+dense embedding, weighted RRF, and paper-diversity reranking. It recovered all
+reviewed evidence groups within the default top eight. See
+[`docs/evaluations/hybrid_retrieval_v1.md`](docs/evaluations/hybrid_retrieval_v1.md)
+for the design, results, and exact target ranks.
+
+## Use the research service across a trusted LAN
+
+The API and UI publish on all host interfaces by default:
+
+```powershell
+Copy-Item .env.example .env
+docker compose up -d mongodb qdrant api mcp web-ui
+
+# Find the research computer's IPv4 address on Windows.
+ipconfig
+```
+
+From another computer on the same network, open:
+
+```text
+Human workspace: http://<research-host-ip>:3000
+API docs:        http://<research-host-ip>:8000/docs
+OpenAPI:         http://<research-host-ip>:8000/openapi.json
+MCP:             http://<research-host-ip>:8001/mcp
+Health:          http://<research-host-ip>:8000/health
+```
+
+The UI uses the browser hostname to locate port 8000, so no frontend rebuild is
+needed for a different LAN address. If another computer cannot connect, allow
+inbound TCP 3000 and 8000 in the research host's firewall.
+
+This configuration assumes a trusted private LAN. Do not forward these ports to
+the public Internet. For local-only use, set both bind variables in `.env` to
+`127.0.0.1`. For remote use, prefer a private VPN/Tailscale; add authentication,
+authorization, TLS, and rate limiting before serving an untrusted network.
+
+When running the analyzer through the `app` container, place the PDF below the
+project `data/` directory and use its container path:
+
+```powershell
+docker compose run --rm app python -m src.pipeline.summarize_paper `
+  --paper-id 2504.18538v1 `
+  --pdf /app/data/2504.18538v1.pdf
 ```
 
 # Dockerized Deployment - Docker Desktop Running
 ## 0. Suggested run in venv from scripts above for your operating system
 
-## 1. **Build and start all basic required services:**
+## 1. **Build and start persistent services:**
    ```bash
-    docker compose up -d
+    docker compose up -d mongodb qdrant api mcp web-ui
     # or to rebuild
     docker compose up -d --build
    ```
- - ✔ Network arxiv_pipeline_default         Started     
- - ✔ Container arxiv_pipeline-neo4j-1       Started     
- - ✔ Container arxiv_pipeline-mongodb-1     Started 
- - ✔ Container arxiv_pipeline-qdrant-1      Started 
- - ✔ Container arxiv_pipeline-web-ui-1      Started   
- - ✔ Container arxiv_pipeline-api-1         Started   
- - ✔ Container arxiv_pipeline-app-1         Started 
+The `app` and bulk synchronization services are on-demand commands and do not
+start as background services.
 
 ## 2. Managing Pipeline Service Containers
    * pipelines do not have to run in order if you have previously run them or starting where you left off
@@ -207,59 +552,67 @@ python.exe -m pip install --upgrade pip
   ```
   > **Note**: The `secure` directory is in `.gitignore` to protect your credentials.
 
-  ### a. Run sync_mongodb pipeline to fetch papers from ArXiv API and store in MongoDB:
-  ```bash
-  # Run the sync-mongodb pipeline container
-  docker compose up --build sync-mongodb
-  or
-   echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/config"
-   python -m src.pipeline.sync_mongodb
+  ### Bulk agent-first test workflow
+
+  This is the ordered multi-paper equivalent of `process_paper`. Each command
+  is idempotent and can be rerun after an interruption:
+
+  ```powershell
+  # Build the small agent/API/MCP/ingestion runtime.
+  docker compose build api
+  docker compose up -d mongodb qdrant api mcp web-ui
+
+  # 1. Upsert the configured arXiv category pages into MongoDB.
+  docker compose run --rm --no-deps sync-mongodb
+
+  # 2. Download, validate, hash, and record the configured PDF corpus.
+  docker compose run --rm --no-deps app python -m src.utils.download_pdfs `
+    --config /app/config/default.yaml
+
+  # 3. Analyze and index the bounded cross-category agent test batch.
+  docker compose run --rm --no-deps app `
+    python -m src.pipeline.process_downloaded_papers `
+    --config /app/config/default.yaml
   ```
 
-  ### b. Run sync-neo4j pipeline for new pdf metadata inserted from MongoDB:
-  ```bash
-   docker compose up --build sync-neo4j
-   or
-   echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/config"
-   echo $env:MONGO_URI
-   python -m src.graph.sync_mongo_to_neo4j
+  Use `--dry-run` on either PDF/batch command to inspect its exact manifest
+  without writing anything. `pdf_storage.papers_per_category` bounds the
+  downloaded corpus; `research_processing.papers_per_category` separately
+  bounds expensive local-model analysis. Increase the latter only when you
+  intentionally want a longer GPU run.
+
+  ### Legacy enrichment workflows (optional)
+
+  These commands support the older graph/topic experiments. They are not
+  required by agent context or the `research_knowledge_hybrid_v1` index. Build the
+  separate legacy image once before running BERTopic, Top2Vec, or the old
+  Qdrant experiment:
+
+  ```powershell
+  docker compose --profile legacy build legacy-runtime
   ```
 
-  ### c. Run sync-bertopic pipeline for topic creation from paper summaries from mongodb:
+  The legacy image contains Torch, Transformers, sentence-transformers,
+  BERTopic, Top2Vec, and the numerical/evaluation stack. Those packages are
+  intentionally absent from `arxiv_pipeline-python:latest`.
+
+  ### a. Run sync-neo4j pipeline for new metadata inserted in MongoDB:
   ```bash
-   docker compose up --build sync-bertopic
-   or
-   echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/config"
-   echo $env:MONGO_URI
-   python -m src.pipeline.insert_bertopic_mongodb
-  ```
-  ### d. Run sync-top2vec pipeline for topic creation from paper summaries from mongodb:
-  ```bash
-   docker compose up --build sync-top2vec
-   or
-   echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/config"
-   echo $env:MONGO_URI
-   python -m src.pipeline.insert_top2vec_mongodb
+   docker compose --profile manual run --rm sync-neo4j
   ```
 
-   ### e. Run sync_qdrant pipeline to process downloaded PDFs and store as vector embeddings in Qdrant:
+  ### b. Run sync-bertopic pipeline for topic creation from paper summaries from mongodb:
+  ```bash
+   docker compose --profile legacy run --rm sync-bertopic
+  ```
+  ### c. Run sync-top2vec pipeline for topic creation from paper summaries from mongodb:
+  ```bash
+   docker compose --profile legacy run --rm sync-top2vec
+  ```
+
+   ### d. Legacy PDF/image Qdrant experiment:
    ```bash
-   docker compose up --build sync-qdrant
-   or *Need to uncomment docker-compose.yml sync-qdrant service????
-   python -m src.pipeline.sync_qdrant
-   ```
-
-   ### f. Run download_pdfs pipeline to download PDFs from arxiv.org using metadata stored in MongoDB:
-  * pdf download does not have a docker container
-   ```bash
-   echo $env:MONGO_URI
-   $env:MONGO_URI="mongodb://localhost:27017/config"
-   echo $env:MONGO_URI
-   python -m src.utils.download_pdfs
+   docker compose --profile legacy run --rm sync-qdrant
    ```
 ## 3. (optional) Managing Monitoring Containers with Prometheus & Grafana
 a. **Start the monitoring stack:**
@@ -319,7 +672,8 @@ The following services are configured with the `manual` profile in Docker Compos
 
 ### a. Jupyter Notebooks for Data Analysis
 ```bash
-# Start Jupyter SciPy notebook server
+# Build and start the project-owned Python 3.13 notebook image. This image
+# installs the legacy research extra; the core API image remains small.
 docker compose --profile manual up jupyter-scipy
 # Stop Jupyter SciPy notebook server
 docker compose --profile manual down jupyter-scipy
@@ -368,31 +722,33 @@ qdrant:
   vector_size: 768  # For all-MiniLM-L6-v2 model
 ```
 ## 6. Web UI
-* To restart Web UI docker service, starts with docker-compose up above:
+* Start or rebuild the research workspace:
    ```bash
-   docker-compose up -d web-ui
+   docker compose up -d --build web-ui
    ```
-* Access the web interface at: http://localhost:3000
+* Open `http://localhost:3000` on the host or
+  `http://<research-host-ip>:3000` on another trusted LAN computer.
 
 ### Web UI Development Setup
 
-* The web interface uses React with the Neo4j JavaScript driver. If you want to develop the web UI locally:
+The current UI uses React and calls only the research API for its active
+workspace. It does not connect directly to MongoDB, Qdrant, or Neo4j.
+
 a. **Navigate to the web-ui directory**:
    ```bash
    cd src/web-ui
    ```
 
-b. **Install dependencies including Neo4j JavaScript driver**:
+b. **Install the locked frontend dependencies**:
    ```bash
-   npm install
-   # Or to install Neo4j driver specifically:
-   npm install neo4j-driver@5.13.0
+   npm ci
    ```
 c. **Start the development server**:
    ```bash
    npm start
    ```
-* The web UI connects to Neo4j using environment variables defined in the docker-compose.yml file.
+When running locally, it uses `http://localhost:8000`. From another computer,
+it derives `http://<browser-hostname>:8000`.
 
 ## 7. Data Visualization and Analysis Dashboards
 
@@ -661,37 +1017,50 @@ For better performance with large vector collections, you can run Qdrant as a st
 
 ---
 
-## Ollama Integration (Optional)
-The `sync_qdrant` pipeline uses [Ollama](https://ollama.ai/) app for analyzing images extracted from PDFs if available:
-- **What Ollama does**: Enhances the vector database by adding AI-generated descriptions of diagrams and figures in papers
-- **Installation Options**:
-  - **Desktop App**: Download and install Ollama from [ollama.ai](https://ollama.ai/)
-  - **Docker Container**: Run Ollama in a Docker container for easier integration with the ArXiv pipeline (see `docs/ollama_docker.md` for detailed instructions)
-- **Required model**: Run `ollama pull llama3` to download the required model
-- **Without Ollama**: The pipeline still functions normally without Ollama, but image descriptions will be placeholders
+## Shared Ollama integration
+
+This project is an `ai-services` consumer and does not run its own Ollama
+container. Paper analysis uses Ollama structured output, while `sync_qdrant`
+can send extracted diagrams to the same vision-capable model.
+
+- Default model: `qwen3.5:4b`
+- Native API: `http://<AI_SERVICES_HOST>:<AI_SERVICES_OLLAMA_PORT>`
+- Windows default: `http://localhost:11434`
+- Container default: `http://host.docker.internal:11434`
+- Full URL override: `OLLAMA_URL`
+
+Metadata ingestion still works while Ollama is unavailable. Paper analysis
+requires it; diagram descriptions fall back to placeholders.
+
+Do not run the native Windows Ollama app on the same port as `ai-ollama`.
+Otherwise Windows and project containers can reach different model stores even
+though both URLs appear to use port 11434.
 
 ## ArXiv Pipeline Configuration Settings
 The system is configured through `config/default.yaml`. Key configuration sections included
 
-### Important Note About PDF Paths in Docker
-When running the `sync_qdrant` service in Docker, the PDF directory path specified in `config/default.yaml` is overridden by the volume mapping in `docker-compose.yml`:
+### Portable PDF paths in Docker
+
+The project uses one storage tree rather than separate host and container
+drive-letter settings:
 
 ```yaml
 
-# In docker-compose.yml
-
 volumes:
-  - E:/AI Research:/app/data/pdfs  # Maps Windows path to container path
+  - ./data:/app/data
 ```
 
 This means:
-- Your PDFs should be stored in `E:/AI Research` on your Windows machine
-- Inside the Docker container, they will be accessible at `/app/data/pdfs`
-- The script automatically detects when running in Docker and adjusts paths accordingly
 
-If you change your PDF storage location, make sure to update both:
-1. The `pdf_storage.directory` in `config/default.yaml` (for local runs)
-2. The volume mapping in `docker-compose.yml` (for Docker runs)
+- Host path: `<project>/data/pdfs`
+- Application-container path: `/app/data/pdfs`
+- Jupyter path: `/home/jovyan/work/data/pdfs`
+- MongoDB stores a portable relative path such as
+  `data/pdfs/cs.AI/2607.02134v1.pdf`
+
+Set `PDF_STORAGE_DIR` to override `pdf_storage.directory`. An external absolute
+host path also needs a corresponding Docker bind mount; the project-local
+default does not.
    ## sync_mongodb pipeline
    - arxiv.categories: Research categories to fetch papers from api into mongodb
    - arxiv.max_results: Number of papers to fetch per API call
@@ -714,12 +1083,21 @@ If you change your PDF storage location, make sure to update both:
    - arxiv.sort_order: Sort papers in this order
 
    ## download_pdfs pipeline
-   - arxiv.max_papers: Maximum number of papers to process
-   - arxiv.max_papers_per_category: Maximum number of papers to download per category
-   - arxiv.sort_by: Sort papers by this field
-   - arxiv.sort_order: Sort papers in this order
+   - pdf_storage.process_categories: Categories to select from MongoDB
+   - pdf_storage.papers_per_category: Maximum unique papers selected per category
+   - pdf_storage.request_interval_seconds: Delay between new arXiv PDF requests
+   - pdf_storage.download_date_filter: Published-date range and sorting
 
-Config changes take effect when services are restarted. See `docs/system_design.md` for detailed information about configuration impact on system behavior.
+   ## process_downloaded_papers pipeline
+   - research_processing.process_categories: Categories represented in the agent test
+   - research_processing.papers_per_category: Maximum analyses selected per category
+   - The command requires a recorded `local_pdf_path`, skips matching immutable
+     analyses, and idempotently indexes stable points in
+     `research_knowledge_hybrid_v1`
+
+Mounted `config/` changes apply to on-demand commands immediately. Restart
+persistent services after changing settings they consume. See
+`docs/06-system_design.md` for configuration impact.
 
 ## 🔍 Project Analysis
 The project includes a metadata generator in the `dev_utils` directory that helps analyze and document the codebase structure. This tool is particularly useful for understanding module dependencies and system architecture.
@@ -890,9 +1268,9 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
 
 ## Notes
 - **Python Versions**: 
-  - Docker containers use `python:3.11-slim`
-  - Local development 'requires' Python ≥3.11 as specified in pyproject.toml
-  - All dependencies are managed through pyproject.toml for consistent environments
+  - Application, agent, and Jupyter containers use `python:3.13-slim-bookworm`
+  - Local development requires Python 3.13 as specified in `pyproject.toml`
+  - Dependencies are declared in `pyproject.toml` and reproducibly locked in `uv.lock`
 
 - **Data Persistence**:
   - All persistent data (MongoDB, Neo4j, Qdrant) is stored in Docker volumes or local directories
@@ -935,7 +1313,8 @@ These tools provide graphical interfaces to explore, query, and visualize the da
 ## 📊 Optional Future Enhancements
 The following features are 'planned' for future development to enhance the research pipeline:
 ### Data Analysis and Visualization
-- **Topic Modeling**: Implement BERTopic or LDA for automatic discovery of research themes
+- **Structured research themes**: Use evidence-aware concepts/tags and measured
+  retrieval rather than reviving BERTopic or Top2Vec clusters
 - **Time-Series Analysis**: Track the evolution of research topics over time
 
 ### Research Enhancement Tools
@@ -946,11 +1325,13 @@ The following features are 'planned' for future development to enhance the resea
 - **Researcher Networks**: Map collaboration networks among authors
 - **Multi-Modal Analysis**: Extract and analyze figures and tables from papers
 - **Fine-tuning Pipelines**: Fine-tune pipelines for specific use cases
-- **Research Agents**: Add specific research agents for specific use cases
+- **Research comparison tools**: Add evaluated method-comparison primitives
+  over the token-budgeted context service. Private project-context matching is
+  owned by the separate AI harness project.
 
 ### Infrastructure Improvements
-- **LangChain-based Research Assistant**: Natural language interface to query the database
-- **Hybrid Search**: Combine keyword and semantic search for better results
+- **MCP client coverage**: Validate the read-only adapter with each harness used in production
+- **Retrieval evaluation growth**: Add real harness queries as the curated corpus expands
 - **Export Tools**: Add BibTeX and PDF collection exports
 - **Web Admin Interface**: Add web admin interface for configuration and running pipelines
 
@@ -965,8 +1346,8 @@ The following features are 'planned' for future development to enhance the resea
 
 - [ ] **Medium-term Tasks**
   - [ ] Fine-tuning pipelines for specific use cases
-  - [ ] Add research agent for specific use cases
-  - [ ] Extend Neo4j schema to include citations between papers
+  - [x] Add a read-only MCP adapter over the token-budgeted harness tools
+  - [ ] Evaluate whether graph-assisted retrieval adds value before extending Neo4j
   - [ ] Add full-text search capabilities
   - [ ] Implement comprehensive citation parsing system
   - [x] Create example Jupyter notebooks for research workflows

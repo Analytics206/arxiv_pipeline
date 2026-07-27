@@ -5,12 +5,13 @@ from typing import Dict, Any, List, Optional
 import logging
 
 from agent_core.models.base import ModelInterface
+from src.utils.ai_services import resolve_ollama_model, resolve_ollama_url
 
 class OllamaModelInterface(ModelInterface):
     """Interface for interacting with Ollama models."""
     
     def __init__(self):
-        self.base_url = "http://localhost:11434"
+        self.base_url = resolve_ollama_url()
         self.available_models = []
         self.logger = logging.getLogger("models.ollama")
     
@@ -54,7 +55,7 @@ class OllamaModelInterface(ModelInterface):
             if self.available_models:
                 model_name = self.available_models[0].get("name")
             else:
-                model_name = "llama3"  # Default fallback
+                model_name = resolve_ollama_model()
         
         # Update with model-specific parameters from config
         for model_config in self.available_models:

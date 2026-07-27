@@ -6,9 +6,8 @@ import { ThemeProvider } from './context/ThemeContext';
 // Components
 import NavBar from './components/NavBar';
 import Home from './components/Home';
-import Neo4jExplorer from './components/Neo4jExplorer';
 import MongoDBReports from './components/MongoDBReports';
-import QdrantSearch from './components/QdrantSearch';
+import ResearchWorkspace from './components/ResearchWorkspace';
 import JupyterReports from './components/JupyterReports';
 import JupyterViewer from './components/JupyterViewer';
 import ConfigEditor from './components/ConfigEditor';
@@ -22,9 +21,9 @@ function App() {
       <div className="content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/neo4j" element={<Neo4jExplorer />} />
+          <Route path="/research" element={<ResearchWorkspace />} />
           <Route path="/mongodb" element={<MongoDBReports />} />
-          <Route path="/qdrant" element={<QdrantSearch />} />
+          <Route path="/qdrant" element={<ResearchWorkspace />} />
           <Route path="/jupyter" element={<JupyterReports />} />
           <Route path="/jupyter/:notebookId" element={<JupyterViewer />} />
           <Route path="/config" element={<ConfigEditor />} />
@@ -32,7 +31,7 @@ function App() {
         </Routes>
       </div>
       <footer className="App-footer">
-        <p>Deep Research Pipeline - Data Science Research Tool</p>
+        <p>ArXiv Research Intelligence · evidence-backed context for agents and humans</p>
       </footer>
     </div>
     </ThemeProvider>

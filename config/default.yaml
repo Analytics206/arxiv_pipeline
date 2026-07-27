@@ -3,10 +3,54 @@
 # MongoDB settings
 mongo:
   connection_string: "mongodb://mongodb:27017/"
-  connection_string_local: "mongodb://localhost:27017/config"
+  connection_string_local: "mongodb://localhost:27017/"
   db_name: "arxiv_papers"
+
+# Shared stateless AI services. Environment variables override these values.
+ai_services:
+  host_local: "localhost"
+  host_docker: "host.docker.internal"
+  ollama_port: 11434
+
+# Agent-first paper analysis settings
+analysis:
+  collection_name: "paper_analyses"
+  schema_version: "1.0"
+  prompt_version: "agent-paper-v5"
+  model: "qwen3.5:4b"
+  context_length: 12288
+  max_output_tokens: 4096
+  chunk_max_chars: 12000
+  cache_directory: "data/analysis_cache"
+
+# Rebuildable, agent-facing hybrid index over canonical MongoDB analyses.
+research_index:
+  collection_name: "research_knowledge_hybrid_v1"
+  schema_version: "2.0"
+  embedding_model: "mxbai-embed-large:latest"
+  embedding_batch_size: 32
+  query_prefix: "Represent this sentence for searching relevant passages: "
+  retrieval_mode: "hybrid"
+  hybrid:
+    candidate_multiplier: 4
+    candidate_minimum: 50
+    dense_weight: 1.1
+    sparse_weight: 1.0
+    rrf_k: 60
+    paper_diversity_penalty: 0.2
+
+# Bounded, resumable agent analysis after the larger PDF corpus is downloaded.
+# One paper per category provides a real multi-paper integration test without
+# committing the local GPU to hundreds of analyses during initial validation.
+research_processing:
+  process_categories:
+    - "cs.AI"
+    - "cs.CV"
+    - "cs.LG"
+  papers_per_category: 1
   
-# Neo4j settings
+# Optional legacy graph settings. Neo4j is not part of the default agent-facing
+# serving path and should be started only for a measured graph experiment.
 neo4j:
   url: "bolt://neo4j:7687"
   url_local: "bolt://localhost:7687"
@@ -25,7 +69,7 @@ qdrant:
     # - "cs.CV" 
     # - "cs.LG"
   papers_per_category: 3 # Maximum number of papers to process into vectors per category (0 for unlimited)
-  default_pdf_path: "X:/AI Research" # Base directory where PDFs are loaded from for vector processing
+  default_pdf_path: "data/pdfs" # Portable project-local PDF storage
   gpu_enabled: false # Disable GPU for vector operations
   gpu_device: 1 # Use the second GPU (index 1)
   tracking:
@@ -46,8 +90,8 @@ paper_summaries:
   papers_per_category: 10 # Maximum number of papers to process into summary vectors per category (0 for unlimited)
   date_filter:
     enabled: true         # Set to false to disable date filtering
-    start_date: "2025-01-01" # Process papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2025-05-31"   # Process papers published on or before this date (format: YYYY-MM-DD)
+    start_date: "2026-01-01" # Process papers published on or after this date (format: YYYY-MM-DD)
+    end_date: "2026-07-31"   # Process papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
   # Tracking settings for processed summaries
   tracking:
@@ -59,46 +103,46 @@ paper_summaries:
 arxiv:
   categories: # used in sync_mongodb.py
     - "cs.AI"
-    - "cs.AR"
-    - "cs.CC"
-    - "cs.CL"
-    - "cs.CE"
-    - "cs.CR"
+    # - "cs.AR"
+    # - "cs.CC"
+    # - "cs.CL"
+    # - "cs.CE"
+    # - "cs.CR"
     - "cs.CV"
-    - "cs.CY"
-    - "cs.DB"
-    - "cs.DC"
-    - "cs.DS"
-    - "cs.GR"
-    - "cs.GT" 
-    - "cs.IR"
-    - "cs.IT"
+    # - "cs.CY"
+    # - "cs.DB"
+    # - "cs.DC"
+    # - "cs.DS"
+    # - "cs.GR"
+    # - "cs.GT"
+    # - "cs.IR"
+    # - "cs.IT"
     - "cs.LG" 
-    - "cs.LO"
-    - "cs.MA"
-    - "cs.NE"
-    - "cs.RO"
-    - "cs.SD"
-    - "cs.SE"
-    - "cs.SI"
-    - "math.AP"
-    - "math.PR"
-    - "math.ST"
-    - "physics.data-an"
-    - "q-bio.NC"
-    - "stat.AP"
-    - "stat.CO"
-    - "stat.ME"
-    - "stat.ML"
-    - "stat.OT"
+    # - "cs.LO"
+    # - "cs.MA"
+    # - "cs.NE"
+    # - "cs.RO"
+    # - "cs.SD"
+    # - "cs.SE"
+    # - "cs.SI"
+    # - "math.AP"
+    # - "math.PR"
+    # - "math.ST"
+    # - "physics.data-an"
+    # - "q-bio.NC"
+    # - "stat.AP"
+    # - "stat.CO"
+    # - "stat.ME"
+    # - "stat.ML"
+    # - "stat.OT"
     # 306,828 papers in arxiv_papers.papers
   max_results: 200 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 50 # Number of times to loop the pipeline for each category above
-  rate_limit_seconds: 6 # seconds to wait between api calls
-  start_date: "2022-01-01" # start_date is used in arxiv api call and save pdfs filters
-  end_date: "2025-07-31" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
+  max_iterations: 10 # Number of times to loop the pipeline for each category above
+  rate_limit_seconds: 10 # seconds to wait between api calls
+  start_date: "2026-01-01" # start_date is used in arxiv api call and save pdfs filters
+  end_date: "2026-07-31" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
   max_no_papers: 25 # Maximum number of no paper fetches before breaking loop for category
 # Embedding model settings
 embedding:
@@ -108,8 +152,9 @@ embedding:
 # 265,979 papers in arxiv_papers.papers
 # PDF storage settings
 pdf_storage:
-  directory: "X:/AI Research" # where papers are downloaded @download_pdfs.py subdirectory is auto created by category
+  directory: "data/pdfs" # ignored runtime data; mounted at /app/data/pdfs in containers
   papers_per_category: 200 # Maximum number of papers to download per category (0 for unlimited)
+  request_interval_seconds: 1 # Be polite to arXiv between new PDF requests
   # Categories to prioritize for PDF downloads - if empty, all papers in MongoDB will be considered
   process_categories: # used in download_pdfs.py - comment out categories you don't want to download
     - "cs.AI"
@@ -118,7 +163,7 @@ pdf_storage:
     # - "cs.CL"
     # - "cs.CE"
     # - "cs.CR"
-    # - "cs.CV"
+    - "cs.CV"
     # - "cs.CY"
     # - "cs.DB"
     # - "cs.DC"
@@ -148,11 +193,12 @@ pdf_storage:
   # Date filters for downloading PDFs
   download_date_filter:
     enabled: true         # Set to false to disable date filtering
-    start_date: "2022-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2025-07-31"   # Download papers published on or before this date (format: YYYY-MM-DD)
+    start_date: "2026-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
+    end_date: "2026-07-31"   # Download papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
 
-# BERTopic settings
+# Retired topic-modeling experiment. This is available only through the
+# Docker Compose `legacy` profile and is not used by the research API/index.
 bertopic:
   # MongoDB connection settings
   mongo:
@@ -167,14 +213,16 @@ bertopic:
   # Category filter
   categories:
     - "cs.AI"
-    # - "cs.LG"
+    - "cs.CV"
+    - "cs.LG"
   # Date filter
   date_filter:
     enabled: true
-    start_date: "2022-01-01"  # Process papers published on or after this date
-    end_date: "2025-07-31"    # Process papers published on or before this date
+    start_date: "2026-01-01"  # Process papers published on or after this date
+    end_date: "2026-07-31"    # Process papers published on or before this date
 
-# Top2Vec settings
+# Retired topic-modeling experiment. This is available only through the
+# Docker Compose `legacy` profile and is not used by the research API/index.
 top2vec:
   # MongoDB connection settings
   mongo:
@@ -194,12 +242,13 @@ top2vec:
   # Category filter
   categories:
     - "cs.AI"
-    # - "cs.LG"
+    - "cs.CV"
+    - "cs.LG"
   # Date filter
   date_filter:
     enabled: true
-    start_date: "2022-01-01"  # Process papers published on or after this date
-    end_date: "2025-07-31"    # Process papers published on or before this date
+    start_date: "2026-01-01"  # Process papers published on or after this date
+    end_date: "2026-07-31"    # Process papers published on or before this date
 
 # Kaggle Dataset Downloader settings
 kaggle:

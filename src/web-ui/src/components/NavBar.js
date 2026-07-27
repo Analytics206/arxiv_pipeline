@@ -2,21 +2,21 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/NavBar.css';
 import ThemeToggle from './ThemeToggle';
+import { apiConfig } from '../services/ResearchService';
 
 function NavBar() {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <Link to="/"><img src="/images/drp_logo_blue.png" alt="DRP Home" className="navbar-logo-img" /></Link>
+        <Link to="/">
+          <img src="/images/drp_logo_blue.png" alt="Research Intelligence Home" className="navbar-logo-img" />
+          <span>Research Intelligence</span>
+        </Link>
       </div>
       <div className="navbar-links">
-        <Link to="/neo4j" className="nav-link">Neo4j Explorer</Link>
-        <Link to="/mongodb" className="nav-link">MongoDB Reports</Link>
-        <Link to="/qdrant" className="nav-link">Qdrant Search</Link>
-        <Link to="/jupyter" className="nav-link">Jupyter Reports</Link>
-        <Link to="/config" className="nav-link">Config Editor</Link>
-        <Link to="/pipelines" className="nav-link">Pipeline Management</Link>
-        <a href="http://localhost:8000/docs#" className="nav-link" target="_blank" rel="noopener noreferrer">Pipeline API</a>
+        <Link to="/research" className="nav-link">Research Search</Link>
+        <Link to="/mongodb" className="nav-link">Metadata</Link>
+        <a href={`${apiConfig.API_BASE_URL}/docs`} className="nav-link" target="_blank" rel="noopener noreferrer">Agent API</a>
         <ThemeToggle />
       </div>
     </nav>

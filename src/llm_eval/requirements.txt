@@ -1,7 +1,8 @@
-transformers
-datasets
-torch
-rouge-score
-nltk
-pycocoevalcap
-pyyaml
+transformers>=5.14.1,<6
+datasets>=5.0.0,<6
+torch>=2.13.0,<3
+rouge-score>=0.1.2,<0.2
+nltk>=3.10.0,<4
+pycocoevalcap>=1.2,<2
+pycocotools>=2.0.11,<3
+pyyaml>=6.0.3,<7

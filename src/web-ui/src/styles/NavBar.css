@@ -11,7 +11,7 @@
   }
   
   .navbar-logo {
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: bold;
   }
   
@@ -20,6 +20,7 @@
     text-decoration: none;
     display: flex;
     align-items: center;
+    gap: 0.7rem;
   }
   
   .navbar-logo-img {
@@ -30,7 +31,7 @@
   .navbar-links {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
   
   .nav-link {
@@ -68,4 +69,3 @@
       margin-top: 1rem;
     }
   }
-  

@@ -7,14 +7,9 @@ models:
   default: ollama
   providers:
     ollama:
-      base_url: http://localhost:11434
       models:
-        - name: llama3
+        - name: qwen3.5:4b
           parameters:
-            temperature: 0.7
-            max_tokens: 4096
-        - name: codellama
-          parameters: 
             temperature: 0.2
             max_tokens: 8192
     huggingface:
@@ -32,7 +27,7 @@ models:
 agents:
   code_documentation:
     enabled: true
-    model: codellama
+    model: qwen3.5:4b
     watch_paths:
       - ./src
       - ./notebooks
@@ -45,7 +40,7 @@ agents:
     
   research_analysis:
     enabled: false
-    model: llama3
+    model: qwen3.5:4b
     data_sources:
       - type: mongodb
         connection: mongodb://localhost:27017
@@ -67,4 +62,3 @@ agents:
       - name: concept_mapping
         description: "Extract and map concepts between papers"
         prompt_template: "templates/concept_mapping.txt"
-    

@@ -1,32 +1,50 @@
-FROM python:3.11.8-slim-bookworm
+FROM python:3.13-slim-bookworm AS base
 
-# Update packages and apply security fixes
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
 
-# Install uv (fast dependency manager)
-RUN pip install --no-cache-dir uv
+RUN python -m pip install --no-cache-dir uv==0.11.32
 
-# Copy only dependency files first for better caching
-COPY pyproject.toml .
-COPY setup.py .
+FROM base AS core-dependencies
 
-# Install Python dependencies (cached unless these files change)
-RUN uv pip install --system -e .
+COPY pyproject.toml uv.lock setup.py README.md ./
 
-# Install Kafka client
-RUN uv pip install --system confluent-kafka
+RUN uv sync --frozen --no-dev --no-install-project
 
-# Now copy the rest of your code
+FROM core-dependencies AS core
+
 COPY . .
 
-# Set environment variables for Python (optional, but recommended)
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
+RUN uv sync --frozen --no-dev
 
-# Default command (can be overridden in docker-compose.yml)
 CMD ["python", "-m", "src.pipeline.run_pipeline", "--config", "config/default.yaml"]
+
+FROM core AS test
+
+RUN uv sync --frozen --extra dev
+
+FROM base AS legacy-dependencies
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git libgomp1 && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml uv.lock setup.py README.md ./
+
+RUN uv sync --frozen --no-dev --extra legacy --no-install-project
+
+FROM legacy-dependencies AS legacy
+
+COPY . .
+
+RUN uv sync --frozen --no-dev --extra legacy
+
+CMD ["python", "-m", "src.pipeline.run_pipeline", "--config", "config/default.yaml"]
+
+# Keep the default Docker build focused on the canonical agent-first runtime.
+FROM core AS runtime

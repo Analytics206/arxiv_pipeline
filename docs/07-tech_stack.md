@@ -1,317 +1,181 @@
-# 🛠️ Technical Stack Documentation
+# Technical Stack
 
-## System Architecture Overview
+## Runtime baseline
 
-The ArXiv Research Pipeline is built on a microservices architecture using Docker containers with the following components:
+| Area | Choice | Notes |
+| --- | --- | --- |
+| Python | 3.13 | Project constraint is `>=3.13,<3.14`; Python 3.14 is deferred until required packages support it cleanly |
+| Dependency management | `pyproject.toml`, `uv.lock`, uv | Cross-platform locked environment |
+| Containers | Docker Compose | Separate `runtime`, `test`, and `legacy` image targets |
+| Host OS | Windows or Linux | Project-relative PDF paths avoid drive-letter coupling |
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Ingestion     │────▶│  Data Storage   │────▶│   Processing    │
-│   Service       │     │    Layer        │     │    Layer        │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                                                         │
-                                                         ▼
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│      User       │◀────│   Knowledge     │◀────│   Vector        │
-│   Interface     │     │     Graph       │     │   Embeddings    │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-```
+The maintained core has 17 direct Python dependencies. Large local ML and
+notebook packages are isolated in the optional `legacy` extra.
 
-## Core Technologies
+## Core application stack
 
-### Infrastructure & Containerization
-- **Docker**: All services containerized for isolation and portability
-- **Docker Compose**: Multi-container orchestration for local development
-- **Python 3.11**: Core programming language (slim container variant)
-- **UV Package Manager**: Fast Python dependency management
-- **Git**: Version control system
+| Layer | Technology | Responsibility |
+| --- | --- | --- |
+| API | FastAPI, Uvicorn, Pydantic | REST/OpenAPI contracts and validation |
+| Agent protocol | MCP Python SDK 1.28, HTTPX | Read-only MCP tools/resources over canonical GET operations |
+| MongoDB access | PyMongo, Motor | Canonical metadata and analysis persistence |
+| Vector access | Qdrant Client | Named dense/sparse indexing, weighted RRF, filters, and hybrid search |
+| PDF parsing | PyMuPDF | Page-aware source extraction |
+| Model client | Ollama Python client | Shared remote/local analysis and embeddings |
+| Ingestion | aiohttp, Requests, Beautiful Soup | arXiv Atom and paper-page access |
+| Configuration | PyYAML, python-dotenv | Versioned defaults plus environment overrides |
+| Tests | pytest | Repository, contract, storage, and workflow regression tests |
 
-### Messaging System
-- **Apache Kafka**: Distributed event streaming platform for high-throughput, fault-tolerant messaging
-- **Confluent Platform**: Enterprise-ready distribution of Kafka
-- **Zookeeper**: Coordinates the Kafka cluster
-- **Confluent Kafka Python Client**: Python client library for producer/consumer interactions
-- **Kafka UI**: Web interface for Kafka cluster management and monitoring (provectuslabs/kafka-ui)
+## Data services
 
-### Monitoring & Observability
-- **Prometheus**: Time series database for metrics collection and storage
-  - Metrics: container performance, system resources, application metrics
-  - Targets: containers, host system, MongoDB, application services
-- **Grafana**: Visualization platform for metrics dashboards
-  - Preconfigured dashboards for Docker containers and system metrics
-  - Customizable alerts and notifications
-- **cAdvisor**: Container metrics collector
-- **Node Exporter**: Host system metrics collector
-- **MongoDB Exporter**: MongoDB-specific metrics collector
-- **Prometheus Client**: Python library for custom application metrics
+### MongoDB
 
-### Data Sources
-- **ArXiv API**: HTTP-based Atom XML API for research paper retrieval
-- **Kaggle Dataset**: Bulk download of arXiv papers from [Cornell-University/arxiv](https://www.kaggle.com/datasets/Cornell-University/arxiv)
-  - Direct integration with Kaggle's API
-  - Configurable download location (default: `X:\kaggle_arxiv`)
-  - Environment variable based authentication
-  - Automatic directory creation and error handling
+MongoDB is canonical for:
 
-### Ingestion Layer
-- **ArXiv API**: HTTP-based Atom XML API for research paper retrieval
-- **Kaggle API**: Python client for dataset downloads
-- **Requests**: HTTP client library
-- **ElementTree**: XML parsing for ArXiv response data
-- **Rate limiting**: Configurable throttling to respect API constraints
+- normalized arXiv paper metadata;
+- local PDF path, hash, validation, and processing state;
+- complete immutable analysis documents;
+- current-analysis pointers and model/prompt/schema provenance.
 
-### Data Storage Layer
-- **MongoDB**: NoSQL document database for paper metadata storage
-  - Collections: papers, authors, categories
-  - Indexes for efficient querying
-  - Deployment options:
-    - Docker container: Standard deployment within main pipeline
-    - External Docker: Standalone deployment on separate machine with persistent storage
-- **Docker volumes**: Persistent storage for database contents
+The API repository creates indexes for analysis identity, current-paper lookup,
+and evidence IDs.
 
-### Graph Representation
-- **Neo4j**: Graph database for representing paper-author-category relationships
-  - Nodes: Papers, Authors, Categories 
-  - Relationships: AUTHORED, BELONGS_TO
-  - Cypher query language
-  - Deployment options:
-    - Docker container: Standard deployment within main pipeline
-    - External Docker: Standalone deployment on separate machine with persistent storage
-- **Neo4j Python Driver**: Interface for graph operations
+### Qdrant
 
-### Vector Embeddings & Topic Modeling
-- **Hugging Face Transformers**: Machine learning models for text embeddings
-- **PyTorch with CUDA**: GPU-accelerated embeddings generation
-- **Top2Vec**: Topic modeling with BERT-based embeddings
-  - Memory-efficient batch processing
-  - Category and date filtering support
-  - MongoDB integration for topic storage
-- **BERTopic**: Topic modeling with BERT-based embeddings
-  - Memory-efficient batch processing
-  - Category and date filtering support
-  - MongoDB integration for topic storage
-- **Ollama**: Local LLM server for text analysis and embedding generation
-  - Deployment options:
-    - Local instance: Run directly on the host machine
-    - Docker container: Standard deployment within main pipeline
-    - External Docker: Standalone deployment on separate machine with model management
-- **Qdrant**: Vector database for similarity search
-  - Collections: paper_embeddings
-  - Storage of metadata with vectors
-  - Deployment options:
-    - Docker container: Standard deployment
-    - External Docker: Standalone deployment on separate machine
-    - WSL2 GPU-accelerated: Enhanced performance with CUDA support
-    - Standalone with GPU: Direct installation with CUDA support
-    - Remote WSL2 with GPU: Dedicated vector server on separate machine
-  - Vector optimization: Native GPU acceleration through Rust with CUDA
-  - Benchmarking tools for performance testing
-- **Embedding models**: Sentence transformers for semantic representation
-- **MongoDB Tracking**: Prevents duplicate PDF processing
+`research_knowledge_hybrid_v1` is the active hybrid index. It stores independently
+retrievable knowledge units such as:
 
-### PDF Processing
-- **PDF Download**: Direct file retrieval from ArXiv
-- **Storage**: Local filesystem storage (E:\AI Research)
+- verified evidence passages;
+- claims and reported findings;
+- limitations;
+- implementation ideas.
 
-### Configuration & Utilities
-- **YAML**: Configuration file format
-- **Environment Variables**: Runtime configuration
-- **Logging**: Standard Python logging
+Points include paper URI, analysis identity, source page/evidence, knowledge
+kind, and embedding provenance. Each point has a 1,024-dimensional dense vector
+and a stable hashed sparse lexical vector. Qdrant applies IDF and weighted RRF;
+the application performs final paper-diversity reranking. The index is
+rebuildable from MongoDB.
 
-## API Integrations
-- **ArXiv.org API**: `http://export.arxiv.org/api/query`
-  - Categories: cs.AI, cs.LG, cs.CV, etc.
-  - Sort options: submittedDate
-  - Result limits: Configurable
+The dense component remains `mxbai-embed-large:latest`, selected after
+comparison with Qwen3 Embedding 0.6B, EmbeddingGemma, and Nomic Embed Text
+v1.5. Hybrid retrieval was separately evaluated against the dense-only
+collection before promotion.
 
-## Development Tools
-- **Python Virtual Environment**: Isolated dependency management
-- **Docker Compose**: Local environment orchestration
+### Neo4j
 
-## Monitoring Architecture
+Neo4j is installed as an optional `manual` service, not as an API dependency or
+part of default startup. The historical author-paper-category graph remains
+available for reference. A richer graph must pass the evaluation gate described
+in the system design before it becomes part of agent retrieval.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                  Monitoring Environment                  │
-│                                                          │
-│   ┌─────────┐     ┌──────────┐     ┌────────────┐       │
-│   │Prometheus│────▶│ Grafana  │     │  cAdvisor  │       │
-│   │          │     │          │     │            │       │
-│   └─────────┘     └──────────┘     └────────────┘       │
-│        │                               │                 │
-│        │          ┌──────────┐         │                 │
-│        └──────────│Node      │─────────┘                 │
-│                   │Exporter  │                           │
-│                   └──────────┘                           │
-│                        │                                 │
-└────────────────────────│─────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────┐
-│                   Docker Environment                     │
-│  (Application containers, databases, and services)       │
-└─────────────────────────────────────────────────────────┘
-```
+## AI inference
 
-## Deployment Architecture
+The project does not run its own Ollama container. It calls the shared
+`ai-services` instance using:
 
-The system supports four deployment architectures:
+- `AI_SERVICES_HOST`
+- `AI_SERVICES_DOCKER_HOST`
+- `AI_SERVICES_OLLAMA_PORT`
+- optional full `OLLAMA_URL`
 
-### 1. Full Docker Deployment with Monitoring
+The current defaults are:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                  Monitoring Environment                  │
-│                                                          │
-│   ┌─────────┐     ┌──────────┐     ┌────────────┐       │
-│   │Prometheus│────▶│ Grafana  │     │  cAdvisor  │       │
-│   │          │     │          │     │            │       │
-│   └─────────┘     └──────────┘     └────────────┘       │
-│        │                │              │                 │
-└────────│────────────────│──────────────│─────────────────┘
-         │                │              │
-         ▼                ▼              ▼
-┌─────────────────────────────────────────────────────────┐
-│                     Docker Environment                   │
-└─────────────────────────────────────────────────────────┘
-```
+| Task | Model | Hardware rationale |
+| --- | --- | --- |
+| Structured paper analysis | `qwen3.5:4b` | Compact enough for an 8 GB RTX 2070 Mobile with configured 12K context |
+| Hybrid retrieval dense component | `mxbai-embed-large:latest` | Evaluated 1,024-dimensional model combined with sparse IDF retrieval |
 
-### 2. Standard Docker Deployment
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Docker Environment                   │
-│                                                          │
-│   ┌─────────┐     ┌──────────┐     ┌────────────┐       │
-│   │  app    │────▶│ mongodb  │────▶│ sync-neo4j │       │
-│   │         │     │          │     │            │       │
-│   └─────────┘     └──────────┘     └────────────┘       │
-│        │                │                 │              │
-│        ▼                ▼                 ▼              │
-│   ┌─────────┐     ┌──────────┐     ┌────────────┐       │
-│   │ qdrant  │◀────│  neo4j   │◀────│web-interface│       │
-│   │         │     │          │     │            │       │
-│   └─────────┘     └──────────┘     └────────────┘       │
-│                                                          │
-└─────────────────────────────────────────────────────────┘
-```
+Model names are configuration, not public-contract fields. Every analysis and
+search hit records the actual model/version provenance.
 
-### 3. Hybrid Deployment with GPU Acceleration
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Docker Environment                   │
-│                                                          │
-│   ┌─────────┐     ┌──────────┐     ┌────────────┐       │
-│   │  app    │────▶│ mongodb  │────▶│ sync-neo4j │       │
-│   │         │     │          │     │            │       │
-│   └─────────┘     └──────────┘     └────────────┘       │
-│        │                │                 │              │
-│        ▼                ▼                 ▼              │
-│                   ┌──────────┐     ┌────────────┐       │
-│                   │  neo4j   │◀────│web-interface│       │
-│                   │          │     │            │       │
-│                   └──────────┘     └────────────┘       │
-└─────────────────────│──────────────────────────────────┘
-                       │
-                       ▼
-┌──────────────────────────────────────────────────────┐
-│                 Host Environment                      │
-│                                                       │
-│ ┌─────────┐                                           │
-│ │ Qdrant  │ GPU-accelerated vector storage            │
-│ │         │ and similarity search                     │
-│ └─────────┘                                           │
-│      ▲                                                │
-│      │                                                │
-│ ┌────┴────┐                                           │
-│ │PyTorch   │ GPU-accelerated                          │
-│ │Embeddings│ vector generation                        │
-│ └─────────┘                                           │
-└──────────────────────────────────────────────────────┘
-```
+## API and agent integration
 
-### 4. Distributed Services Deployment
-```
-┌────────────────────────────────────────────┐     ┌────────────────────────────────────────────┐
-│          Machine 1 (Main Pipeline)         │     │          Machine 2 (MongoDB)               │
-│                                            │     │                                            │
-│ ┌─────────┐     ┌──────────┐     ┌──────┐ │     │ ┌──────────┐                               │
-│ │  app    │────▶│sync-neo4j│────▶│web-ui│ │     │ │ mongodb  │◀─────────────────────────────┤
-│ │         │     │          │     │      │ │     │ │          │                               │
-│ └─────────┘     └──────────┘     └──────┘ │     │ └──────────┘                               │
-└────────────────────────────────────────────┘     └────────────────────────────────────────────┘
-                       ▲
-                       │
-                       ▼
-┌────────────────────────────────────────────┐     ┌────────────────────────────────────────────┐
-│          Machine 3 (Neo4j)                 │     │          Machine 4 (Qdrant GPU)            │
-│                                            │     │                                            │
-│ ┌──────────┐                               │     │ ┌─────────┐                                │
-│ │  neo4j   │◀─────────────────────────────┤     │ │ qdrant  │◀─────────────────────────────┤
-│ │          │                               │     │ │ (GPU)   │                                │
-│ └──────────┘                               │     │ └─────────┘                                │
-└────────────────────────────────────────────┘     └────────────────────────────────────────────┘
-```
+FastAPI publishes:
 
-## Database Schema
+- a capability document for tool discovery;
+- an OpenAPI schema for generated clients and harness tools;
+- curated-paper catalog, complete context, and deterministic token-budgeted
+  context contracts;
+- evaluated hybrid search with filters and explicit score semantics;
+- stable evidence lookup;
+- health and interactive documentation.
 
-### MongoDB Collections
-- **papers**: Research paper metadata
-  - id: ArXiv ID
-  - title: Paper title
-  - summary: Abstract
-  - authors: Array of author names
-  - categories: Array of category codes
-  - published: Publication date
-  - pdf_url: URL to PDF file
-  - vector_id: Reference to vector embedding (if processed)
-  - topics: Array of extracted topics with probabilities (if processed)
-- **vector_processed_pdfs**: PDF processing tracking for Qdrant vector storage
-  - file_id: Unique identifier for the PDF file
-  - file_path: Full path to the PDF file
-  - category: Research category of the paper
-  - file_hash: SHA-256 hash of the file content
-  - chunk_count: Number of text chunks created for vector storage
-  - processed_date: Timestamp of processing
+REST/OpenAPI and MCP Streamable HTTP are the current cross-computer
+integrations. The MCP server also supports stdio for local harnesses. The SDK
+is constrained to `mcp>=1.28.1,<2`: v1 is the current stable production line,
+while the breaking v2 release was still a release candidate when this adapter
+was implemented.
 
-### Neo4j Graph Model
-- **Nodes**:
-  - :Paper (id, title, summary, published, pdf_url)
-  - :Author (name)
-  - :Category (code, description)
-- **Relationships**:
-  - (:Author)-[:AUTHORED]->(:Paper)
-  - (:Paper)-[:BELONGS_TO]->(:Category)
+## Web UI
 
-### MongoDB Topic Collection
-- **paper_topics**: Topic modeling results
-  - paper_id: ArXiv ID
-  - topics: Array of topic assignments
-  - probabilities: Topic probability scores
-  - model_version: BERTopic model version
-  - processed_date: Processing timestamp
+The human workspace currently uses React 18, React Router, Axios, Bootstrap,
+and Recharts. It provides:
 
-### Qdrant Collections
-- **paper_embeddings** (arxiv_papers):
-  - Vector dimension: Model-dependent (768 default)
-  - Metadata: paper_id, title
-  - Distance metric: Cosine similarity
-  - Source: PDF text content
+- service health and curated-corpus status;
+- semantic research search;
+- paper and knowledge-kind filters;
+- ranked evidence-aware results;
+- complete paper context and provenance views;
+- dynamic API hostname resolution for LAN access.
 
-- **papers_summary**:
-  - Vector dimension: Model-dependent (768 default)
-  - Metadata: paper_id, title, category, published date, summary_length
-  - Distance metric: Cosine similarity
-  - Source: Paper summary/abstract from MongoDB
-  - Tracking: summary_processed_papers collection in MongoDB
+The production image builds static assets with Node and serves them on port
+3000. The current Create React App/`react-scripts` toolchain is functional but
+old; migrating it to Vite and current frontend dependencies is a planned
+maintenance task because the build-stage dependency audit reports known
+vulnerabilities.
 
-## Security Considerations
-- Local-first architecture minimizes external dependencies
-- Docker isolation for service components
-- No exposed credentials in code
-- Grafana access protected by authentication
+## Container targets and profiles
 
-## Scaling Considerations
-- Container-based architecture supports horizontal scaling
-- Database services can be scaled independently
-- Modular components allow selective enhancement
-- Monitoring stack provides visibility into resource usage for capacity planning
+### Python images
+
+| Target | Contents | Consumers |
+| --- | --- | --- |
+| `runtime` | Core ingestion, PDF, database, API, retrieval, and Ollama clients | API, app, Mongo sync |
+| `test` | Runtime plus pytest/dev tools | CI and container verification |
+| `legacy` | Runtime plus Torch, Transformers, topic modeling, notebooks, and evaluation | Historical experiments only |
+
+### Compose profiles
+
+| Profile | Services |
+| --- | --- |
+| Default | `mongodb`, `qdrant`, `api`, `web-ui` |
+| `manual` | `app`, `sync-mongodb`, `neo4j`, `sync-neo4j`, Jupyter, Kafka utilities |
+| `legacy` | `legacy-runtime`, `sync-bertopic`, `sync-top2vec`, historical `sync-qdrant` |
+
+## Legacy Python stack
+
+The optional `legacy` extra contains PyTorch, Transformers,
+sentence-transformers, BERTopic, Top2Vec, NumPy/pandas/scikit-learn/Numba,
+Jupyter, evaluation metrics, Kaggle tools, and historical importers.
+
+These dependencies remain locked for reproducibility but are deliberately
+absent from the core runtime. BERTopic and Top2Vec are retired from the active
+research architecture because their clusters did not improve the intended
+agent/graph workflows.
+
+## Network configuration
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `RESEARCH_API_BIND` | `0.0.0.0` | API host-interface binding |
+| `RESEARCH_API_PORT` | `8000` | Published API port |
+| `RESEARCH_MCP_BIND` | `0.0.0.0` | MCP host-interface binding |
+| `RESEARCH_MCP_PORT` | `8001` | Published Streamable HTTP port |
+| `RESEARCH_MCP_API_TIMEOUT` | `30` | REST request timeout in seconds |
+| `RESEARCH_UI_BIND` | `0.0.0.0` | UI host-interface binding |
+| `RESEARCH_UI_PORT` | `3000` | Published UI port |
+| `CORS_ALLOWED_ORIGINS` | `*` | Trusted-LAN browser origins; replace with allowlist where appropriate |
+| `ENABLE_LEGACY_CYPHER_API` | `false` | Opt-in arbitrary legacy Cypher route |
+| `ENABLE_LEGACY_MUTATION_API` | `false` | Opt-in legacy mutation/debug route |
+
+The defaults are suitable only for a trusted private LAN. Binding to
+`127.0.0.1` restricts a service to the research host.
+
+## Deliberate exclusions
+
+- Python 3.14 package workarounds or source-build forcing;
+- a second project-owned Ollama model cache;
+- BERTopic/Top2Vec in the production path;
+- Neo4j as an always-on dependency;
+- Kafka for the current bounded single-host workload;
+- direct public-Internet serving without a security layer.

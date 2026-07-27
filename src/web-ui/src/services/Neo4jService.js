@@ -1,8 +1,7 @@
 import axios from 'axios';
+import apiConfig from '../config/api-config';
 
-// API configuration - use environment variables or defaults
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-const NEO4J_API_URL = `${API_BASE_URL}/neo4j`;
+const NEO4J_API_URL = `${apiConfig.API_BASE_URL}/neo4j`;
 
 // Log API configuration
 console.log(`Neo4j API configured with URL: ${NEO4J_API_URL}`);

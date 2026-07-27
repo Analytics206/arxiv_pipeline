@@ -1,0 +1,464 @@
+{
+  "suite_id": "agent-research-retrieval-v2",
+  "description": "Reviewed coding-agent retrieval questions over five immutable AI-paper analyses, including paper-scoped paraphrases, corpus discovery, cross-paper synthesis, and unanswerable controls.",
+  "document_hashes": {
+    "2607.22518": "e61f8dd88af6892f7fddfa4c3e6bf560e5d31a4bbc6150a4032225eab0dc7179",
+    "2607.22535": "559ba2ac4c9fddaa59f49ba864a071f33354f56217589e5ce76357fc28cc5c33",
+    "2607.22534": "e141127f8f5a77132e32200d12a02c1fb74f809af23a32edafc63ea0ca9e7213",
+    "2607.02134": "abc74823d062856acdcf45709b42364ff3a6b94383901af557bdb5096c739fe5",
+    "2607.21557": "2ab40353893eff95b84314067bf5cebcff34d915298c6f4f9aef9591b9b063fe"
+  },
+  "cases": [
+    {
+      "case_id": "pin-weighted-graph-exploration",
+      "query": "How does the recommendation system bias graph exploration toward content that has not been explored yet?",
+      "scope": "paper",
+      "paper_id": "2607.22518",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_3f9f26adb5bbd7a09b8bebae",
+        "ev_b4d2c97ecc82272d76098ef4"
+      ],
+      "tags": ["method", "paraphrase"]
+    },
+    {
+      "case_id": "pin-retire-exploration-items",
+      "query": "When should an item stop receiving exploration traffic?",
+      "scope": "paper",
+      "paper_id": "2607.22518",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_16227214a643f5183c850a12",
+        "ev_c38fa903a6d7580b31eccb99"
+      ],
+      "tags": ["method", "decision-rule"]
+    },
+    {
+      "case_id": "pin-long-term-fresh-holdout",
+      "query": "What experiment measures the cumulative value of fresh content rather than only short-term engagement?",
+      "scope": "paper",
+      "paper_id": "2607.22518",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_eeb21fbc8fd18c91408c9adb",
+        "ev_c38fa903a6d7580b31eccb99"
+      ],
+      "tags": ["method", "evaluation"]
+    },
+    {
+      "case_id": "pin-search-regularization-failure",
+      "query": "What went wrong when the ranking model was regularized too strongly on the search product surface?",
+      "scope": "paper",
+      "paper_id": "2607.22518",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_8e41fa5a1905fb37909a3e66",
+        "ev_b2cfa82aa9464572c6a5cb85"
+      ],
+      "tags": ["result", "failure"]
+    },
+    {
+      "case_id": "pin-missing-embedding-imputation",
+      "query": "How could a production ranking system cheaply fill missing embedding dimensions for cold-start content?",
+      "scope": "paper",
+      "paper_id": "2607.22518",
+      "kinds": ["implementation_idea"],
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_0a0ac5c06d647e5525282503"
+      ],
+      "tags": ["implementation-idea", "cold-start"]
+    },
+    {
+      "case_id": "robot-rendered-action-interface",
+      "query": "How are robot actions converted into camera-aligned visual conditioning for the world model?",
+      "scope": "paper",
+      "paper_id": "2607.22535",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_ef06b76da1116ec3452c6b38",
+        "ev_fed259fc933e428819ca591f"
+      ],
+      "tags": ["method", "visual-conditioning"]
+    },
+    {
+      "case_id": "robot-flow-matching-video-model",
+      "query": "What generative training objective and dynamics formulation are used by the video predictor?",
+      "scope": "paper",
+      "paper_id": "2607.22535",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_0b7eaa35b9142d598b06259c",
+        "ev_94cf3df91fe540fe9929c5dc"
+      ],
+      "tags": ["method", "diffusion"]
+    },
+    {
+      "case_id": "robot-unseen-embodiment-generalization",
+      "query": "Does the rendered robot interface generalize beyond the robot bodies seen during training?",
+      "scope": "paper",
+      "paper_id": "2607.22535",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_94890fbd2fabee346b1d1686"
+      ],
+      "tags": ["result", "generalization"]
+    },
+    {
+      "case_id": "robot-calibration-requirement",
+      "query": "What robot model and calibration information must be available before applying this method to a new embodiment?",
+      "scope": "paper",
+      "paper_id": "2607.22535",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_02caddbba0f0af8b4a065b84"
+      ],
+      "tags": ["limitation", "deployment"]
+    },
+    {
+      "case_id": "robot-kinematic-controller-idea",
+      "query": "What preprocessing step can turn raw action commands into a more useful visual trajectory input?",
+      "scope": "paper",
+      "paper_id": "2607.22535",
+      "kinds": ["implementation_idea"],
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_87ff3e3e5155960b5d7fc670"
+      ],
+      "tags": ["implementation-idea", "kinematics"]
+    },
+    {
+      "case_id": "sm4rt-parallel-geometry-motion",
+      "query": "What architecture jointly recovers scene geometry, motion, and kinematic structure in one pass?",
+      "scope": "paper",
+      "paper_id": "2607.22534",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_13f81a59abbd03b8fd6b8e7e"
+      ],
+      "tags": ["method", "architecture"]
+    },
+    {
+      "case_id": "sm4rt-sparse-motion-bases",
+      "query": "How is dense per-pixel scene motion reconstructed from a compact structured representation?",
+      "scope": "paper",
+      "paper_id": "2607.22534",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_aa016ecb27df89b7bca47763",
+        "ev_fe92cd8b15342a20056a42e6"
+      ],
+      "tags": ["method", "representation"]
+    },
+    {
+      "case_id": "sm4rt-contact-dynamics-limit",
+      "query": "Which physical interactions cannot be represented by the rigid-body motion assumption?",
+      "scope": "paper",
+      "paper_id": "2607.22534",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_d5c4f45fa10ef8818612d02d",
+        "ev_eab00a2b5871cf6255c95cb8"
+      ],
+      "tags": ["limitation", "physics"]
+    },
+    {
+      "case_id": "sm4rt-deformable-fixed-bases",
+      "query": "Why may the method be unreliable on highly deformable objects?",
+      "scope": "paper",
+      "paper_id": "2607.22534",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_7ff0825ab4d8ce944e8f8670"
+      ],
+      "tags": ["limitation", "deformation"]
+    },
+    {
+      "case_id": "sm4rt-adaptive-grouping-tradeoff",
+      "query": "What tradeoff was observed when adaptive grouping reduced dynamic-motion deformation?",
+      "scope": "paper",
+      "paper_id": "2607.22534",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_927952a523e6ad090c420c97"
+      ],
+      "tags": ["result", "tradeoff"]
+    },
+    {
+      "case_id": "replication-spec-before-match",
+      "query": "What must a coding agent reconstruct before an experimental target can be marked as matched?",
+      "scope": "paper",
+      "paper_id": "2607.02134",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_6cffdd6f43159ec3a482c4ed",
+        "ev_e4956409609a8688a09486a9"
+      ],
+      "tags": ["method", "agent-workflow"]
+    },
+    {
+      "case_id": "replication-external-validation",
+      "query": "How does the workflow prevent an agent from declaring completion based only on its own narrative?",
+      "scope": "paper",
+      "paper_id": "2607.02134",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_d75c30f14f703cdaa5a9a21d",
+        "ev_bf5978108259c2d0069d6daa"
+      ],
+      "tags": ["method", "validation"]
+    },
+    {
+      "case_id": "replication-numeric-acceptance",
+      "query": "How are numerical reproduction results judged against values reported by the source paper?",
+      "scope": "paper",
+      "paper_id": "2607.02134",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_00d694e1fe2301cccf9aeb9b",
+        "ev_7da7e28d2085a16a40da0a53"
+      ],
+      "tags": ["method", "numeric-validation"]
+    },
+    {
+      "case_id": "replication-hash-detection-limit",
+      "query": "What kind of copying can file hash checks fail to detect?",
+      "scope": "paper",
+      "paper_id": "2607.02134",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_6e5f85aff4ec1a8a647e4893",
+        "ev_39708eb2f822cf80b104e2d9"
+      ],
+      "tags": ["limitation", "provenance"]
+    },
+    {
+      "case_id": "replication-output-asset-separation",
+      "query": "How can a harness separate generated artifacts from paper-provided materials to discourage reuse?",
+      "scope": "paper",
+      "paper_id": "2607.02134",
+      "kinds": ["implementation_idea"],
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_fd8efc05bb0d6d4ec6a4a661"
+      ],
+      "tags": ["implementation-idea", "provenance"]
+    },
+    {
+      "case_id": "openforge-inference-proxy",
+      "query": "How does the inference proxy turn harness activity into reinforcement-learning samples?",
+      "scope": "paper",
+      "paper_id": "2607.21557",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_5002c8b64d726803e47397a1",
+        "ev_7eb3a93fcf9b7ece70af8cd9",
+        "ev_dea1fb7ad3d79d394b624392"
+      ],
+      "tags": ["method", "agent-harness"]
+    },
+    {
+      "case_id": "openforge-error-recovery",
+      "query": "What remains weak after RL training and may need dedicated data or training methods?",
+      "scope": "paper",
+      "paper_id": "2607.21557",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_e43349495ab1efbd771ca3ed",
+        "ev_4daf75b7c8667eace4b42e9d"
+      ],
+      "tags": ["limitation", "paraphrase"]
+    },
+    {
+      "case_id": "openforge-lightweight-gui-containers",
+      "query": "What reusable technique makes GUI rollout containers lightweight enough to run in parallel?",
+      "scope": "paper",
+      "paper_id": "2607.21557",
+      "kinds": ["implementation_idea"],
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_75427686a49f17e58e9e7e73"
+      ],
+      "tags": ["implementation-idea", "infrastructure"]
+    },
+    {
+      "case_id": "openforge-remote-rollout-orchestration",
+      "query": "How are remote agent rollouts orchestrated and scaled on cloud infrastructure?",
+      "scope": "paper",
+      "paper_id": "2607.21557",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_4b2cde284ff6c3c3f58c84c9",
+        "ev_828b9b79fa066c460c406800"
+      ],
+      "tags": ["method", "infrastructure"]
+    },
+    {
+      "case_id": "openforge-multi-harness-gains",
+      "query": "What evidence shows that training across multiple harnesses improves performance?",
+      "scope": "paper",
+      "paper_id": "2607.21557",
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_9cae4c72ba9981577b859a0c"
+      ],
+      "tags": ["result", "agent-harness"]
+    },
+    {
+      "case_id": "openforge-gui-rl-results",
+      "query": "Did reinforcement learning improve the GUI agent over the SFT-only model?",
+      "scope": "paper",
+      "paper_id": "2607.21557",
+      "kinds": ["claim", "evidence"],
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_d9e0b87a4d7d7ddf43e6f255"
+      ],
+      "tags": ["result", "gui-agent"]
+    },
+    {
+      "case_id": "corpus-persistent-agent-workspace",
+      "query": "Find a reusable pattern for keeping coding-agent state auditable and refusing completion until external checks pass.",
+      "scope": "corpus",
+      "limit": 8,
+      "expected_evidence_ids": [
+        "ev_a2e3686400149cc0ed3e0a09",
+        "ev_1448fbd3d3f2f4ce2ccd264d",
+        "ev_d75c30f14f703cdaa5a9a21d"
+      ],
+      "tags": ["discovery", "agent-harness"]
+    },
+    {
+      "case_id": "corpus-new-item-graph-exploration",
+      "query": "Which research idea uses weighted graph walks to deliberately expose under-explored items?",
+      "scope": "corpus",
+      "limit": 8,
+      "expected_evidence_ids": [
+        "ev_3f9f26adb5bbd7a09b8bebae",
+        "ev_b4d2c97ecc82272d76098ef4"
+      ],
+      "tags": ["discovery", "recommendation"]
+    },
+    {
+      "case_id": "corpus-robot-mesh-conditioning",
+      "query": "Which paper turns a robot trajectory and URDF geometry into camera-aligned mesh images for prediction?",
+      "scope": "corpus",
+      "limit": 8,
+      "expected_evidence_ids": [
+        "ev_ef06b76da1116ec3452c6b38",
+        "ev_fed259fc933e428819ca591f"
+      ],
+      "tags": ["discovery", "robotics"]
+    },
+    {
+      "case_id": "corpus-collision-limit",
+      "query": "Which method explicitly cannot model collisions, rebounds, contact dynamics, or fluid deformation?",
+      "scope": "corpus",
+      "limit": 8,
+      "expected_evidence_ids": [
+        "ev_d5c4f45fa10ef8818612d02d",
+        "ev_eab00a2b5871cf6255c95cb8"
+      ],
+      "tags": ["discovery", "limitation"]
+    },
+    {
+      "case_id": "corpus-harness-training-samples",
+      "query": "Find a method for intercepting model calls from arbitrary agent harnesses and reconstructing training trajectories.",
+      "scope": "corpus",
+      "limit": 8,
+      "expected_evidence_ids": [
+        "ev_5002c8b64d726803e47397a1",
+        "ev_dea1fb7ad3d79d394b624392"
+      ],
+      "tags": ["discovery", "agent-harness"]
+    },
+    {
+      "case_id": "corpus-generated-asset-provenance",
+      "query": "Find an implementation pattern that uses directory separation and hashes to prove agent outputs were generated rather than copied.",
+      "scope": "corpus",
+      "kinds": ["implementation_idea"],
+      "limit": 8,
+      "expected_evidence_ids": [
+        "ev_fd8efc05bb0d6d4ec6a4a661",
+        "ev_9e22efd60a6f237e661ad63c"
+      ],
+      "tags": ["discovery", "provenance"]
+    },
+    {
+      "case_id": "cross-paper-validation-workflows",
+      "query": "Find evidence from both paper replication and RL-task synthesis that external validation is used to make agent-produced work trustworthy.",
+      "scope": "cross-paper",
+      "limit": 12,
+      "expected_evidence_groups": [
+        [
+          "ev_d75c30f14f703cdaa5a9a21d",
+          "ev_bf5978108259c2d0069d6daa",
+          "ev_a2e3686400149cc0ed3e0a09"
+        ],
+        [
+          "ev_7781073a2980c1915efa0957"
+        ]
+      ],
+      "tags": ["cross-paper", "validation"]
+    },
+    {
+      "case_id": "cross-paper-incomplete-observations",
+      "query": "Find two limitations where a model or agent lacks complete scene or interface observations in real-world use.",
+      "scope": "cross-paper",
+      "limit": 12,
+      "expected_evidence_groups": [
+        [
+          "ev_d12915265566041511575580"
+        ],
+        [
+          "ev_f579391ce5483551879df92d"
+        ]
+      ],
+      "tags": ["cross-paper", "limitations"]
+    },
+    {
+      "case_id": "cross-paper-structured-motion-representations",
+      "query": "Find both approaches that impose structure on dynamic prediction: rendered robot trajectories and sparse rigid motion bases.",
+      "scope": "cross-paper",
+      "limit": 12,
+      "expected_evidence_groups": [
+        [
+          "ev_ef06b76da1116ec3452c6b38",
+          "ev_fed259fc933e428819ca591f"
+        ],
+        [
+          "ev_aa016ecb27df89b7bca47763",
+          "ev_fe92cd8b15342a20056a42e6"
+        ]
+      ],
+      "tags": ["cross-paper", "representation"]
+    },
+    {
+      "case_id": "negative-sql-index-tuning",
+      "query": "Which paper evaluates SQL query planners, B-tree index tuning, and transaction isolation levels?",
+      "case_type": "negative",
+      "scope": "negative",
+      "limit": 8,
+      "tags": ["negative", "out-of-domain"],
+      "note": "No curated paper covers relational database query optimization."
+    },
+    {
+      "case_id": "negative-encryption-key-rotation",
+      "query": "What encryption protocol and production key-rotation schedule do the papers recommend?",
+      "case_type": "negative",
+      "scope": "negative",
+      "limit": 8,
+      "tags": ["negative", "unsupported"],
+      "note": "No curated evidence specifies encryption or key rotation."
+    },
+    {
+      "case_id": "negative-federated-medical-privacy",
+      "query": "How is differential privacy implemented for federated medical-image training?",
+      "case_type": "negative",
+      "scope": "negative",
+      "limit": 8,
+      "tags": ["negative", "out-of-domain"],
+      "note": "No curated paper covers federated medical imaging or differential privacy."
+    }
+  ]
+}

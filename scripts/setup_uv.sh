@@ -1,45 +1,36 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
 # Detect OS
 case "$(uname -s)" in
   Linux*|Darwin*)
-    echo "Setting up UV on Unix-like system"
-    # Check if UV is installed
+    echo "Setting up uv on a Unix-like system"
     if ! command -v uv &> /dev/null; then
-        echo "Installing UV..."
+        echo "Installing uv..."
         curl -LsSf https://astral.sh/uv/install.sh | sh
-        # Add to path for the current session
-        export PATH="$HOME/.cargo/bin:$PATH"
+        export PATH="$HOME/.local/bin:$PATH"
     fi
     ;;
   MINGW*|MSYS*|CYGWIN*)
-    echo "Setting up UV on Windows"
-    # For Windows, use pip to install UV if not present
+    echo "Setting up uv on Windows"
     if ! command -v uv &> /dev/null; then
-        echo "Installing UV..."
-        pip install uv
+        echo "Install uv from https://docs.astral.sh/uv/getting-started/installation/"
+        exit 1
     fi
     ;;
   *)
-    echo "Unknown OS. Installing UV via pip"
-    pip install uv
+    echo "Unsupported operating system: $(uname -s)"
+    exit 1
     ;;
 esac
 
-# Create virtual environment
-echo "Creating virtual environment..."
-uv venv
+echo "Installing Python 3.13..."
+uv python install 3.13
 
-# Install dependencies
-echo "Installing dependencies..."
-uv pip install -e .
+echo "Creating the environment and installing locked dependencies..."
+uv sync --python 3.13 --extra agent --extra legacy --extra dev --frozen
 
-# Install dev dependencies
-echo "Installing dev dependencies..."
-uv pip install -e ".[dev]"
-
-echo "Setup complete! You can activate the virtual environment with:"
+echo "Setup complete! Activate the virtual environment with:"
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
     echo ".venv\\Scripts\\activate.bat  # In CMD"
     echo ".venv\\Scripts\\Activate.ps1  # In PowerShell"

@@ -10,7 +10,7 @@ This directory contains Jupyter notebooks for interactive exploration, testing, 
 
 ### Prerequisites
 
-- Python 3.8+ installed
+- Python 3.13 installed (the setup scripts can install it through uv)
 - Jupyter lab or notebook installed
 - Docker containers running (if testing against containerized databases)
 

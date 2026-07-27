@@ -18,7 +18,27 @@ function MongoDBReports() {
   
   // Fetch paper analysis data on component mount
   useEffect(() => {
-    fetchPaperAnalysisData();
+    let active = true;
+    const loadInitialData = async () => {
+      try {
+        const data = await getPaperAnalysisByTime();
+        if (!active) return;
+        setPaperAnalysis(data);
+        if (data.categories && data.categories.length > 0) {
+          setAvailableCategories(data.categories);
+        }
+      } catch (err) {
+        if (active) {
+          setError('Failed to load paper analysis data. Please try again later.');
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    loadInitialData();
+    return () => {
+      active = false;
+    };
   }, []);
   
   // Function to fetch paper analysis data with optional filters

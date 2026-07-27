@@ -2,11 +2,11 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json ./
+# Copy package files together so dependency installation is reproducible
+COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm install
+# Install the exact locked dependencies
+RUN npm ci
 
 # Copy the rest of the application
 COPY . .

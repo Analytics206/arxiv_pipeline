@@ -9,12 +9,13 @@ The Model Metadata Viewer provides a user-friendly interface to browse, search, 
 ### Supported Model Sources
 
 - **Hugging Face Models**: Public models from the Hugging Face Hub
-- **Ollama Installed Models**: Models currently installed in your local Ollama instance
+- **Ollama Installed Models**: Models currently installed in the shared
+  `ai-services` Ollama instance
 - **Ollama Available Models**: Models available for download from the Ollama library
 
 ## Prerequisites
 
-- Python 3.7+
+- Python 3.13
 - Required Python packages: `requests`, `beautifulsoup4`
 - For Ollama models: A running Ollama server (for installed models)
 - For Hugging Face models: Internet connection to fetch model data
@@ -55,13 +56,15 @@ This will create `open_models_data.json` in the `model_metadata_viewer` director
 
 ### 2. Ollama Installed Models
 
-Make sure your Ollama server is running, then:
+Make sure the shared `ai-services` Ollama server is running and `.env` points
+to it, then:
 
 ```bash
 python -m src.utils.load_ollama_metadata
 ```
 
-This will create `ollama_models_data.json` with metadata for your locally installed Ollama models.
+This creates `ollama_models_data.json` with metadata from the configured shared
+Ollama server.
 
 ### 3. Ollama Available Models
 

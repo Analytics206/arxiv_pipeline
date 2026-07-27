@@ -1,21 +1,19 @@
 from typing import Dict, List, Any, Optional
 import logging
-from datetime import datetime
-
-from langchain_community.document_loaders.mongodb import MongodbLoader
-from langchain_community.vectorstores.mongodb_atlas import MongoDBAtlasVectorSearch
+from datetime import datetime, timezone
 
 import pymongo
 
 logger = logging.getLogger(__name__)
 
+
 class MongoStorage:
-    """MongoDB storage for arXiv papers, using LangChain."""
+    """MongoDB storage for arXiv papers."""
 
     def __init__(
         self,
         connection_string: str = "mongodb://localhost:27017/",
-        db_name: str = "arxiv_papers"
+        db_name: str = "arxiv_papers",
     ):
         """
         Initialize MongoDB connection.
@@ -28,13 +26,6 @@ class MongoStorage:
         self.db = self.client[db_name]
         self.papers = self.db.papers
         self.stats = self.db.ingestion_stats
-
-        # LangChain MongoDB loader for document operations
-        self.loader = MongodbLoader(
-            connection_string=connection_string,
-            db_name=db_name,
-            collection_name="papers"
-        )
 
         # Create indexes
         self._setup_indexes()
@@ -65,24 +56,26 @@ class MongoStorage:
 
         for paper in papers:
             try:
-                paper['ingestion_timestamp'] = datetime.utcnow()
+                paper["ingestion_timestamp"] = datetime.utcnow()
                 # Use LangChain loader for upsert
                 # loader.add_documents expects a list of dicts
                 # But we want to upsert by "id", so we use update_one directly
                 result = self.papers.update_one(
-                    {"id": paper["id"]},
-                    {"$set": paper},
-                    upsert=True
+                    {"id": paper["id"]}, {"$set": paper}, upsert=True
                 )
                 if result.upserted_id:
                     inserted += 1
                 elif result.modified_count > 0:
                     updated += 1
             except PyMongoError as e:
-                logger.error(f"MongoDB error storing paper {paper.get('id', 'unknown')}: {str(e)}")
+                logger.error(
+                    f"MongoDB error storing paper {paper.get('id', 'unknown')}: {str(e)}"
+                )
                 failed += 1
             except Exception as e:
-                logger.exception(f"Unexpected error storing paper {paper.get('id', 'unknown')}: {str(e)}")
+                logger.exception(
+                    f"Unexpected error storing paper {paper.get('id', 'unknown')}: {str(e)}"
+                )
                 failed += 1
 
         stats = {
@@ -90,7 +83,7 @@ class MongoStorage:
             "inserted": inserted,
             "updated": updated,
             "failed": failed,
-            "total_processed": len(papers)
+            "total_processed": len(papers),
         }
 
         try:
@@ -116,7 +109,7 @@ class MongoStorage:
 
         operations = []
         for paper in papers:
-            paper['ingestion_timestamp'] = datetime.utcnow()
+            paper["ingestion_timestamp"] = datetime.utcnow()
             operations.append(
                 UpdateOne({"id": paper["id"]}, {"$set": paper}, upsert=True)
             )
@@ -147,7 +140,7 @@ class MongoStorage:
             "inserted": inserted,
             "updated": updated,
             "failed": failed,
-            "total_processed": len(papers)
+            "total_processed": len(papers),
         }
 
         try:
@@ -155,16 +148,45 @@ class MongoStorage:
         except PyMongoError as e:
             logger.warning(f"Could not log ingestion stats: {str(e)}")
 
-        logger.info(f"Bulk stored {inserted} new papers, updated {updated}, failed {failed}")
+        logger.info(
+            f"Bulk stored {inserted} new papers, updated {updated}, failed {failed}"
+        )
         return stats
 
     def get_paper(self, paper_id: str) -> Optional[Dict]:
         """Retrieve single paper by ID."""
-        # Use LangChain loader for retrieval
-        docs = self.loader.load({"id": paper_id})
-        if docs:
-            return docs[0]
-        return None
+        return self.papers.find_one({"id": paper_id})
+
+    def record_pdf(
+        self,
+        *,
+        paper_id: str,
+        arxiv_id: str,
+        local_pdf_path: str,
+        document_hash: str,
+        size_bytes: int,
+    ) -> None:
+        """Record a portable PDF location on the paper and legacy tracker."""
+
+        now = datetime.now(timezone.utc)
+        pdf_fields = {
+            "local_pdf_path": local_pdf_path,
+            "pdf_document_hash": document_hash,
+            "pdf_size_bytes": size_bytes,
+            "pdf_downloaded_at": now,
+        }
+        self.papers.update_one({"id": paper_id}, {"$set": pdf_fields})
+        self.db["downloaded_pdfs"].update_one(
+            {"arxiv_id": arxiv_id},
+            {
+                "$set": {
+                    "arxiv_id": arxiv_id,
+                    "downloaded": True,
+                    **pdf_fields,
+                }
+            },
+            upsert=True,
+        )
 
     def get_papers(
         self,
@@ -172,7 +194,7 @@ class MongoStorage:
         limit: int = 100,
         skip: int = 0,
         sort_by: str = "published",
-        sort_order: int = -1
+        sort_order: int = -1,
     ) -> List[Dict]:
         """
         Retrieve papers with filtering, pagination and sorting.
@@ -190,14 +212,13 @@ class MongoStorage:
         if filter_query is None:
             filter_query = {}
 
-        # Use LangChain loader for retrieval
-        docs = self.loader.load(
-            filter_query,
-            limit=limit,
-            skip=skip,
-            sort=[(sort_by, sort_order)]
+        cursor = (
+            self.papers.find(filter_query)
+            .sort(sort_by, sort_order)
+            .skip(skip)
+            .limit(limit)
         )
-        return docs
+        return list(cursor)
 
     def get_stats(self, limit: int = 10) -> List[Dict]:
         """Get recent ingestion statistics."""

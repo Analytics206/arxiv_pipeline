@@ -1,147 +1,140 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  apiConfig,
+  getResearchCapabilities,
+  getServiceHealth,
+  listCuratedPapers,
+} from '../services/ResearchService';
 import '../styles/Home.css';
-import { getAllDatabaseMetrics } from '../services/DatabaseMetricsService';
 
 function Home() {
-  // State for database metrics and loading status
-  const [metrics, setMetrics] = useState({
-    neo4j: { connected: false, metrics: { papers: 0, authors: 0, categories: 0 } },
-    mongodb: { connected: false, metrics: { papers: 0, authors: 0, categories: 0 } },
-    qdrant: { connected: false, metrics: { papers: 0, authors: 0, categories: 0 } }
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [catalog, setCatalog] = useState({ total: 0, papers: [] });
+  const [capabilities, setCapabilities] = useState(null);
+  const [health, setHealth] = useState(null);
+  const [error, setError] = useState('');
 
-  // Format large numbers with commas
-  const formatNumber = (num) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-
-  // Fetch database metrics when component mounts
   useEffect(() => {
-    const fetchMetrics = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllDatabaseMetrics();
-        setMetrics(data);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching database metrics:', err);
-        setError('Failed to fetch database metrics. Please check your connections.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMetrics();
-
-    // Set up polling interval (every 30 seconds)
-    const intervalId = setInterval(fetchMetrics, 30000);
-
-    // Clean up interval on component unmount
-    return () => clearInterval(intervalId);
+    Promise.all([
+      listCuratedPapers({ limit: 6 }),
+      getResearchCapabilities(),
+      getServiceHealth(),
+    ])
+      .then(([paperData, capabilityData, healthData]) => {
+        setCatalog(paperData);
+        setCapabilities(capabilityData);
+        setHealth(healthData);
+      })
+      .catch((loadError) => setError(loadError.message));
   }, []);
 
   return (
-    <div className="home-container">
-      <h1 className="main-title">Deep Research Pipeline Dashboard</h1>
-      <p className="subtitle">AI Research Papers Analytics Platform</p>
-      
-      <div className="cards-container">
-        <div className="card">
-          <h2>Neo4j Explorer</h2>
-          <p>Visualize and explore research papers as a knowledge graph</p>
-          <p>Connect to Neo4j database to query and visualize paper relationships</p>
-          <Link to="/neo4j" className="card-button">Launch</Link>
+    <main className="home-container">
+      <section className="home-hero">
+        <div>
+          <span className="eyebrow">Local research intelligence</span>
+          <h1>Turn AI papers into engineering leverage.</h1>
+          <p>
+            Evidence-backed analyses and implementation ideas, curated for
+            coding agents and readable by humans.
+          </p>
+          <div className="hero-actions">
+            <Link to="/research" className="primary-action">
+              Search curated research
+            </Link>
+            <a
+              href={`${apiConfig.API_BASE_URL}/docs`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="secondary-action"
+            >
+              Inspect the agent API
+            </a>
+          </div>
         </div>
-        
-        <div className="card">
-          <h2>MongoDB Reports</h2>
-          <p>Access and create customized reports from paper metadata</p>
-          <p>Run custom queries and generate visualizations from MongoDB data</p>
-          <Link to="/mongodb" className="card-button">Launch</Link>
+        <div className="service-card">
+          <div className="service-status">
+            <span className={health?.status === 'ok' ? 'status-dot online' : 'status-dot'} />
+            {health?.status === 'ok' ? 'Research service online' : 'Connecting…'}
+          </div>
+          <strong>{catalog.total}</strong>
+          <span>curated papers</span>
+          <code>{apiConfig.API_BASE_URL}</code>
         </div>
-        
-        <div className="card">
-          <h2>Qdrant Search</h2>
-          <p>Perform semantic search across research papers</p>
-          <p>Find relevant papers using vector similarity search</p>
-          <Link to="/qdrant" className="card-button">Launch</Link>
+      </section>
+
+      {error && <div className="workspace-error">{error}</div>}
+
+      <section className="product-principles">
+        <article>
+          <span>01</span>
+          <h2>Evidence before eloquence</h2>
+          <p>Material claims retain verified quotes and source pages.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h2>Structured for agents</h2>
+          <p>Stable JSON contracts can enter a harness without scraping UI.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h2>Ideas you can apply</h2>
+          <p>Paper claims stay separate from derived implementation ideas.</p>
+        </article>
+      </section>
+
+      <section className="library-section">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Curated library</span>
+            <h2>Recently analyzed</h2>
+          </div>
+          <Link to="/research">Search all knowledge →</Link>
         </div>
-        
-        <div className="card">
-          <h2>Jupyter Reports</h2>
-          <p>Access data analysis notebooks and reports</p>
-          <p>View and download interactive Jupyter notebooks with research insights</p>
-          <Link to="/jupyter" className="card-button">Launch</Link>
+        <div className="paper-grid">
+          {catalog.papers.map((paper) => (
+            <article key={paper.paper_id} className="paper-card">
+              <div className="paper-card-meta">
+                <span>{paper.paper_version_id}</span>
+                <span>{paper.page_count} pages</span>
+              </div>
+              <h3>{paper.title}</h3>
+              <div className="paper-stats">
+                <span>{paper.claim_count} claims</span>
+                <span>{paper.evidence_count} citations</span>
+                <span>{paper.implementation_idea_count} ideas</span>
+              </div>
+              <Link to={`/research?paper=${paper.paper_id}`}>
+                Explore this paper
+              </Link>
+            </article>
+          ))}
+          {!catalog.papers.length && !error && (
+            <div className="empty-state">Loading the curated library…</div>
+          )}
         </div>
-        
-        <div className="card">
-          <h2>Config Editor</h2>
-          <p>Edit and save application configuration</p>
-          <p>Modify the default.yaml settings for all pipeline components</p>
-          <Link to="/config" className="card-button">Launch</Link>
+      </section>
+
+      <section className="agent-access-section">
+        <div>
+          <span className="eyebrow">Harness integration</span>
+          <h2>Use the same knowledge from another computer.</h2>
+          <p>
+            Point your agent tool at this host’s OpenAPI document. Discovery,
+            search, paper context, and evidence lookup are read-only.
+          </p>
         </div>
-        
-        <div className="card">
-          <h2>Pipeline Management</h2>
-          <p>Start, stop and monitor data pipelines</p>
-          <p>Control and monitor the status of all data processing jobs</p>
-          <Link to="/pipelines" className="card-button">Launch</Link>
+        <div className="endpoint-stack">
+          <code>{apiConfig.API_BASE_URL}/openapi.json</code>
+          {capabilities?.tools.map((tool) => (
+            <span key={tool.name}>
+              <strong>{tool.name}</strong>
+              {tool.path}
+            </span>
+          ))}
         </div>
-      </div>
-      
-      <div className="metrics-table-container">
-        <h2 className="metrics-title">Database Metrics</h2>
-        {loading ? (
-          <div className="loading-indicator">Loading database metrics...</div>
-        ) : error ? (
-          <div className="error-message">{error}</div>
-        ) : (
-          <table className="metrics-table">
-            <thead>
-              <tr>
-                <th>Database</th>
-                <th>Connection Status</th>
-                <th>Papers</th>
-                <th>Authors</th>
-                <th>Categories</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Neo4j</td>
-                <td className={metrics.neo4j.connected ? "status-connected" : "status-disconnected"}>
-                  {metrics.neo4j.connected ? "Connected" : "Disconnected"}
-                </td>
-                <td>{formatNumber(metrics.neo4j.metrics.papers)}</td>
-                <td>{formatNumber(metrics.neo4j.metrics.authors)}</td>
-                <td>{formatNumber(metrics.neo4j.metrics.categories)}</td>
-              </tr>
-              <tr>
-                <td>MongoDB</td>
-                <td className={metrics.mongodb.connected ? "status-connected" : "status-disconnected"}>
-                  {metrics.mongodb.connected ? "Connected" : "Disconnected"}
-                </td>
-                <td>{formatNumber(metrics.mongodb.metrics.papers)}</td>
-                <td>{formatNumber(metrics.mongodb.metrics.authors)}</td>
-                <td>{formatNumber(metrics.mongodb.metrics.categories)}</td>
-              </tr>
-              <tr>
-                <td>Qdrant</td>
-                <td className={metrics.qdrant.connected ? "status-connected" : "status-disconnected"}>
-                  {metrics.qdrant.connected ? "Connected" : "Disconnected"}
-                </td>
-                <td>{formatNumber(metrics.qdrant.metrics.papers)}</td>
-                <td>{formatNumber(metrics.qdrant.metrics.authors)}</td>
-                <td>{formatNumber(metrics.qdrant.metrics.categories)}</td>
-              </tr>
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 

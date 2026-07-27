@@ -37,7 +37,7 @@ docker-compose --profile manual build --no-cache sync-top2vec
 docker-compose --profile manual up sync-top2vec
 
 Remove-Item -Recurse -Force .venv  # or venv, depending on your folder name
-python3.11 -m venv .venv
+uv venv --python 3.13
 .\.venv\Scripts\Activate
 pip install -e .
 python.exe -m pip install --upgrade pip

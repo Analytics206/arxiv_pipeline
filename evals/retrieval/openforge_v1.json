@@ -1,0 +1,82 @@
+{
+  "suite_id": "openforge-agent-retrieval-v1",
+  "description": "Reviewed agent-oriented questions over OpenForgeRL v1.",
+  "document_hash": "2ab40353893eff95b84314067bf5cebcff34d915298c6f4f9aef9591b9b063fe",
+  "cases": [
+    {
+      "case_id": "inference-proxy",
+      "query": "How does the inference proxy turn harness activity into reinforcement-learning samples?",
+      "paper_id": "2607.21557",
+      "kinds": null,
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_5002c8b64d726803e47397a1",
+        "ev_7eb3a93fcf9b7ece70af8cd9",
+        "ev_dea1fb7ad3d79d394b624392"
+      ],
+      "note": "Should retrieve the proxy capture and trajectory reconstruction method."
+    },
+    {
+      "case_id": "error-recovery",
+      "query": "What remains weak after RL training and may need dedicated data or training methods?",
+      "paper_id": "2607.21557",
+      "kinds": null,
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_e43349495ab1efbd771ca3ed",
+        "ev_4daf75b7c8667eace4b42e9d"
+      ],
+      "note": "Should retrieve the paper's explicit error-recovery limitation."
+    },
+    {
+      "case_id": "lightweight-gui-containers",
+      "query": "What reusable technique makes GUI rollout containers lightweight enough to run in parallel?",
+      "paper_id": "2607.21557",
+      "kinds": [
+        "implementation_idea"
+      ],
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_75427686a49f17e58e9e7e73"
+      ],
+      "note": "Should retrieve the Xvfb implementation idea."
+    },
+    {
+      "case_id": "remote-rollout-orchestration",
+      "query": "How are remote agent rollouts orchestrated and scaled on cloud infrastructure?",
+      "paper_id": "2607.21557",
+      "kinds": null,
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_4b2cde284ff6c3c3f58c84c9",
+        "ev_828b9b79fa066c460c406800"
+      ],
+      "note": "Should retrieve Kubernetes container orchestration."
+    },
+    {
+      "case_id": "multi-harness-gains",
+      "query": "What evidence shows that training across multiple harnesses improves performance?",
+      "paper_id": "2607.21557",
+      "kinds": null,
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_9cae4c72ba9981577b859a0c"
+      ],
+      "note": "Should retrieve the reported all-harness gains."
+    },
+    {
+      "case_id": "gui-rl-results",
+      "query": "Did reinforcement learning improve the GUI agent over the SFT-only model?",
+      "paper_id": "2607.21557",
+      "kinds": [
+        "claim",
+        "evidence"
+      ],
+      "limit": 5,
+      "expected_evidence_ids": [
+        "ev_d9e0b87a4d7d7ddf43e6f255"
+      ],
+      "note": "Should retrieve the three-benchmark GUI improvement."
+    }
+  ]
+}

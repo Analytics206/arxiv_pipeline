@@ -4,16 +4,11 @@ import hashlib
 import datetime
 from pymongo import MongoClient
 from qdrant_client import QdrantClient
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Qdrant
-from langchain.schema.document import Document
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
-from langchain_community.llms import Ollama
-from PIL import Image
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from ollama import Client as OllamaClient
 import fitz  # PyMuPDF
+
+from src.utils.ai_services import resolve_ollama_model, resolve_ollama_url
 
 # Load configuration from file
 def load_config():
@@ -22,6 +17,11 @@ def load_config():
         return yaml.safe_load(config_file)
 
 config = load_config()
+OLLAMA_MODEL = resolve_ollama_model(config)
+ollama_client = OllamaClient(
+    host=resolve_ollama_url(config),
+    timeout=600,
+)
 
 # Get settings from config
 QDRANT_URL = config['qdrant']['url']
@@ -171,10 +171,20 @@ def extract_images_from_pdf(pdf_path, output_dir):
 
 def process_pdf(pdf_path, qdrant_url=QDRANT_URL, qdrant_collection=QDRANT_COLLECTION):
     # 1. Load PDF and split text
-    loader = PyPDFLoader(pdf_path)
-    pages = loader.load()
+    pdf_document = fitz.open(pdf_path)
+    try:
+        page_texts = [page.get_text() for page in pdf_document]
+    finally:
+        pdf_document.close()
+
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    chunks = text_splitter.split_documents(pages)
+    chunks = text_splitter.create_documents(
+        page_texts,
+        metadatas=[
+            {"source": pdf_path, "page": page_number}
+            for page_number in range(len(page_texts))
+        ],
+    )
 
     # 2. Embed and store text chunks in Qdrant using HuggingFace local embeddings with GPU if available
     # Get GPU settings from config
@@ -280,21 +290,21 @@ def process_pdf(pdf_path, qdrant_url=QDRANT_URL, qdrant_collection=QDRANT_COLLEC
     os.makedirs(image_dir, exist_ok=True)
     image_paths = extract_images_from_pdf(pdf_path, image_dir)
 
-    # 4. Analyze images with local Ollama LLM (text-only, not vision) if available
+    # 4. Analyze images with the shared ai-services Ollama model, if available.
     image_descriptions = []
     try:
-        # Try to use Ollama for image analysis
-        llm = Ollama(model="llama3")
-        image_analysis_prompt = PromptTemplate(
-            template="Describe this technical diagram in detail, including any labeled components: {image_path}",
-            input_variables=["image_path"]
-        )
-        image_chain = LLMChain(llm=llm, prompt=image_analysis_prompt)
-        
         for img_path in image_paths:
             try:
-                # NOTE: Ollama llama3 is text-only; you can only pass the image path or a description, not the image itself.
-                description = image_chain.run(image_path=img_path)
+                response = ollama_client.generate(
+                    model=OLLAMA_MODEL,
+                    prompt=(
+                        "Describe this technical diagram in detail, including any "
+                        "labeled components and relationships."
+                    ),
+                    images=[img_path],
+                    options={"temperature": 0, "num_ctx": 8192},
+                )
+                description = response.response
                 image_descriptions.append({"file": img_path, "description": description})
             except Exception as e:
                 print(f"Error analyzing image {img_path}: {str(e)}")

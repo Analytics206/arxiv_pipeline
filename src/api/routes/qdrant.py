@@ -259,6 +259,14 @@ def sync_summary_vectors(background_tasks: BackgroundTasks) -> Dict[str, Any]:
     """
     Starts a background task to sync paper summaries from MongoDB to Qdrant.
     """
+    if os.getenv("ENABLE_LEGACY_MUTATION_API", "false").lower() != "true":
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "Legacy mutation endpoints are disabled on the LAN research "
+                "service. Run the explicit Compose workflow instead."
+            ),
+        )
     # Path to the sync script
     script_path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(__file__))),

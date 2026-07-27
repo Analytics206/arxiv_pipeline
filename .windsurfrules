@@ -10,7 +10,7 @@
 - Use Context7 agent to when you need deeper understand of the code or when you need to reason about the code
 
 ## Technology Stack
-- Use Python 3.11 as the primary programming language
+- Use Python 3.13 as the primary programming language
 - Use Docker and Docker Compose for containerization and orchestration
 - Use MongoDB for document storage of paper metadata
 - Use Neo4j for graph database representation of papers, authors, and categories

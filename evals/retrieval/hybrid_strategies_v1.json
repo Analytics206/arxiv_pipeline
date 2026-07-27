@@ -1,0 +1,109 @@
+{
+  "benchmark_id": "hybrid-retrieval-strategies-v1",
+  "description": "Dense baseline versus hashed lexical IDF retrieval, weighted reciprocal-rank fusion, and paper-diversity reranking.",
+  "embedding_model": "mxbai-embed-large:latest",
+  "baseline_collection": "research_knowledge_v1",
+  "hybrid_collection": "research_knowledge_hybrid_v1",
+  "hybrid_index_schema_version": "2.0",
+  "selected_strategy_id": "hybrid-dense-110-diverse-20",
+  "strategies": [
+    {
+      "strategy_id": "dense-baseline",
+      "retrieval_mode": "dense",
+      "note": "Current production retrieval."
+    },
+    {
+      "strategy_id": "hybrid-equal",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 1.0,
+      "sparse_weight": 1.0,
+      "note": "Equal dense and sparse RRF."
+    },
+    {
+      "strategy_id": "hybrid-dense-2",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 2.0,
+      "sparse_weight": 1.0,
+      "note": "Dense-biased RRF intended to protect semantic recall."
+    },
+    {
+      "strategy_id": "hybrid-sparse-2",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 1.0,
+      "sparse_weight": 2.0,
+      "note": "Sparse-biased RRF for exact technical terminology."
+    },
+    {
+      "strategy_id": "hybrid-equal-diverse-10",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 1.0,
+      "sparse_weight": 1.0,
+      "paper_diversity_penalty": 0.1,
+      "note": "Equal fusion with a light repeated-paper penalty."
+    },
+    {
+      "strategy_id": "hybrid-equal-diverse-20",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 1.0,
+      "sparse_weight": 1.0,
+      "paper_diversity_penalty": 0.2,
+      "note": "Equal fusion with a moderate repeated-paper penalty."
+    },
+    {
+      "strategy_id": "hybrid-dense-2-diverse-20",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 2.0,
+      "sparse_weight": 1.0,
+      "paper_diversity_penalty": 0.2,
+      "note": "Dense-biased fusion with moderate paper diversity."
+    },
+    {
+      "strategy_id": "hybrid-dense-125-diverse-20",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 1.25,
+      "sparse_weight": 1.0,
+      "paper_diversity_penalty": 0.2,
+      "note": "Light dense bias with moderate paper diversity."
+    },
+    {
+      "strategy_id": "hybrid-dense-110-diverse-20",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 1.1,
+      "sparse_weight": 1.0,
+      "paper_diversity_penalty": 0.2,
+      "note": "Minimal dense bias with moderate paper diversity."
+    },
+    {
+      "strategy_id": "hybrid-dense-120-diverse-20",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 1.2,
+      "sparse_weight": 1.0,
+      "paper_diversity_penalty": 0.2,
+      "note": "Small dense bias with moderate paper diversity."
+    },
+    {
+      "strategy_id": "hybrid-dense-150-diverse-20",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 1.5,
+      "sparse_weight": 1.0,
+      "paper_diversity_penalty": 0.2,
+      "note": "Balanced dense bias with moderate paper diversity."
+    },
+    {
+      "strategy_id": "hybrid-dense-175-diverse-20",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 1.75,
+      "sparse_weight": 1.0,
+      "paper_diversity_penalty": 0.2,
+      "note": "Stronger dense bias with moderate paper diversity."
+    },
+    {
+      "strategy_id": "hybrid-sparse-2-diverse-20",
+      "retrieval_mode": "hybrid",
+      "dense_weight": 1.0,
+      "sparse_weight": 2.0,
+      "paper_diversity_penalty": 0.2,
+      "note": "Sparse-biased fusion with moderate paper diversity."
+    }
+  ]
+}

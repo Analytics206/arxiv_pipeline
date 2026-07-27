@@ -1,15 +1,16 @@
 __init__
 agents
 agents_core
+analysis
 api
 embedding
 graph
 ingestion
 llm_eval
-mcp_agent
 model_metadata_viewer
 pipeline
 pubmed
+retrieval
 storage
 utils
 web-ui

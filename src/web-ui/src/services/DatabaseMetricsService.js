@@ -1,4 +1,3 @@
-import config from '../config';
 import apiConfig from '../config/api-config';
 import axios from 'axios';
 

@@ -1,6 +1,166 @@
 # ArXiv Deep Research Pipeline Release Notes
 
 ---
+## Version 0.8.0 (July 27, 2026)
+
+### LAN Research Service
+
+- Added a read-only capability contract at `/research/capabilities` and a
+  machine-readable tool surface through `/openapi.json`.
+- Added a paginated curated-paper catalog and stable evidence lookup by
+  evidence ID.
+- Published configurable API/MCP/UI bindings for trusted-LAN clients and made
+  the UI derive its API host from the browser address.
+- Disabled arbitrary Cypher and legacy mutation/debug operations by default.
+- Kept the current LAN surface unauthenticated only within the documented
+  trusted-network boundary.
+
+### Token-Budgeted Agent Context
+
+- Added `/research/papers/context-package` without changing the existing
+  complete-context contract.
+- Added fixed 1.5K, 4K, and 8K profile aliases plus explicit 512-32,768
+  estimated-token budgets.
+- Added deterministic implementation-first selection that preserves complete
+  claim-to-evidence closure and is monotonic across increasing budgets.
+- Added estimator, selection-policy, truncation, and included/omitted metadata
+  to every response.
+- Added a reproducible corpus evaluator; all 15 packages over the five current
+  papers passed budget, evidence, determinism, provenance, TLDR, and
+  monotonicity checks.
+
+### Read-Only MCP Adapter
+
+- Added the five evaluated research operations as structured MCP tools with
+  explicit read-only, non-destructive, and idempotent annotations.
+- Added capability, standard paper-context, and evidence resources with stable
+  URI templates.
+- Added stdio for local clients and stateless JSON Streamable HTTP on port 8001
+  for trusted-LAN harnesses.
+- Isolated the adapter from MongoDB and Qdrant credentials; every operation
+  calls the canonical REST API through `RESEARCH_API_URL`.
+- Locked stable MCP Python SDK 1.28 with a `<2` ceiling instead of forcing the
+  v2 release candidate.
+- Added in-memory protocol tests and a live handshake/context/evidence
+  validator.
+
+### Human Research Workspace
+
+- Replaced the placeholder vector-search page with semantic research search,
+  paper and knowledge-kind filters, scored source-aware results, and complete
+  paper context.
+- Added service health, curated-corpus status, paper cards, OpenAPI discovery,
+  verified source quotes, implementation ideas, and provenance views.
+- Removed the hidden Neo4j route and graph-only Cytoscape/Neo4j frontend
+  packages from the production bundle.
+- Validated desktop, mobile-width, and cross-computer LAN behavior.
+
+### Architecture Simplification
+
+- Removed Neo4j from default startup and API dependencies; it now uses the
+  optional `manual` profile and must demonstrate measured retrieval value before
+  further investment.
+- Retired BERTopic and Top2Vec from the active product path and moved their
+  services, along with the historical Qdrant experiment, behind the `legacy`
+  profile.
+- Documented MongoDB as canonical storage, Qdrant as the active rebuildable
+  retrieval index, and REST/OpenAPI plus MCP as the active harness interfaces.
+
+### Retrieval Evaluation and Embedding Benchmark
+
+- Added a five-paper, 38-case coding-agent retrieval suite with immutable
+  document manifests, exact evidence judgments, cross-paper relevance groups,
+  and unanswerable controls.
+- Added a reproducible runner that validates judgments, inventories shared
+  Ollama models, builds isolated Qdrant collections, and records quality,
+  provenance, indexing, latency, vector-size, and model-size metrics.
+- Added separate model-specific query and document instructions for asymmetric
+  embedding models.
+- Benchmarked `mxbai-embed-large`, Qwen3 Embedding 0.6B, EmbeddingGemma, and
+  Nomic Embed Text v1.5 on 350 research points.
+- Retained `mxbai-embed-large:latest` for production, measured Nomic v1.5 as
+  the best efficiency fallback, and isolated cross-paper evidence coverage as
+  the next hybrid-search/reranking target.
+
+### Evaluated Hybrid Retrieval
+
+- Added a versioned Qdrant collection with named dense and hashed sparse
+  lexical vectors plus collection-managed IDF.
+- Added weighted reciprocal-rank fusion and provenance-safe repeated-paper
+  diversity reranking with stable candidate depth across output limits.
+- Added group-rank and grouped-recall-at-5/8 metrics plus a reproducible
+  strategy-tuning matrix.
+- Improved positive-query MRR from 0.905 to 0.933 and grouped recall at the
+  default top eight from 0.947 to 1.000 while retaining complete provenance.
+- Promoted `research_knowledge_hybrid_v1` and exposed `retrieval_mode` and
+  `score_semantics` in the API.
+- Updated the UI to display hybrid ranks rather than treating RRF scores as
+  cosine-similarity percentages.
+
+---
+## Version 0.7.0 (July 26, 2026)
+
+### Python 3.13 Runtime Upgrade
+
+- Standardized local development, application containers, agent containers, and Jupyter on Python 3.13.
+- Added `.python-version` and a cross-platform `uv.lock` for reproducible environments.
+- Updated the setup scripts to install a uv-managed Python 3.13 runtime and synchronize locked dependencies.
+- Replaced the Jupyter image with the project-owned Python 3.13 Jupyter Dockerfile.
+
+### Dependency Compatibility
+
+- Upgraded the numerical and ML stack to Python 3.13-compatible releases, including NumPy 2.4, SciPy 1.18, pandas 3.0, scikit-learn 1.9, Numba 0.66, HDBSCAN 0.8.44, and PyTorch 2.13.
+- Upgraded the MongoDB, Neo4j, Qdrant, FastAPI, Hugging Face, topic-modeling, notebook, evaluation, and development dependencies.
+- Removed duplicate dependency declarations and the obsolete `scipy<1.11` constraint.
+- Updated LangChain integrations to current package import paths, removed the
+  deprecated `langchain-community` dependency, and moved Ollama generation to
+  the maintained Ollama client.
+- Kept Gensim on its released PyPI package, avoiding source-build and native
+  runtime workarounds.
+- Fixed nondeterministic web UI builds by synchronizing `package-lock.json`
+  with `package.json` and using `npm ci` in the frontend Docker image.
+
+### Container Runtime Split
+
+- Reduced the canonical agent/API image to ingestion, PDF processing, database
+  clients, Qdrant retrieval, and shared Ollama access.
+- Moved Torch, Transformers, sentence-transformers, BERTopic, Top2Vec,
+  notebooks, and evaluation packages into the optional `legacy` extra.
+- Added separate `runtime`, `test`, and `legacy` Docker targets and routed the
+  historical topic/Qdrant services to `arxiv_pipeline-legacy:latest`.
+- Removed the local Hugging Face/Torch and development toolchain from the
+  historical `deployment/Dockerfile.agent-base` image and moved its small
+  agent-only packages into the shared lockfile's `agent` extra.
+- Kept local development and Jupyter on the full locked toolset while allowing
+  core-only installs for agents and services.
+
+### Agent-First Research Intelligence
+
+- Added versioned, evidence-backed paper analysis using Qwen 3.5 4B through the
+  shared `ai-services` Ollama instance.
+- Added source-quote validation, bibliography exclusion, persistent chunk
+  caching, analysis quality gates, and immutable MongoDB analysis history.
+- Added agent-context and analysis REST contracts with stable
+  `paper://arxiv/<id>` resource identifiers.
+- Added a separate `research_knowledge_v1` Qdrant collection using
+  `mxbai-embed-large:latest` through shared Ollama.
+- Added stable, idempotent indexing for page-level evidence, claims, and
+  implementation ideas with full analysis and embedding provenance.
+- Added `GET /research/search` with paper and knowledge-kind filters.
+- Validated the complete flow on OpenForgeRL (`2607.21557v1`): 47 verified
+  evidence references and 75 idempotent retrieval points.
+- Added `python -m src.pipeline.process_paper` for exact arXiv metadata fetch,
+  validated PDF download, analysis persistence, and research indexing in one
+  idempotent command.
+- Replaced retired `X:`/`E:` PDF paths with portable ignored storage under
+  `data/pdfs/<category>/<versioned-id>.pdf`.
+- Added an official arXiv paper-page metadata fallback for Atom API timeouts and
+  rate limits.
+- Validated the full process on `2607.02134v1`: 70 verified evidence references
+  and 102 retrieval points. A repeat run reused the analysis and preserved the
+  Qdrant point identities.
+
+---
 ## Version 0.6.0 (May 18, 2025)
 
 ### Major Features

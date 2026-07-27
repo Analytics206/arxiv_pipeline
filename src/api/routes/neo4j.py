@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, Body
+from fastapi import APIRouter, Query, Body, HTTPException
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 import os
@@ -101,6 +101,15 @@ def neo4j_db_stats():
 @router.post("/run-query")
 def run_neo4j_query(cypher_query: str = Body(..., embed=True)):
     """Run a Cypher query and return the results in a format suitable for visualization"""
+    if os.getenv("ENABLE_LEGACY_CYPHER_API", "false").lower() != "true":
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "The arbitrary Cypher endpoint is disabled. Neo4j is an "
+                "optional experimental index, not part of the LAN research "
+                "contract."
+            ),
+        )
     try:
         driver = get_driver()
         if not driver:

@@ -1,0 +1,34 @@
+{
+  "benchmark_id": "small-local-embedding-models-v2",
+  "description": "Comparison of four sub-1GB Ollama embedding models using each model's documented retrieval instructions and isolated Qdrant collections.",
+  "targets": [
+    {
+      "embedding_model": "mxbai-embed-large:latest",
+      "collection_name": "research_bench_mxbai_v2",
+      "query_prefix": "Represent this sentence for searching relevant passages: ",
+      "document_prefix": "",
+      "note": "Current 1024-dimension production baseline using its documented retrieval query prefix."
+    },
+    {
+      "embedding_model": "qwen3-embedding:0.6b",
+      "collection_name": "research_bench_qwen3_06b_v2",
+      "query_prefix": "Instruct: Given an AI research question, retrieve relevant evidence passages and implementation ideas that answer the query\nQuery: ",
+      "document_prefix": "",
+      "note": "Instruction-aware 1024-dimension text and code retrieval candidate."
+    },
+    {
+      "embedding_model": "embeddinggemma:latest",
+      "collection_name": "research_bench_embeddinggemma_v2",
+      "query_prefix": "task: search result | query: ",
+      "document_prefix": "title: none | text: ",
+      "note": "Compact 768-dimension candidate using its retrieval query and document formats."
+    },
+    {
+      "embedding_model": "nomic-embed-text:v1.5",
+      "collection_name": "research_bench_nomic_v15_v2",
+      "query_prefix": "search_query: ",
+      "document_prefix": "search_document: ",
+      "note": "Compact 768-dimension candidate using its required asymmetric retrieval prefixes."
+    }
+  ]
+}

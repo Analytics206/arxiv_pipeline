@@ -6,6 +6,7 @@ import logging
 from typing import Dict, Any, Optional
 import re
 from dotenv import load_dotenv
+from src.utils.ai_services import resolve_ollama_model, resolve_ollama_url
 
 # Load environment variables from .env file
 load_dotenv()
@@ -121,10 +122,10 @@ def create_default_config(output_path: str) -> None:
             "default": "ollama",
             "providers": {
                 "ollama": {
-                    "base_url": "http://localhost:11434",
+                    "base_url": resolve_ollama_url(),
                     "models": [
                         {
-                            "name": "llama3",
+                            "name": resolve_ollama_model(),
                             "parameters": {
                                 "temperature": 0.7,
                                 "max_tokens": 4096
@@ -137,7 +138,7 @@ def create_default_config(output_path: str) -> None:
         "agents": {
             "code_documentation": {
                 "enabled": True,
-                "model": "llama3",
+                "model": resolve_ollama_model(),
                 "watch_paths": ["./src"],
                 "ignore_patterns": ["*.pyc", "__pycache__"],
                 "update_frequency": "on_change"

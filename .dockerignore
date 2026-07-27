@@ -5,5 +5,8 @@ __pycache__/
 .venv/
 venv/
 node_modules/
+data/
+docker_volumes/
+secure/
 .DS_Store
 *.log

@@ -4,8 +4,7 @@ import datetime
 import pymongo
 from pymongo import MongoClient
 from qdrant_client import QdrantClient
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Qdrant
+from langchain_huggingface import HuggingFaceEmbeddings
 from tqdm import tqdm
 import torch
 

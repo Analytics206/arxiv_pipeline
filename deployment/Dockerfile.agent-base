@@ -1,20 +1,24 @@
-FROM python:3.10-slim
+FROM python:3.13-slim-bookworm
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    PATH="/app/.venv/bin:$PATH" \
+    PYTHONPATH="/app:/app/src"
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --no-cache-dir uv==0.11.32
 
-# Environment setup
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
+COPY pyproject.toml uv.lock setup.py README.md ./
+RUN uv sync --frozen --no-dev --extra agent --no-install-project
 
-# Set the entrypoint
+COPY . .
+RUN uv sync --frozen --no-dev --extra agent
+
 ENTRYPOINT ["python", "-m", "cli.main"]
