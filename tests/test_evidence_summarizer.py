@@ -3,6 +3,7 @@ import json
 import pytest
 
 from src.analysis.identity import normalize_arxiv_id
+from src.analysis.evidence_quality import expand_verification_span
 from src.analysis.models import (
     ChunkAnalysisDraft,
     SynthesisDraft,
@@ -112,7 +113,11 @@ def test_summarizer_keeps_only_verified_evidence_ids():
     )
 
     assert analysis.paper_id == "2504.18538"
-    assert analysis.evidence[0].quote == quote
+    assert analysis.evidence[0].supporting_quote == quote
+    assert analysis.evidence[0].quote == (
+        f"{quote} We introduce durable checkpoints for agent memory."
+    )
+    assert analysis.evidence[0].truncated is False
     assert analysis.tldr.evidence_ids == [analysis.evidence[0].evidence_id]
     assert analysis.implementation_ideas[0].evidence_ids == [
         analysis.evidence[0].evidence_id
@@ -195,6 +200,33 @@ def test_near_verbatim_quote_is_mapped_back_to_exact_source():
 
 def test_empty_draft_quote_is_not_accepted_as_evidence():
     assert _find_source_quote("", "Any source page text") is None
+
+
+def test_evidence_span_expands_mid_sentence_quote_with_context():
+    page = (
+        "The workflow records each target before execution. "
+        "First, it stores the agent state in workspace files. "
+        "Second, an external validator checks the recorded evidence."
+    )
+
+    span = expand_verification_span(
+        "stores the agent state in workspace files",
+        page,
+    )
+
+    assert span.truncated is False
+    assert span.supporting_quote == "stores the agent state in workspace files"
+    assert span.quote.startswith("The workflow records")
+    assert span.quote.endswith("evidence.")
+
+
+def test_non_prose_evidence_is_explicitly_truncated():
+    span = expand_verification_span(
+        "Proposed 56.9 ± 5.7 61.7 ± 5.9",
+        "Proposed 56.9 ± 5.7 61.7 ± 5.9",
+    )
+
+    assert span.truncated is True
 
 
 class FakeOllamaClient:

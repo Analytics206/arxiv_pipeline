@@ -18,7 +18,7 @@ from src.retrieval.models import (
 from src.retrieval.qdrant_index import QdrantResearchIndex
 
 router = APIRouter()
-SERVICE_VERSION = "0.8.0"
+SERVICE_VERSION = "0.9.0"
 
 
 def get_research_index() -> QdrantResearchIndex:
@@ -66,6 +66,17 @@ def search_research(
     limit: Annotated[int, Query(ge=1, le=50)] = 8,
     paper_id: Annotated[str | None, Query(min_length=3)] = None,
     kind: Annotated[list[ResearchPointKind] | None, Query()] = None,
+    min_relevance: Annotated[
+        float | None,
+        Query(
+            ge=0,
+            le=1,
+            description=(
+                "Normalized relevance threshold; defaults to the evaluated "
+                "service threshold. Set 0 to inspect all nearest candidates."
+            ),
+        ),
+    ] = None,
 ) -> ResearchSearchResponse:
     try:
         normalized_paper_id = normalize_arxiv_id(paper_id).base_id if paper_id else None
@@ -74,6 +85,7 @@ def search_research(
             limit=limit,
             paper_id=normalized_paper_id,
             kinds=kind,
+            min_relevance=min_relevance,
         )
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error

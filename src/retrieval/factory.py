@@ -40,6 +40,7 @@ def create_research_index(
     rrf_sparse_weight: float | None = None,
     rrf_k: int | None = None,
     paper_diversity_penalty: float | None = None,
+    default_min_relevance: float | None = None,
     index_schema_version: str | None = None,
 ) -> QdrantResearchIndex:
     settings = config.get("research_index", {})
@@ -110,6 +111,11 @@ def create_research_index(
             paper_diversity_penalty
             if paper_diversity_penalty is not None
             else hybrid_settings.get("paper_diversity_penalty", 0.0)
+        ),
+        default_min_relevance=float(
+            default_min_relevance
+            if default_min_relevance is not None
+            else hybrid_settings.get("default_min_relevance", 0.05)
         ),
     )
 

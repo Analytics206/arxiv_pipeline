@@ -11,8 +11,8 @@ Status legend: **Complete**, **In progress**, **Planned**, **Legacy**, or
 | FR-ING-03..04 | Complete | Exact-version PDF download, validation, hashing, and portable paths |
 | FR-ING-05 | Complete | `process_paper` and bounded `process_downloaded_papers` workflows |
 | FR-DAT-01..05 | Complete | Canonical MongoDB analysis repository and rebuildable Qdrant index |
-| FR-ANL-01..06 | Complete | Page-aware parsing, structured schema, verified evidence, provenance, cache, and quality gates |
-| FR-RET-01..05,07 | Complete | `research_knowledge_hybrid_v1`, named dense/lexical vectors, deterministic IDs, filtered weighted RRF, diversity reranking, explicit score semantics, and provenance |
+| FR-ANL-01..07 | Complete | Page-aware parsing, structured schema, sentence-aware verification spans, stable evidence IDs, explicit truncation, provenance, cache, and quality gates |
+| FR-RET-01..05,07..09 | Complete | `research_knowledge_hybrid_v1`, named dense/lexical vectors, deterministic IDs, structured idea payloads, clean canonical embeddings, weighted RRF, calibrated relevance/no-match behavior, coverage, diversity reranking, and provenance |
 | FR-RET-06 | Complete | Five-paper reviewed suite, four-model benchmark, hybrid/RRF strategy benchmark, and cutoff-sensitive grouped recall |
 | FR-API-01 | Complete | FastAPI REST service and `/openapi.json` |
 | FR-API-02 | Complete | `/research/capabilities` advertises the read-only tool contract |
@@ -22,6 +22,7 @@ Status legend: **Complete**, **In progress**, **Planned**, **Legacy**, or
 | FR-API-06 | Complete | Configurable `0.0.0.0` API/MCP/UI bindings; validated from the host LAN address |
 | FR-API-07 | Complete | Five read-only tools plus paper/evidence resources over stdio and Streamable HTTP; adapter has no database credentials |
 | FR-API-08 | Complete | `/research/papers/context-package`; evaluated 1.5K/4K/8K profiles and explicit 512-32,768 budgets |
+| FR-API-09 | Complete | REST/MCP return complete verification spans plus search status, calibration, threshold, and coverage contracts |
 | FR-UI-01..05 | Complete | New home/research workspace, filters, ranked evidence, paper context, provenance, and dynamic LAN API address |
 | FR-INF-01..06 | Complete | Python 3.13, uv lock, shared Ollama, configurable models, slim runtime, and separate test/legacy targets |
 | FR-OPS-01..04 | Complete | State logging, idempotent workflows, bounded dry runs, health checks, and automated tests |

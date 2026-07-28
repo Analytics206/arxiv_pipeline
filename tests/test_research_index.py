@@ -40,6 +40,7 @@ def make_analysis() -> PaperAnalysis:
                 description="Record harness inference at the model boundary.",
                 agent_use="Turn existing agent executions into training samples.",
                 expected_benefit="Avoid rewriting the agent harness.",
+                risks=["Not stated"],
                 evidence_ids=[evidence.evidence_id],
             )
         ],
@@ -69,6 +70,15 @@ def test_analysis_points_are_stable_and_preserve_provenance():
     assert all(point.evidence[0].page == 4 for point in first)
     assert all(point.evidence_ids == ["ev_1"] for point in first)
     assert "embedding_text" not in first[0].payload()
+    idea_point = next(point for point in first if point.kind == "implementation_idea")
+    assert idea_point.text == "Record harness inference at the model boundary."
+    assert idea_point.text.count("Record harness inference") == 1
+    assert idea_point.implementation_idea is not None
+    assert idea_point.implementation_idea.agent_use == (
+        "Turn existing agent executions into training samples."
+    )
+    assert idea_point.implementation_idea.risks == []
+    assert "Not stated" not in idea_point.embedding_text
 
 
 def test_index_identity_changes_with_embedding_model():

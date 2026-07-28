@@ -108,7 +108,7 @@ All five tools advertise `readOnlyHint=true`, `destructiveHint=false`,
 
 | Tool | Use | Important inputs |
 | --- | --- | --- |
-| `search_research` | Search cited claims, evidence, and implementation ideas across curated papers | `query`; optional `limit` 1-50, `paper_id`, and `kind` filters |
+| `search_research` | Search cited claims, evidence, and implementation ideas across curated papers | `query`; optional `limit` 1-50, `paper_id`, `kind`, and normalized `min_relevance` 0-1 |
 | `list_curated_papers` | Discover which papers have a current curated analysis | optional `offset` and `limit` |
 | `get_paper_context_package` | Get normal agent context under a deterministic token budget | `paper_id`; `profile` or optional `token_budget` |
 | `get_paper_context` | Get the complete canonical analysis when a bounded package is insufficient | `paper_id` |
@@ -138,12 +138,26 @@ Context packages are evidence-closed: an included claim or implementation idea
 retains all evidence records required to support it. Each response also reports
 what was included, omitted, or truncated.
 
+Search defaults to `min_relevance=0.05`. A below-threshold query returns
+`result_status="no_match"`, `hits=[]`, and `no_match_reason`; this is a normal
+successful result. Set `min_relevance=0` only for diagnostics. Each hit keeps
+the raw RRF `score` and adds normalized `relevance`. Read
+`score_calibration`: relevance measures dense/lexical retriever agreement, not
+topical probability. `coverage` reports the indexed and filter-eligible paper
+and point counts.
+
+Implementation-idea hits use one canonical `text` and expose structured fields
+under `implementation_idea`. Evidence records expose a complete sentence-aware
+`quote`, the exact matched `supporting_quote`, and `truncated`; normal search
+and context packages do not return truncated evidence.
+
 ## Recommended agent workflow
 
 1. Convert the local task into a research question without sending unnecessary
    private code. Include the failure mode, constraint, or desired behavior.
 2. Call `search_research` with the evaluated default `limit=8`.
-3. Review distinct papers, the result `kind`, source pages, and evidence IDs.
+3. Stop successfully when `result_status="no_match"`. Otherwise review
+   `relevance`, distinct papers, result `kind`, source pages, and evidence IDs.
    Search results are curated corpus matches, not a claim of complete or
    up-to-the-minute literature coverage.
 4. Call `get_paper_context_package` with `profile="brief"` for triage or
@@ -305,10 +319,14 @@ async def main():
                     "protocol_version": client.protocol_version,
                     "tool_count": len(tools),
                     "search_contract": search["contract"],
+                    "result_status": search["result_status"],
                     "retrieval_mode": search["retrieval_mode"],
+                    "corpus_papers": search["coverage"]["papers"],
                     "top_title": top["title"],
                     "top_paper_id": top["paper_id"],
                     "top_kind": top["kind"],
+                    "top_score": top["score"],
+                    "top_relevance": top["relevance"],
                     "top_text": top["text"],
                     "evidence_id": resolved["evidence_id"],
                     "evidence_page": resolved["page"],
@@ -340,7 +358,7 @@ uv run --isolated --no-project --prerelease=allow `
 
 ## Observed example response
 
-On July 27, 2026, the standalone test above returned:
+On July 28, 2026, the standalone test above returned:
 
 ```json
 {
@@ -348,18 +366,25 @@ On July 27, 2026, the standalone test above returned:
   "protocol_version": "2025-11-25",
   "tool_count": 5,
   "search_contract": "research-search-results",
+  "result_status": "matches",
   "retrieval_mode": "hybrid",
+  "corpus_papers": 53,
   "top_title": "OpenForgeRL: Train Harness-native Agents in Any Environment",
   "top_paper_id": "2607.21557",
   "top_kind": "claim",
+  "top_score": 0.03240343,
+  "top_relevance": 0.87660923,
   "top_text": "The system uses a lightweight proxy to record prompt-response pairs from harness inference, converting them into standard samples compatible with RL codebases like veRL.",
   "evidence_id": "ev_5002c8b64d726803e47397a1",
   "evidence_page": 1,
-  "evidence_quote": "with\na lightweight proxy that serves the harness’s model calls while recording them\nas training data for a standard RL codebase (e.g., veRL"
+  "evidence_quote": "To address this, we present OPENFORGE RL, an open-source framework for training harness-based agents end-to-end in diverse environments. OPENFORGE RL achieves this with a lightweight proxy that serves the harness’s model calls while recording them as training data for a standard RL codebase (e.g., veRL), and a Kubernetes orchestrator that runs each rollout in its own remote container, together enabling training on any harness in any environment at scale. By decoupling training and inference, OPENFORGE RL allows researchers to easily train, study, and improve agents directly in the real harnesses and environments they are deployed with."
 }
 ```
 
-Exact rank scores may change after an intentional corpus or index rebuild.
+The quote above illustrates the repaired evidence contract: a readable
+sentence is returned while the exact source substring remains available as
+`supporting_quote`. Exact rank scores may change after an intentional corpus
+or index rebuild.
 Contracts, stable IDs, evidence records, and required provenance are the
 integration surface.
 
@@ -370,7 +395,11 @@ integration surface.
 - [ ] Tool discovery returns exactly the five documented tools.
 - [ ] Every tool is marked read-only and non-destructive.
 - [ ] The example search returns at least one structured hit.
+- [ ] An unrelated query returns `result_status=no_match` and no hits at the
+      default threshold.
+- [ ] Search output includes normalized relevance and corpus coverage.
 - [ ] `get_evidence` resolves a returned evidence ID.
+- [ ] Resolved evidence is not truncated and ends at a sentence boundary.
 - [ ] The harness uses budgeted context for normal work.
 - [ ] The harness retains paper/evidence provenance in generated
       recommendations.

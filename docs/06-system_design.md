@@ -74,12 +74,27 @@ lexical vector per research point. Search performs:
 2. dependency-free hashed lexical retrieval with Qdrant-managed IDF;
 3. weighted reciprocal-rank fusion;
 4. a final repeated-paper diversity penalty;
-5. provenance-preserving response construction.
+5. normalization against the strongest single-retriever and ideal
+   dual-retriever RRF bounds;
+6. a configurable minimum relevance threshold that may produce an honest empty
+   result;
+7. provenance- and coverage-preserving response construction.
 
 Both candidate paths receive the same paper and knowledge-kind filters.
 Candidate retrieval has a fixed minimum depth so a request for eight final
 results is evaluated over the same useful search space as a larger request.
-The API identifies the retrieval mode and RRF score semantics explicitly.
+The API identifies the retrieval mode and RRF score semantics explicitly. Raw
+RRF remains available for reproducibility. Normalized `relevance` measures
+dense/lexical rank agreement rather than topical probability. Every response
+reports `matches` or `no_match`, a reason for empty results, and total/eligible
+paper and point counts.
+
+Evidence IDs remain stable over the exact verified `supporting_quote`.
+Agent-facing `quote` expands that substring to complete sentences with bounded
+surrounding context. Spans that cannot be reconstructed as prose are marked
+`truncated` and omitted from search and normal token-budgeted contexts.
+Implementation ideas remain structured; Qdrant embeds one canonical
+description rather than a rendered concatenation of every field.
 
 ## Processing flows
 

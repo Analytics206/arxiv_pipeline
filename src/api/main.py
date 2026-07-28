@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.models import ResearchCapabilities, research_capabilities
 from src.api.routes.mongodb import router as mongodb_router
 
-SERVICE_VERSION = "0.8.0"
+SERVICE_VERSION = "0.9.0"
 
 app = FastAPI(
     title="ArXiv Research Intelligence API",
@@ -53,12 +53,15 @@ def service_health() -> dict[str, str]:
 app.include_router(mongodb_router, prefix="/metrics/mongodb", tags=["mongodb"])
 
 from src.api.routes.qdrant import router as qdrant_router
+
 app.include_router(qdrant_router, prefix="/metrics/qdrant", tags=["qdrant"])
 
 from src.api.routes.neo4j import router as neo4j_router
+
 app.include_router(neo4j_router, prefix="/neo4j", tags=["neo4j"])
 
 from src.api.routes.papers import router as papers_router
+
 app.include_router(
     papers_router,
     prefix="/research/papers",
@@ -66,6 +69,7 @@ app.include_router(
 )
 
 from src.api.routes.research import router as research_router
+
 app.include_router(
     research_router,
     prefix="/research",

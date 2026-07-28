@@ -36,7 +36,7 @@ class ResearchApiClient:
             base_url=self.base_url,
             timeout=timeout_seconds,
             transport=transport,
-            headers={"User-Agent": "arxiv-research-mcp/0.8.0"},
+            headers={"User-Agent": "arxiv-research-mcp/0.9.0"},
         )
 
     async def __aenter__(self) -> "ResearchApiClient":

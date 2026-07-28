@@ -397,7 +397,34 @@ GET http://localhost:8000/research/search?query=lightweight%20GUI%20containers&p
 Every hit includes its stable paper URI, analysis/model provenance, evidence
 IDs, exact quotes, and source pages. `retrieval_mode` identifies dense versus
 hybrid retrieval, and `score_semantics` distinguishes cosine similarity from
-RRF rank scores.
+RRF rank scores. Hybrid responses also include:
+
+- `relevance`, a normalized 0-1 retriever-agreement signal on every hit;
+- `score_calibration`, including the raw RRF floor/ceiling and its meaning;
+- `result_status=matches|no_match` plus `no_match_reason`;
+- indexed and filter-eligible paper/point counts under `coverage`.
+
+The default `min_relevance=0.05` removes single-retriever nearest-neighbor
+leftovers. Pass `min_relevance=0` only when intentionally inspecting every
+candidate. RRF and normalized relevance are ranking/agreement signals, not
+probabilities that a result is topically applicable.
+
+Evidence lookup returns a complete sentence-aware `quote`, the original exact
+`supporting_quote`, and `truncated`. Search and normal context packages exclude
+records marked truncated. Implementation-idea hits expose their title,
+description, agent use, expected benefit, and risks under
+`implementation_idea`; the indexed `text` contains only one canonical
+description.
+
+Repair and reindex existing canonical analyses after upgrading an older corpus:
+
+```powershell
+docker compose run --rm --no-deps app python -m src.pipeline.repair_research_quality `
+  --config /app/config/default.yaml
+```
+
+Use `--dry-run` first to validate PDF hashes and inspect the proposed corpus
+repair without writing MongoDB or Qdrant.
 
 ### Evaluate retrieval and embedding models
 

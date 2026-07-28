@@ -7,6 +7,8 @@ from src.retrieval.models import (
     EvidenceSnippet,
     ResearchSearchHit,
     ResearchSearchResponse,
+    SearchCorpusCoverage,
+    SearchScoreCalibration,
 )
 
 
@@ -19,6 +21,7 @@ def make_hit(evidence_id: str, point_id: str) -> ResearchSearchHit:
     return ResearchSearchHit(
         point_id=point_id,
         score=0.9,
+        relevance=0.9,
         paper_id="2607.21557",
         paper_version_id="2607.21557v1",
         resource_uri="paper://arxiv/2607.21557",
@@ -36,13 +39,38 @@ def make_hit(evidence_id: str, point_id: str) -> ResearchSearchHit:
     )
 
 
+def make_response(query: str, limit: int, hits: list[ResearchSearchHit]):
+    return ResearchSearchResponse(
+        query=query,
+        limit=limit,
+        embedding_model="fake-embedder",
+        score_calibration=SearchScoreCalibration(
+            raw_score="cosine_similarity",
+            relevance="cosine_clamped_v1",
+            floor=0,
+            ceiling=1,
+            minimum_relevance=0,
+            description="Test calibration.",
+        ),
+        result_status="matches" if hits else "no_match",
+        coverage=SearchCorpusCoverage(
+            collection="test",
+            papers=1,
+            points=len(hits),
+            eligible_papers=1,
+            eligible_points=len(hits),
+            returned_hits=len(hits),
+        ),
+        hits=hits,
+    )
+
+
 class FakeIndex:
     def search(self, query, *, limit=8, paper_id=None, kinds=None):
-        return ResearchSearchResponse(
-            query=query,
-            limit=limit,
-            embedding_model="fake-embedder",
-            hits=[
+        return make_response(
+            query,
+            limit,
+            [
                 make_hit("ev_wrong", "point-1"),
                 make_hit("ev_expected", "point-2"),
             ],
@@ -85,12 +113,7 @@ class GroupedIndex:
                 make_hit("ev_group_a", "point-a"),
                 make_hit("ev_group_b", "point-b"),
             ]
-        return ResearchSearchResponse(
-            query=query,
-            limit=limit,
-            embedding_model="fake-embedder",
-            hits=hits,
-        )
+        return make_response(query, limit, hits)
 
 
 def test_retrieval_evaluation_scores_groups_and_negative_controls():

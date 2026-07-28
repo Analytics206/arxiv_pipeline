@@ -77,6 +77,7 @@ def build_agent_context_package(
     ``custom``.
     """
 
+    context = _trusted_context(context)
     if profile not in CONTEXT_PROFILE_BUDGETS:
         raise ValueError(f"Unknown context profile: {profile}")
     if token_budget is not None and token_budget < 1:
@@ -118,9 +119,23 @@ def build_agent_context_package(
         budget_source=budget_source,
     )
     if package.budget.estimated_tokens > requested_tokens:
+        minimum_required_tokens = package.budget.estimated_tokens
+        for _ in range(4):
+            minimum_package = _make_package(
+                context=context,
+                selected=selected,
+                evidence_ids=selected_evidence_ids,
+                available=available,
+                requested_tokens=minimum_required_tokens,
+                profile=response_profile,
+                budget_source=budget_source,
+            )
+            if minimum_package.budget.estimated_tokens == minimum_required_tokens:
+                break
+            minimum_required_tokens = minimum_package.budget.estimated_tokens
         raise ContextBudgetTooSmallError(
             requested_tokens=requested_tokens,
-            minimum_required_tokens=package.budget.estimated_tokens,
+            minimum_required_tokens=minimum_required_tokens,
         )
 
     for field_name, item in _selection_candidates(context):
@@ -143,6 +158,54 @@ def build_agent_context_package(
         selected_evidence_ids = candidate_evidence_ids
 
     return package
+
+
+def _trusted_context(context: AgentPaperContext) -> AgentPaperContext:
+    """Exclude incomplete evidence and any derived item left unsupported."""
+
+    source = context.analysis
+    evidence_by_id = {item.evidence_id: item for item in source.evidence}
+    referenced_ids = set(source.tldr.evidence_ids)
+    for field_name in (*_CLAIM_FIELDS, "implementation_ideas"):
+        referenced_ids.update(
+            evidence_id
+            for item in getattr(source, field_name)
+            for evidence_id in item.evidence_ids
+        )
+    _require_evidence(referenced_ids, evidence_by_id)
+    trusted_ids = {item.evidence_id for item in source.evidence if not item.truncated}
+
+    def clean_item(item: SupportedClaim | ImplementationIdea):
+        evidence_ids = [
+            evidence_id
+            for evidence_id in item.evidence_ids
+            if evidence_id in trusted_ids
+        ]
+        if not evidence_ids:
+            return None
+        return item.model_copy(update={"evidence_ids": evidence_ids})
+
+    tldr = clean_item(source.tldr)
+    if tldr is None:
+        raise ValueError("Paper TLDR has no complete verification span")
+    updates: dict[str, object] = {
+        "tldr": tldr,
+        "evidence": [
+            item for item in source.evidence if item.evidence_id in trusted_ids
+        ],
+        "implementation_ideas": [
+            cleaned
+            for item in source.implementation_ideas
+            if (cleaned := clean_item(item)) is not None
+        ],
+    }
+    for field_name in _CLAIM_FIELDS:
+        updates[field_name] = [
+            cleaned
+            for item in getattr(source, field_name)
+            if (cleaned := clean_item(item)) is not None
+        ]
+    return context.model_copy(update={"analysis": source.model_copy(update=updates)})
 
 
 def estimate_context_tokens(value: AgentContextPackage | dict) -> int:

@@ -122,6 +122,17 @@ def create_mcp_server(
                 ),
             ),
         ] = None,
+        min_relevance: Annotated[
+            float | None,
+            Field(
+                ge=0,
+                le=1,
+                description=(
+                    "Normalized relevance threshold. Omit for the service "
+                    "default; use 0 only to inspect below-threshold neighbors."
+                ),
+            ),
+        ] = None,
     ) -> dict[str, Any]:
         """Search evaluated hybrid retrieval with provenance-preserving results."""
 
@@ -133,6 +144,7 @@ def create_mcp_server(
                 "limit": limit,
                 "paper_id": paper_id,
                 "kind": kind,
+                "min_relevance": min_relevance,
             },
         )
 

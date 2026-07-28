@@ -164,6 +164,19 @@ def test_package_rejects_dangling_evidence_in_canonical_analysis():
         build_agent_context_package(context)
 
 
+def test_package_excludes_truncated_evidence_and_unsupported_items():
+    context = make_context()
+    context.analysis.evidence[1].truncated = True
+
+    package = build_agent_context_package(context, token_budget=32000)
+
+    assert "ev-2" not in {item.evidence_id for item in package.analysis.evidence}
+    assert all(
+        "ev-2" not in item.evidence_ids
+        for item in package.analysis.implementation_ideas
+    )
+
+
 def test_context_package_evaluation_covers_all_profiles():
     report = evaluate_context_packages([make_context()])
 

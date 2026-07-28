@@ -111,6 +111,8 @@ def test_hybrid_search_uses_weighted_rrf_and_returns_mode():
 
     assert response.retrieval_mode == "hybrid"
     assert response.score_semantics == "rrf"
+    assert response.result_status == "matches"
+    assert response.hits[0].relevance == 1.0
     assert len(client.query["prefetch"]) == 2
     assert all(item.limit == 50 for item in client.query["prefetch"])
     assert [item.using for item in client.query["prefetch"]] == [
@@ -119,6 +121,39 @@ def test_hybrid_search_uses_weighted_rrf_and_returns_mode():
     ]
     assert client.query["query"].rrf.weights == [2.0, 1.0]
     assert response.hits[0].point_id == "point-a"
+
+
+def test_hybrid_search_can_return_an_honest_empty_result():
+    payload = build_analysis_points(
+        make_analysis(),
+        embedding_model=FakeEmbedder.model_name,
+        index_schema_version="2.1",
+    )[0].payload()
+    client = FakeQdrant()
+    client.query_results = [
+        SimpleNamespace(id="leftover", score=0.0167, payload=payload)
+    ]
+    index = QdrantResearchIndex(
+        url="http://unused",
+        collection_name="hybrid",
+        embedder=FakeEmbedder(),
+        retrieval_mode="hybrid",
+        rrf_dense_weight=1.1,
+        rrf_sparse_weight=1.0,
+        rrf_k=60,
+        default_min_relevance=0.05,
+        client=client,
+    )
+
+    response = index.search("unrelated tokens", limit=5)
+    unfiltered = index.search("unrelated tokens", limit=5, min_relevance=0)
+
+    assert response.result_status == "no_match"
+    assert response.hits == []
+    assert response.no_match_reason is not None
+    assert response.score_calibration.floor > 0.018
+    assert response.coverage.returned_hits == 0
+    assert unfiltered.hits[0].relevance == 0
 
 
 def test_diversity_reranker_can_promote_a_second_paper():

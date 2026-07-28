@@ -10,12 +10,19 @@ from typing import Any, Protocol
 
 from qdrant_client import QdrantClient, models
 
+from src.analysis.idea_quality import (
+    canonical_idea_text,
+    normalize_implementation_idea,
+)
 from src.analysis.models import EvidenceRef, PaperAnalysis
 from src.retrieval.models import (
     EvidenceSnippet,
+    ImplementationIdeaFields,
     ResearchIndexPoint,
     ResearchPointKind,
     RetrievalMode,
+    SearchCorpusCoverage,
+    SearchScoreCalibration,
     ResearchSearchHit,
     ResearchSearchResponse,
 )
@@ -57,6 +64,7 @@ class QdrantResearchIndex:
         rrf_sparse_weight: float = 1.0,
         rrf_k: int = 60,
         paper_diversity_penalty: float = 0.0,
+        default_min_relevance: float = 0.05,
         client: Any | None = None,
     ):
         if retrieval_mode not in {"dense", "hybrid"}:
@@ -71,6 +79,8 @@ class QdrantResearchIndex:
             raise ValueError("rrf_k must be positive")
         if not 0 <= paper_diversity_penalty <= 1:
             raise ValueError("paper_diversity_penalty must be between 0 and 1")
+        if not 0 <= default_min_relevance <= 1:
+            raise ValueError("default_min_relevance must be between 0 and 1")
         self.collection_name = collection_name
         self.embedder = embedder
         self.index_schema_version = index_schema_version
@@ -82,6 +92,7 @@ class QdrantResearchIndex:
         self.rrf_sparse_weight = rrf_sparse_weight
         self.rrf_k = rrf_k
         self.paper_diversity_penalty = paper_diversity_penalty
+        self.default_min_relevance = default_min_relevance
         self.client = client or QdrantClient(url=url, timeout=60)
 
     def index_analysis(self, analysis: PaperAnalysis) -> dict[str, Any]:
@@ -198,7 +209,15 @@ class QdrantResearchIndex:
         limit: int = 8,
         paper_id: str | None = None,
         kinds: Sequence[ResearchPointKind] | None = None,
+        min_relevance: float | None = None,
     ) -> ResearchSearchResponse:
+        effective_min_relevance = (
+            self.default_min_relevance
+            if min_relevance is None
+            else float(min_relevance)
+        )
+        if not 0 <= effective_min_relevance <= 1:
+            raise ValueError("min_relevance must be between 0 and 1")
         query_filter = _search_filter(paper_id=paper_id, kinds=kinds)
         if self.retrieval_mode == "hybrid":
             points = self._hybrid_query(
@@ -207,15 +226,46 @@ class QdrantResearchIndex:
                 query_filter=query_filter,
             )
         else:
+            candidate_limit = min(
+                200,
+                max(limit, self.hybrid_candidate_minimum, limit * 4),
+            )
             result = self.client.query_points(
                 collection_name=self.collection_name,
                 query=self.embedder.embed_query(query),
                 query_filter=query_filter,
-                limit=limit,
+                limit=candidate_limit,
                 with_payload=True,
             )
             points = result.points
-        hits = [_search_hit(point) for point in points if point.payload is not None]
+        candidates = [
+            _search_hit(
+                point,
+                relevance=self._relevance(float(point.score)),
+            )
+            for point in points
+            if point.payload is not None
+        ]
+        hits = [hit for hit in candidates if hit.relevance >= effective_min_relevance][
+            :limit
+        ]
+        calibration = self._score_calibration(effective_min_relevance)
+        coverage = self._corpus_coverage(
+            query_filter=query_filter,
+            returned_hits=len(hits),
+        )
+        no_match_reason = None
+        if not hits:
+            top_relevance = max(
+                (candidate.relevance for candidate in candidates),
+                default=0.0,
+            )
+            no_match_reason = (
+                "No indexed candidate met the normalized relevance threshold "
+                f"{effective_min_relevance:.3f}; top candidate relevance was "
+                f"{top_relevance:.3f}. RRF relevance reflects dense/lexical "
+                "retriever agreement, not a probability of topical relevance."
+            )
         return ResearchSearchResponse(
             query=query,
             limit=limit,
@@ -224,6 +274,10 @@ class QdrantResearchIndex:
             score_semantics=(
                 "rrf" if self.retrieval_mode == "hybrid" else "cosine_similarity"
             ),
+            score_calibration=calibration,
+            result_status="matches" if hits else "no_match",
+            no_match_reason=no_match_reason,
+            coverage=coverage,
             hits=hits,
         )
 
@@ -273,8 +327,90 @@ class QdrantResearchIndex:
         candidates = [point for point in result.points if point.payload is not None]
         return _rerank_for_paper_diversity(
             candidates,
-            limit=limit,
+            limit=candidate_limit,
             penalty=self.paper_diversity_penalty,
+        )
+
+    def _relevance(self, score: float) -> float:
+        if self.retrieval_mode != "hybrid":
+            return min(1.0, max(0.0, score))
+        floor, ceiling = self._rrf_relevance_bounds()
+        if ceiling <= floor:
+            return 0.0
+        return min(1.0, max(0.0, (score - floor) / (ceiling - floor)))
+
+    def _rrf_relevance_bounds(self) -> tuple[float, float]:
+        first_rank_denominator = self.rrf_k + 1
+        floor = max(self.rrf_dense_weight, self.rrf_sparse_weight) / (
+            first_rank_denominator
+        )
+        ceiling = (self.rrf_dense_weight + self.rrf_sparse_weight) / (
+            first_rank_denominator
+        )
+        return floor, ceiling
+
+    def _score_calibration(
+        self,
+        minimum_relevance: float,
+    ) -> SearchScoreCalibration:
+        if self.retrieval_mode == "hybrid":
+            floor, ceiling = self._rrf_relevance_bounds()
+            return SearchScoreCalibration(
+                raw_score="rrf",
+                relevance="rrf_retriever_agreement_v1",
+                floor=floor,
+                ceiling=ceiling,
+                minimum_relevance=minimum_relevance,
+                description=(
+                    "Weighted reciprocal-rank fusion over dense and lexical "
+                    "rankings. Scores at or below the strongest possible "
+                    "single-retriever rank-one contribution map to relevance "
+                    "0; the ideal dual-retriever rank-one score maps to 1. "
+                    "Relevance measures retriever agreement, not topical "
+                    "probability."
+                ),
+            )
+        return SearchScoreCalibration(
+            raw_score="cosine_similarity",
+            relevance="cosine_clamped_v1",
+            floor=0.0,
+            ceiling=1.0,
+            minimum_relevance=minimum_relevance,
+            description=(
+                "Cosine similarity clamped to the 0-1 interval. It is a "
+                "ranking signal, not a calibrated topical probability."
+            ),
+        )
+
+    def _corpus_coverage(
+        self,
+        *,
+        query_filter: models.Filter | None,
+        returned_hits: int,
+    ) -> SearchCorpusCoverage:
+        points = _safe_count(self.client, self.collection_name, None)
+        papers = _safe_paper_count(self.client, self.collection_name, None)
+        eligible_points = (
+            points
+            if query_filter is None
+            else _safe_count(self.client, self.collection_name, query_filter)
+        )
+        eligible_papers = (
+            papers
+            if query_filter is None
+            else _safe_paper_count(
+                self.client,
+                self.collection_name,
+                query_filter,
+            )
+        )
+        return SearchCorpusCoverage(
+            collection=self.collection_name,
+            papers=papers,
+            points=points,
+            eligible_papers=eligible_papers,
+            eligible_points=eligible_points,
+            returned_hits=returned_hits,
         )
 
     def _ensure_collection(self, dimensions: int) -> None:
@@ -362,12 +498,14 @@ def build_analysis_points(
         category: str,
         text: str,
         evidence_ids: Sequence[str],
+        implementation_idea: ImplementationIdeaFields | None = None,
     ) -> None:
         normalized_ids = list(
             dict.fromkeys(
                 evidence_id
                 for evidence_id in evidence_ids
                 if evidence_id in evidence_by_id
+                and not evidence_by_id[evidence_id].truncated
             )
         )
         if not normalized_ids:
@@ -417,6 +555,7 @@ def build_analysis_points(
                 pages=pages,
                 evidence_ids=normalized_ids,
                 evidence=snippets,
+                implementation_idea=implementation_idea,
                 document_hash=analysis.document_hash,
                 analysis_schema_version=analysis.schema_version,
                 prompt_version=analysis.prompt_version,
@@ -426,6 +565,8 @@ def build_analysis_points(
         )
 
     for source in analysis.evidence:
+        if source.truncated:
+            continue
         add_point(
             kind="evidence",
             category=source.section or "source_evidence",
@@ -455,18 +596,19 @@ def build_analysis_points(
             )
 
     for idea in analysis.implementation_ideas:
-        risk_text = "; ".join(idea.risks) if idea.risks else "Not stated"
+        normalized_idea = normalize_implementation_idea(idea)
         add_point(
             kind="implementation_idea",
             category="implementation_idea",
-            text=(
-                f"{idea.title}\n"
-                f"{idea.description}\n"
-                f"Agent use: {idea.agent_use}\n"
-                f"Expected benefit: {idea.expected_benefit}\n"
-                f"Risks: {risk_text}"
+            text=canonical_idea_text(normalized_idea),
+            implementation_idea=ImplementationIdeaFields(
+                title=normalized_idea.title,
+                description=normalized_idea.description,
+                agent_use=normalized_idea.agent_use,
+                expected_benefit=normalized_idea.expected_benefit,
+                risks=normalized_idea.risks,
             ),
-            evidence_ids=idea.evidence_ids,
+            evidence_ids=normalized_idea.evidence_ids,
         )
     return points
 
@@ -526,6 +668,8 @@ def _evidence_snippet(source: EvidenceRef) -> EvidenceSnippet:
         evidence_id=source.evidence_id,
         page=source.page,
         quote=source.quote,
+        supporting_quote=source.supporting_quote,
+        truncated=source.truncated,
         section=source.section,
     )
 
@@ -623,11 +767,47 @@ def _search_filter(
     return models.Filter(must=conditions) if conditions else None
 
 
-def _search_hit(point: Any) -> ResearchSearchHit:
+def _safe_count(
+    client: Any,
+    collection_name: str,
+    query_filter: models.Filter | None,
+) -> int | None:
+    try:
+        return int(
+            client.count(
+                collection_name=collection_name,
+                count_filter=query_filter,
+                exact=True,
+            ).count
+        )
+    except Exception:
+        return None
+
+
+def _safe_paper_count(
+    client: Any,
+    collection_name: str,
+    query_filter: models.Filter | None,
+) -> int | None:
+    try:
+        response = client.facet(
+            collection_name=collection_name,
+            key="paper_id",
+            facet_filter=query_filter,
+            limit=1_000,
+            exact=True,
+        )
+        return len(response.hits)
+    except Exception:
+        return None
+
+
+def _search_hit(point: Any, *, relevance: float) -> ResearchSearchHit:
     payload = point.payload
     return ResearchSearchHit(
         point_id=str(point.id),
         score=float(point.score),
+        relevance=relevance,
         paper_id=payload["paper_id"],
         paper_version_id=payload["paper_version_id"],
         resource_uri=payload["resource_uri"],
@@ -638,6 +818,7 @@ def _search_hit(point: Any) -> ResearchSearchHit:
         pages=payload.get("pages", []),
         evidence_ids=payload.get("evidence_ids", []),
         evidence=payload.get("evidence", []),
+        implementation_idea=payload.get("implementation_idea"),
         document_hash=payload["document_hash"],
         prompt_version=payload["prompt_version"],
         analysis_model=payload["analysis_model"],

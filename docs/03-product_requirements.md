@@ -42,6 +42,10 @@ listed separately so it is not mistaken for the current critical path.
   provenance.
 - **FR-ANL-06:** Use quality gates and cached intermediate work so failed or
   repeated runs do not silently degrade the corpus.
+- **FR-ANL-07:** Preserve stable evidence IDs while returning complete
+  sentence-aware verification spans, the exact supporting substring, and an
+  explicit truncation marker; exclude incomplete spans from normal agent
+  contexts.
 
 ## Retrieval (FR-RET)
 
@@ -58,6 +62,10 @@ listed separately so it is not mistaken for the current critical path.
   model, sparse retrieval, or reranker.
 - **FR-RET-07:** Support versioned named dense/sparse vectors, filtered
   candidate generation, weighted RRF, and provenance-safe diversity reranking.
+- **FR-RET-08:** Keep implementation-idea fields structured, embed one
+  canonical idea text, and omit null/sentinel fields from retrieval content.
+- **FR-RET-09:** Return normalized score calibration, allow an honest empty
+  result through a relevance threshold, and disclose corpus/filter coverage.
 
 ## Agent and LAN API (FR-API)
 
@@ -74,6 +82,9 @@ listed separately so it is not mistaken for the current critical path.
 - **FR-API-08:** Return deterministic token-budgeted context packages with
   explicit estimator/selection metadata, complete evidence for every included
   claim, and included/omitted counts.
+- **FR-API-09:** Expose complete verification spans and machine-readable search
+  status, no-match reason, score calibration, and corpus coverage identically
+  through REST and MCP.
 
 ## Human research workspace (FR-UI)
 

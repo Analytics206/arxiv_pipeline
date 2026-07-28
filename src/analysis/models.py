@@ -29,6 +29,8 @@ class EvidenceRef(ContractModel):
     chunk_id: str
     page: int = Field(ge=1)
     quote: str = Field(min_length=8, max_length=1200)
+    supporting_quote: str | None = Field(default=None, min_length=8, max_length=1200)
+    truncated: bool = False
     section: str | None = Field(default=None, max_length=200)
 
 

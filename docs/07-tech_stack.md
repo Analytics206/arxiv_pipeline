@@ -53,8 +53,11 @@ retrievable knowledge units such as:
 Points include paper URI, analysis identity, source page/evidence, knowledge
 kind, and embedding provenance. Each point has a 1,024-dimensional dense vector
 and a stable hashed sparse lexical vector. Qdrant applies IDF and weighted RRF;
-the application performs final paper-diversity reranking. The index is
-rebuildable from MongoDB.
+the application performs final paper-diversity reranking, RRF agreement
+normalization, thresholding, and coverage reporting. Implementation ideas keep
+structured fields in payload while embedding only one canonical description.
+Incomplete evidence spans are not indexed. The index is rebuildable from
+MongoDB.
 
 The dense component remains `mxbai-embed-large:latest`, selected after
 comparison with Qwen3 Embedding 0.6B, EmbeddingGemma, and Nomic Embed Text
@@ -96,7 +99,8 @@ FastAPI publishes:
 - an OpenAPI schema for generated clients and harness tools;
 - curated-paper catalog, complete context, and deterministic token-budgeted
   context contracts;
-- evaluated hybrid search with filters and explicit score semantics;
+- evaluated hybrid search with filters, explicit score semantics, normalized
+  relevance, honest empty results, and corpus coverage;
 - stable evidence lookup;
 - health and interactive documentation.
 

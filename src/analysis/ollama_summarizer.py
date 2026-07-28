@@ -25,6 +25,8 @@ from src.analysis.models import (
     SupportedClaim,
     SynthesisDraft,
 )
+from src.analysis.evidence_quality import expand_verification_span
+from src.analysis.idea_quality import normalize_implementation_idea
 from src.analysis.pdf_parser import DocumentChunk, ParsedPaperDocument
 
 TModel = TypeVar("TModel", bound=BaseModel)
@@ -398,11 +400,21 @@ possible engineering applications.
                 proposed.page,
                 source_quote,
             )
+            verification = expand_verification_span(source_quote, page_text)
+            if verification.truncated:
+                logger.debug(
+                    "Rejected incomplete evidence span on page %d: %r",
+                    proposed.page,
+                    source_quote[:120],
+                )
+                continue
             evidence[evidence_id] = EvidenceRef(
                 evidence_id=evidence_id,
                 chunk_id=chunk.chunk_id,
                 page=proposed.page,
-                quote=source_quote,
+                quote=verification.quote,
+                supporting_quote=verification.supporting_quote,
+                truncated=False,
                 section=proposed.section,
             )
             evidence_ids.append(evidence_id)
@@ -447,11 +459,14 @@ possible engineering applications.
                     minimum_coverage=0.22,
                 ):
                     cleaned.append(
-                        idea.model_copy(
-                            update={
-                                "evidence_ids": list(dict.fromkeys(evidence_ids))[:12],
-                                "risks": idea.risks[:10],
-                            }
+                        normalize_implementation_idea(
+                            idea.model_copy(
+                                update={
+                                    "evidence_ids": list(dict.fromkeys(evidence_ids))[
+                                        :12
+                                    ],
+                                }
+                            )
                         )
                     )
             return cleaned

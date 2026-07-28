@@ -30,7 +30,7 @@ analysis:
 # Rebuildable, agent-facing hybrid index over canonical MongoDB analyses.
 research_index:
   collection_name: "research_knowledge_hybrid_v1"
-  schema_version: "2.0"
+  schema_version: "2.1"
   embedding_model: "mxbai-embed-large:latest"
   embedding_batch_size: 32
   query_prefix: "Represent this sentence for searching relevant passages: "
@@ -42,6 +42,9 @@ research_index:
     sparse_weight: 1.0
     rrf_k: 60
     paper_diversity_penalty: 0.2
+    # Excludes single-retriever leftovers by default. Callers can request 0 to
+    # inspect every nearest neighbor while retaining normalized relevance.
+    default_min_relevance: 0.05
 
 # Bounded, resumable agent analysis after the larger PDF corpus is downloaded.
 # One paper per category is a safe three-paper batch on the 8 GB GPU. Completed

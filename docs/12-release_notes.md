@@ -1,6 +1,27 @@
 # ArXiv Deep Research Pipeline Release Notes
 
 ---
+## Version 0.9.0 (July 28, 2026)
+
+### Citation and retrieval quality
+
+- Expanded exact supporting substrings to complete, bounded sentence-aware
+  verification spans while preserving stable evidence IDs.
+- Added `supporting_quote` and `truncated`; incomplete/non-prose evidence is
+  excluded from search and normal agent context packages.
+- Stopped flattening implementation-idea fields into repeated text. Search now
+  embeds one canonical description, returns structured idea fields, and omits
+  null strings such as `Risks: Not stated`.
+- Added per-hit normalized `relevance`, machine-readable RRF calibration,
+  `matches|no_match` status, explicit no-match reasons, configurable
+  `min_relevance`, and indexed/filter-eligible corpus coverage.
+- Repaired and reindexed all 53 current papers under research-index schema 2.1:
+  2,303 evidence records audited, 2,293 expanded, 133 incomplete spans marked,
+  and zero paper/PDF hash mismatches.
+- Validated 20 randomly sampled indexed evidence records, the reported
+  truncation reproduction, unrelated-query empty results, and the complete
+  REST/MCP path.
+
 ## Version 0.8.0 (July 27, 2026)
 
 ### LAN Research Service
