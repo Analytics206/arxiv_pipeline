@@ -9,6 +9,7 @@ from src.analysis.models import (
 )
 from src.analysis.ollama_summarizer import (
     EvidenceAwareSummarizer,
+    OllamaStructuredModel,
     SummarizationError,
     _find_source_quote,
     _ollama_format_schema,
@@ -194,3 +195,72 @@ def test_near_verbatim_quote_is_mapped_back_to_exact_source():
 
 def test_empty_draft_quote_is_not_accepted_as_evidence():
     assert _find_source_quote("", "Any source page text") is None
+
+
+class FakeOllamaClient:
+    def __init__(self):
+        self.calls = []
+
+    def chat(self, **kwargs):
+        self.calls.append(kwargs)
+        if len(self.calls) == 1:
+            return {
+                "message": {
+                    "content": (
+                        '{"tldr":{"statement":"A complete statement",'
+                        '"evidence_ids":["ev_123'
+                    )
+                },
+                "done_reason": "length",
+                "prompt_eval_count": 9000,
+                "eval_count": 4096,
+            }
+        return {
+            "message": {
+                "content": json.dumps(
+                    {
+                        "tldr": {
+                            "statement": "A complete supported statement.",
+                            "evidence_ids": ["ev_123"],
+                        },
+                        "problem": [],
+                        "contributions": [],
+                        "methods": [],
+                        "results": [],
+                        "limitations": [],
+                        "implementation_ideas": [],
+                        "concepts": [],
+                        "tags": [],
+                    }
+                )
+            },
+            "done_reason": "stop",
+            "prompt_eval_count": 9100,
+            "eval_count": 200,
+        }
+
+
+def test_truncated_ollama_json_retries_with_larger_generation_budget():
+    client = FakeOllamaClient()
+    model = OllamaStructuredModel(
+        "qwen3.5:4b",
+        "http://ollama.invalid",
+        context_length=12288,
+        max_output_tokens=4096,
+        retry_context_length=18432,
+        retry_max_output_tokens=6144,
+        client=client,
+    )
+
+    result = model.complete(
+        schema=SynthesisDraft,
+        system="Return JSON.",
+        prompt="Synthesize verified evidence.",
+    )
+
+    assert result.tldr.statement == "A complete supported statement."
+    assert client.calls[0]["options"]["num_ctx"] == 12288
+    assert client.calls[0]["options"]["num_predict"] == 4096
+    assert client.calls[1]["options"]["num_ctx"] == 18432
+    assert client.calls[1]["options"]["num_predict"] == 6144
+    assert "at most 3 problem items" in client.calls[1]["messages"][1]["content"]

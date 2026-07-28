@@ -136,6 +136,12 @@ def main(argv: list[str] | None = None) -> int:
             host=ollama_url,
             context_length=int(analysis_config.get("context_length", 12288)),
             max_output_tokens=int(analysis_config.get("max_output_tokens", 4096)),
+            retry_context_length=int(
+                analysis_config.get("retry_context_length", 18432)
+            ),
+            retry_max_output_tokens=int(
+                analysis_config.get("retry_max_output_tokens", 6144)
+            ),
         )
         chunk_cache = None
         if not args.no_cache:

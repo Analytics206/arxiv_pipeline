@@ -55,13 +55,26 @@ class OllamaStructuredModel:
         *,
         context_length: int = 12288,
         max_output_tokens: int = 4096,
+        retry_context_length: int | None = None,
+        retry_max_output_tokens: int | None = None,
+        client=None,
     ):
-        from ollama import Client
-
         self.model_name = model_name
         self.context_length = context_length
         self.max_output_tokens = max_output_tokens
-        self._client = Client(host=host, timeout=600)
+        self.retry_context_length = max(
+            context_length,
+            retry_context_length or context_length,
+        )
+        self.retry_max_output_tokens = max(
+            max_output_tokens,
+            retry_max_output_tokens or max_output_tokens,
+        )
+        if client is None:
+            from ollama import Client
+
+            client = Client(host=host, timeout=600)
+        self._client = client
 
     def complete(
         self,
@@ -71,14 +84,21 @@ class OllamaStructuredModel:
         prompt: str,
     ) -> TModel:
         last_error: Exception | None = None
+        previous_was_truncated = False
         for attempt in range(1, 3):
             attempt_prompt = prompt
             if attempt > 1:
-                attempt_prompt += (
-                    "\n\nThe previous response was invalid or truncated. Return "
-                    "a much shorter complete response with only the most "
-                    "important supported items."
-                )
+                attempt_prompt += _retry_output_instruction(schema)
+            context_length = (
+                self.retry_context_length
+                if previous_was_truncated
+                else self.context_length
+            )
+            max_output_tokens = (
+                self.retry_max_output_tokens
+                if previous_was_truncated
+                else self.max_output_tokens
+            )
             response = self._client.chat(
                 model=self.model_name,
                 messages=[
@@ -89,8 +109,8 @@ class OllamaStructuredModel:
                 think=False,
                 options={
                     "temperature": 0,
-                    "num_ctx": self.context_length,
-                    "num_predict": self.max_output_tokens,
+                    "num_ctx": context_length,
+                    "num_predict": max_output_tokens,
                 },
             )
             if isinstance(response, dict):
@@ -103,10 +123,26 @@ class OllamaStructuredModel:
                 return schema.model_validate_json(content)
             except ValueError as error:
                 last_error = error
+                done_reason = _response_value(response, "done_reason")
+                prompt_tokens = _response_value(response, "prompt_eval_count")
+                output_tokens = _response_value(response, "eval_count")
+                previous_was_truncated = done_reason == "length" or (
+                    _looks_like_truncated_json(content, error)
+                )
                 logger.warning(
-                    "Invalid structured response from %s (attempt %d/2): %s",
+                    "Invalid structured response from %s (attempt %d/2, "
+                    "done_reason=%s, prompt_tokens=%s, output_tokens=%s, "
+                    "output_chars=%d, num_ctx=%d, num_predict=%d, "
+                    "truncated=%s): %s",
                     self.model_name,
                     attempt,
+                    done_reason,
+                    prompt_tokens,
+                    output_tokens,
+                    len(content or ""),
+                    context_length,
+                    max_output_tokens,
+                    previous_was_truncated,
                     error,
                 )
         raise SummarizationError(
@@ -116,6 +152,40 @@ class OllamaStructuredModel:
 
 class SummarizationError(RuntimeError):
     """Raised when a trustworthy analysis cannot be produced."""
+
+
+def _retry_output_instruction(schema: type[BaseModel]) -> str:
+    instruction = (
+        "\n\nThe previous response was invalid or truncated. Return a complete "
+        "JSON object and close every string, array, and object. Use only the "
+        "most important supported items and keep every statement to one concise "
+        "sentence."
+    )
+    if schema is SynthesisDraft:
+        instruction += (
+            " Hard limits: one TLDR; at most 3 problem items, 6 contributions, "
+            "6 methods, 6 results, 4 limitations, 4 implementation ideas, "
+            "16 concepts, and 12 tags. Cite at most 3 evidence IDs per item."
+        )
+    return instruction
+
+
+def _response_value(response, field_name: str):
+    if isinstance(response, dict):
+        return response.get(field_name)
+    return getattr(response, field_name, None)
+
+
+def _looks_like_truncated_json(content: str, error: ValueError) -> bool:
+    if not content or not content.strip():
+        return False
+    message = str(error).casefold()
+    return (
+        "eof while parsing" in message
+        or "unexpected eof" in message
+        or "end of input" in message
+        or not content.rstrip().endswith(("}", "]"))
+    )
 
 
 class EvidenceAwareSummarizer:
