@@ -40,8 +40,8 @@ research_index:
     paper_diversity_penalty: 0.2
 
 # Bounded, resumable agent analysis after the larger PDF corpus is downloaded.
-# One paper per category provides a real multi-paper integration test without
-# committing the local GPU to hundreds of analyses during initial validation.
+# One paper per category is a safe three-paper batch on the 8 GB GPU. Completed
+# analysis identities are skipped, so each rerun advances to the next papers.
 research_processing:
   process_categories:
     - "cs.AI"

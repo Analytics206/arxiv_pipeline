@@ -220,12 +220,19 @@ The following test is independent of the harness and proves MCP
 initialization, exact tool discovery, read-only annotations, hybrid search,
 structured JSON output, and evidence resolution.
 
-Install a compatible stable MCP client into a temporary environment or the
-harness development environment:
+The harness should use its own current MCP client; it does not need to match
+the Python SDK version used internally by the research server. The optional
+standalone test below uses the modern Python SDK v2 client API. On July 27,
+2026, v2 is still a release candidate, so opt in explicitly in a temporary
+environment:
 
 ```powershell
-python -m pip install "mcp>=1.28.1,<2"
+python -m pip install --pre --upgrade "mcp>=2.0.0rc1,<3"
+python -c "import importlib.metadata; print(importlib.metadata.version('mcp'))"
 ```
+
+No `streamable_http_client` or `streamablehttp_client` transport import is
+needed with the v2 high-level `Client`; it accepts the remote MCP URL directly.
 
 Save this as `test_research_mcp.py` in the external project:
 
@@ -234,8 +241,7 @@ import asyncio
 import json
 import os
 
-from mcp import ClientSession
-from mcp.client.streamable_http import streamable_http_client
+from mcp import Client
 
 URL = os.getenv(
     "RESEARCH_MCP_URL",
@@ -250,69 +256,67 @@ EXPECTED_TOOLS = {
 }
 
 
-async def call_json(session, name, arguments):
-    result = await session.call_tool(name, arguments)
-    if result.isError:
+async def call_json(client, name, arguments):
+    result = await client.call_tool(name, arguments)
+    if result.is_error:
         message = result.content[0].text if result.content else "unknown MCP error"
         raise RuntimeError(f"{name} failed: {message}")
-    if not isinstance(result.structuredContent, dict):
+    if not isinstance(result.structured_content, dict):
         raise RuntimeError(f"{name} did not return structured JSON")
-    return result.structuredContent
+    return result.structured_content
 
 
 async def main():
-    async with streamable_http_client(URL) as (read, write, _):
-        async with ClientSession(read, write) as session:
-            initialized = await session.initialize()
-            listed = await session.list_tools()
-            tools = {tool.name: tool for tool in listed.tools}
+    async with Client(URL) as client:
+        listed = await client.list_tools()
+        tools = {tool.name: tool for tool in listed.tools}
 
-            assert set(tools) == EXPECTED_TOOLS
-            assert all(
-                tool.annotations is not None
-                and tool.annotations.readOnlyHint is True
-                and tool.annotations.destructiveHint is False
-                for tool in tools.values()
-            )
+        assert set(tools) == EXPECTED_TOOLS
+        assert all(
+            tool.annotations is not None
+            and tool.annotations.read_only_hint is True
+            and tool.annotations.destructive_hint is False
+            for tool in tools.values()
+        )
 
-            search = await call_json(
-                session,
-                "search_research",
+        search = await call_json(
+            client,
+            "search_research",
+            {
+                "query": "How does the harness record RL training data?",
+                "limit": 3,
+            },
+        )
+        assert search["contract"] == "research-search-results"
+        assert search["hits"]
+        top = search["hits"][0]
+
+        evidence = await call_json(
+            client,
+            "get_evidence",
+            {"evidence_id": top["evidence_ids"][0]},
+        )
+        resolved = evidence["evidence"]
+
+        print(
+            json.dumps(
                 {
-                    "query": "How does the harness record RL training data?",
-                    "limit": 3,
+                    "server": client.server_info.name,
+                    "protocol_version": client.protocol_version,
+                    "tool_count": len(tools),
+                    "search_contract": search["contract"],
+                    "retrieval_mode": search["retrieval_mode"],
+                    "top_title": top["title"],
+                    "top_paper_id": top["paper_id"],
+                    "top_kind": top["kind"],
+                    "top_text": top["text"],
+                    "evidence_id": resolved["evidence_id"],
+                    "evidence_page": resolved["page"],
+                    "evidence_quote": resolved["quote"],
                 },
+                indent=2,
             )
-            assert search["contract"] == "research-search-results"
-            assert search["hits"]
-            top = search["hits"][0]
-
-            evidence = await call_json(
-                session,
-                "get_evidence",
-                {"evidence_id": top["evidence_ids"][0]},
-            )
-            resolved = evidence["evidence"]
-
-            print(
-                json.dumps(
-                    {
-                        "server": initialized.serverInfo.name,
-                        "protocol_version": initialized.protocolVersion,
-                        "tool_count": len(tools),
-                        "search_contract": search["contract"],
-                        "retrieval_mode": search["retrieval_mode"],
-                        "top_title": top["title"],
-                        "top_paper_id": top["paper_id"],
-                        "top_kind": top["kind"],
-                        "top_text": top["text"],
-                        "evidence_id": resolved["evidence_id"],
-                        "evidence_page": resolved["page"],
-                        "evidence_quote": resolved["quote"],
-                    },
-                    indent=2,
-                )
-            )
+        )
 
 
 asyncio.run(main())
@@ -329,7 +333,9 @@ The same test can be run without changing the external project's dependency
 files when `uv` is available:
 
 ```powershell
-uv run --with "mcp>=1.28.1,<2" python .\test_research_mcp.py
+uv run --isolated --no-project --prerelease=allow `
+  --with "mcp>=2.0.0rc1,<3" `
+  python .\test_research_mcp.py
 ```
 
 ## Observed example response

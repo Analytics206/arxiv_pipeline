@@ -569,7 +569,14 @@ start as background services.
   docker compose run --rm --no-deps app python -m src.utils.download_pdfs `
     --config /app/config/default.yaml
 
-  # 3. Analyze and index the bounded cross-category agent test batch.
+  # 3. Preview the next batch. Exact analyses already completed with the
+  # configured PDF hash, schema, prompt, and model are skipped.
+  docker compose run --rm --no-deps app `
+    python -m src.pipeline.process_downloaded_papers `
+    --config /app/config/default.yaml `
+    --dry-run
+
+  # 4. Analyze and index the next bounded cross-category batch.
   docker compose run --rm --no-deps app `
     python -m src.pipeline.process_downloaded_papers `
     --config /app/config/default.yaml
@@ -578,8 +585,15 @@ start as background services.
   Use `--dry-run` on either PDF/batch command to inspect its exact manifest
   without writing anything. `pdf_storage.papers_per_category` bounds the
   downloaded corpus; `research_processing.papers_per_category` separately
-  bounds expensive local-model analysis. Increase the latter only when you
-  intentionally want a longer GPU run.
+  bounds expensive local-model analysis. The default of one per category is a
+  three-paper sequential batch on the 8 GB GPU. Repeat the command to advance
+  the queue, or use `--limit-per-category 2` for up to six papers. Papers run
+  sequentially inside the batch rather than competing for GPU memory.
+
+  A paper is skipped only when its PDF hash, analysis schema, prompt version,
+  and model match a stored analysis. Failed or changed analyses remain eligible
+  on the next run. `--force-analysis` intentionally includes matching papers
+  and starts again from the newest paper in each category.
 
   ### Legacy enrichment workflows (optional)
 
