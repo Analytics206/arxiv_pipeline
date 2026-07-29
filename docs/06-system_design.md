@@ -262,7 +262,8 @@ directly useful and retain paper provenance.
 - `manual`: one-shot application commands, Mongo sync, optional Neo4j, Jupyter,
   and historical operations that do not require the legacy ML stack.
 - `legacy`: BERTopic, Top2Vec, the historical Qdrant experiment, and their large
-  Torch/Transformers runtime.
+  topic-model/sentence-transformer dependencies.
 
-The core image intentionally excludes the legacy ML stack so API and ingestion
-builds remain small and compatible with the current hardware.
+The normal image includes dependencies for supported pipelines, notebooks,
+importers, monitoring, and evaluation. Only the retired embedding processes
+require the `legacy` image.

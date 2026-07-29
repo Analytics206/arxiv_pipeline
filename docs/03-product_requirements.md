@@ -110,9 +110,10 @@ listed separately so it is not mistaken for the current critical path.
 - **FR-INF-03:** Use the shared `ai-services` Ollama instance rather than owning
   another model server.
 - **FR-INF-04:** Keep analysis and embedding models configurable.
-- **FR-INF-05:** Keep the core runtime free of Torch, Transformers,
-  sentence-transformers, BERTopic, and Top2Vec.
-- **FR-INF-06:** Provide separate core, test, and legacy container targets.
+- **FR-INF-05:** Keep only retired BERTopic, Top2Vec, and historical
+  Hugging Face/Qdrant embedding dependencies behind the `legacy` extra.
+- **FR-INF-06:** Provide normal runtime/test targets and a narrow legacy
+  embedding target.
 
 ## Operations (FR-OPS)
 
@@ -123,7 +124,7 @@ listed separately so it is not mistaken for the current critical path.
 - **FR-OPS-04:** Provide health endpoints and focused automated tests for
   contracts, persistence, and evidence.
 - **FR-OPS-05:** Document the exact startup, LAN access, bulk-processing, and
-  legacy commands.
+  retired embedding commands.
 
 ## Optional graph (FR-GPH)
 
@@ -146,11 +147,11 @@ listed separately so it is not mistaken for the current critical path.
 - **FR-SEC-05:** Require authentication, authorization, TLS, and rate limiting
   before use outside a trusted LAN or VPN.
 
-## Deferred and legacy requirements
+## Deferred and retired embedding requirements
 
 - BERTopic and Top2Vec topic pipelines are retained only under the `legacy`
   Compose profile and are not inputs to the current agent contracts.
-- The original author-paper-category Neo4j graph is retained as a historical
+- The original author-paper-category Neo4j graph remains an optional manual
   experiment.
 - Kafka/Zookeeper, a generic autonomous-agent platform, public multi-user
   hosting, and a UI for starting pipelines are deferred.

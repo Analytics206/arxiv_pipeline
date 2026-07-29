@@ -1,75 +1,75 @@
 Metadata-Version: 2.4
 Name: arxiv_pipeline
-Version: 0.8.0
+Version: 0.9.0
 Summary: Local evidence-backed research intelligence for AI and coding agents
 License: MIT
 Requires-Python: <3.14,>=3.13
 Description-Content-Type: text/markdown
+Requires-Dist: absl-py<3,>=2.5.0
 Requires-Dist: aiohttp<4,>=3.14.3
 Requires-Dist: beautifulsoup4<5,>=4.15.0
+Requires-Dist: biopython<2,>=1.87
+Requires-Dist: confluent-kafka<3,>=2.15.0
+Requires-Dist: datasets<6,>=5.0.0
+Requires-Dist: dill<0.4.2,>=0.4.1
+Requires-Dist: evaluate<0.5,>=0.4.6
 Requires-Dist: fastapi<1,>=0.140.0
+Requires-Dist: fsspec[http]<=2026.4.0,>=2026.4.0
 Requires-Dist: httpx<1,>=0.28.1
+Requires-Dist: ipywidgets<9,>=8.1.8
+Requires-Dist: jupyter<2,>=1.1.1
+Requires-Dist: jupyterlab<5,>=4.6.2
+Requires-Dist: kaggle<3,>=2.2.4
+Requires-Dist: kagglehub<2,>=1.0.2
+Requires-Dist: matplotlib<4,>=3.11.1
 Requires-Dist: mcp<2,>=1.28.1
 Requires-Dist: motor<4,>=3.7.1
+Requires-Dist: multiprocess<0.70.20,>=0.70.19
 Requires-Dist: neo4j<7,>=6.2.0
+Requires-Dist: nltk<4,>=3.10.0
+Requires-Dist: numpy<2.5,>=2.4.3
 Requires-Dist: ollama<1,>=0.6.2
+Requires-Dist: pandas<4,>=3.0.5
+Requires-Dist: pillow<13,>=12.3.0
+Requires-Dist: prometheus-client<1,>=0.26.0
+Requires-Dist: protobuf<8,>=7.35.1
+Requires-Dist: pyarrow<26,>=25.0.0
+Requires-Dist: pycocoevalcap<2,>=1.2
+Requires-Dist: pycocotools<3,>=2.0.11
 Requires-Dist: pydantic<3,>=2.13.4
 Requires-Dist: pymupdf<2,>=1.28.0
 Requires-Dist: pymongo<5,>=4.17.0
+Requires-Dist: pypdf<7,>=6.14.2
 Requires-Dist: python-dotenv<2,>=1.2.2
 Requires-Dist: pyyaml<7,>=6.0.3
 Requires-Dist: qdrant-client<2,>=1.18.0
 Requires-Dist: requests<3,>=2.34.2
+Requires-Dist: rouge-score<0.2,>=0.1.2
+Requires-Dist: sacrebleu<3,>=2.6.0
+Requires-Dist: sentencepiece<0.3,>=0.2.2
+Requires-Dist: tabulate<1,>=0.10.0
+Requires-Dist: torch<3,>=2.13.0
 Requires-Dist: tqdm<5,>=4.69.1
+Requires-Dist: transformers<6,>=5.14.1
 Requires-Dist: uvicorn<1,>=0.51.0
+Requires-Dist: xxhash<4,>=3.8.1
 Provides-Extra: agent
 Requires-Dist: ast-comments<2,>=1.3.0; extra == "agent"
 Requires-Dist: click<9,>=8.4.2; extra == "agent"
 Requires-Dist: gitpython<4,>=3.1.57; extra == "agent"
 Provides-Extra: legacy
-Requires-Dist: absl-py<3,>=2.5.0; extra == "legacy"
 Requires-Dist: bertopic<0.18,>=0.17.4; extra == "legacy"
-Requires-Dist: biopython<2,>=1.87; extra == "legacy"
-Requires-Dist: confluent-kafka<3,>=2.15.0; extra == "legacy"
-Requires-Dist: datasets<6,>=5.0.0; extra == "legacy"
-Requires-Dist: dill<0.4.2,>=0.4.1; extra == "legacy"
-Requires-Dist: evaluate<0.5,>=0.4.6; extra == "legacy"
-Requires-Dist: fsspec[http]<=2026.4.0,>=2026.4.0; extra == "legacy"
 Requires-Dist: gensim<5,>=4.4.0; extra == "legacy"
 Requires-Dist: hdbscan<0.9,>=0.8.44; extra == "legacy"
-Requires-Dist: ipywidgets<9,>=8.1.8; extra == "legacy"
-Requires-Dist: jupyter<2,>=1.1.1; extra == "legacy"
-Requires-Dist: jupyterlab<5,>=4.6.2; extra == "legacy"
-Requires-Dist: kaggle<3,>=2.2.4; extra == "legacy"
-Requires-Dist: kagglehub<2,>=1.0.2; extra == "legacy"
 Requires-Dist: langchain-huggingface<2,>=1.2.2; extra == "legacy"
 Requires-Dist: langchain-text-splitters<2,>=1.1.2; extra == "legacy"
-Requires-Dist: matplotlib<4,>=3.11.1; extra == "legacy"
-Requires-Dist: multiprocess<0.70.20,>=0.70.19; extra == "legacy"
-Requires-Dist: nltk<4,>=3.10.0; extra == "legacy"
 Requires-Dist: numba<0.67,>=0.66.0; extra == "legacy"
-Requires-Dist: numpy<2.5,>=2.4.3; extra == "legacy"
-Requires-Dist: pandas<4,>=3.0.5; extra == "legacy"
-Requires-Dist: pillow<13,>=12.3.0; extra == "legacy"
-Requires-Dist: prometheus-client<1,>=0.26.0; extra == "legacy"
-Requires-Dist: protobuf<8,>=7.35.1; extra == "legacy"
-Requires-Dist: pyarrow<26,>=25.0.0; extra == "legacy"
-Requires-Dist: pycocoevalcap<2,>=1.2; extra == "legacy"
-Requires-Dist: pycocotools<3,>=2.0.11; extra == "legacy"
-Requires-Dist: pypdf<7,>=6.14.2; extra == "legacy"
-Requires-Dist: rouge-score<0.2,>=0.1.2; extra == "legacy"
-Requires-Dist: sacrebleu<3,>=2.6.0; extra == "legacy"
 Requires-Dist: scikit-learn<2,>=1.9.0; extra == "legacy"
 Requires-Dist: scipy<2,>=1.18.0; extra == "legacy"
 Requires-Dist: seaborn<0.14,>=0.13.2; extra == "legacy"
 Requires-Dist: sentence-transformers<6,>=5.6.1; extra == "legacy"
-Requires-Dist: sentencepiece<0.3,>=0.2.2; extra == "legacy"
-Requires-Dist: tabulate<1,>=0.10.0; extra == "legacy"
 Requires-Dist: top2vec<1.1,>=1.0.36; extra == "legacy"
-Requires-Dist: torch<3,>=2.13.0; extra == "legacy"
-Requires-Dist: transformers<6,>=5.14.1; extra == "legacy"
 Requires-Dist: umap-learn<0.6,>=0.5.12; extra == "legacy"
-Requires-Dist: xxhash<4,>=3.8.1; extra == "legacy"
 Provides-Extra: dev
 Requires-Dist: black<27,>=26.5.1; extra == "dev"
 Requires-Dist: isort<9,>=8.0.1; extra == "dev"
@@ -100,9 +100,9 @@ for the current product direction and phased implementation plan.
 | **ArXiv ingestion** | Fetches normalized metadata and exact PDF versions from configurable categories/date ranges. |
 | **Canonical MongoDB storage** | Stores paper state and immutable, versioned analyses with full provenance. |
 | **Agent hybrid retrieval** | Combines shared-Ollama embeddings, lexical IDF retrieval, weighted RRF, and paper-diversity reranking. |
-| **Agent API** | Publishes read-only capability, catalog, search, token-budgeted context, and evidence tools through REST/OpenAPI. |
+| **Agent interfaces** | Publishes the same read-only capability, catalog, search, token-budgeted context, and evidence contracts through REST/OpenAPI and MCP. |
 | **Human research workspace** | Searches the same curated knowledge and opens complete evidence-aware paper context. |
-| **Reproducible containers** | Separates the small core runtime from optional historical ML/topic-modeling tools. |
+| **Reproducible containers** | Keeps only retired embedding/topic-modeling processes in an optional image. |
 ---
 
 ### Neo4j Graph Database
@@ -123,9 +123,10 @@ for the current product direction and phased implementation plan.
 | **Qdrant** | Stores the rebuildable `research_knowledge_hybrid_v1` dense/lexical index |
 | **Shared Ollama** | Runs configurable analysis and embedding models from the separate `ai-services` project |
 | **Research API** | Serves stable read-only REST/OpenAPI tools to UI and external agents |
+| **MCP adapter** | Maps the five evaluated GET contracts and stable resources to MCP over Streamable HTTP or stdio |
 | **Web UI** | Provides human semantic search, paper context, evidence, and provenance |
 | **Neo4j** | Optional manual relationship experiment; not a default dependency |
-| **Legacy runtime** | Isolates BERTopic, Top2Vec, historical local-Hugging-Face work, notebooks, and evaluation tools |
+| **Legacy embedding runtime** | Isolates only BERTopic, Top2Vec, and the historical Hugging Face/Qdrant embedding processes |
 
 ---
 ## 🧵 High Level Overview
@@ -250,27 +251,16 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 # Activate the virtual environment
 .\.venv\Scripts\Activate.ps1
 
-# Install the exact locked dependencies, including legacy research tools and
+# Install the exact locked dependencies for the supported pipelines and
 # development tools
-uv sync --python 3.13 --extra agent --extra legacy --extra dev --frozen
-```
-
-If you use a separately installed Python 3.13 instead of `uv`, the original
-standard-library workflow is still supported:
-
-```powershell
-Remove-Item -LiteralPath .venv -Recurse -Force
-py -3.13 -m venv .venv
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -e ".[agent,legacy,dev]"
+uv sync --python 3.13 --extra agent --extra dev --frozen
 ```
 
 Both setup scripts install a uv-managed Python 3.13 runtime and synchronize
-the full local environment from `uv.lock`, including legacy research tools and
-development tools. For a smaller agent/API-only environment, omit
-`--extra legacy`.
+the supported pipelines and development tools from `uv.lock` into `.venv`.
+The uv-managed environment intentionally does not need a separate `pip`
+installation. Retired BERTopic, Top2Vec, and historical local-model workflows
+are available only when explicitly requested with `--extra legacy`.
 
 ## Process a paper end to end (recommended)
 
@@ -283,7 +273,7 @@ evidence-backed analysis, and idempotently indexes it in Qdrant:
 Copy-Item .env.example .env
 
 # Start the persistent services. The app itself is an on-demand command.
-docker compose up -d mongodb qdrant api web-ui
+docker compose up -d mongodb qdrant api mcp web-ui
 
 # Process one exact paper version from arXiv through semantic search.
 docker compose run --rm --no-deps app python -m src.pipeline.process_paper `
@@ -375,9 +365,69 @@ harness can perform an exact final count with its target model tokenizer. If a
 custom budget cannot hold the mandatory TLDR, evidence, and provenance, the API
 returns 422 with the minimum estimated budget for that paper.
 
-An AI harness can generate tools from `/openapi.json` now. A read-only MCP
-adapter is planned over the same service; it is not required for
-cross-computer use.
+An AI harness can generate tools from `/openapi.json` or connect to the MCP
+adapter at `http://<research-host>:8001/mcp`. MCP exposes the same five names:
+
+- `search_research`
+- `list_curated_papers`
+- `get_paper_context`
+- `get_paper_context_package`
+- `get_evidence`
+
+Every MCP tool advertises `readOnlyHint=true`, `destructiveHint=false`, and
+`idempotentHint=true`. The adapter has no MongoDB or Qdrant credentials and
+calls only the canonical GET-only research API.
+
+For a network-capable MCP harness, configure the Streamable HTTP URL:
+
+```json
+{
+  "mcpServers": {
+    "arxiv-research": {
+      "type": "http",
+      "url": "http://<research-host>:8001/mcp"
+    }
+  }
+}
+```
+
+For a local stdio client, run the same server without publishing a port:
+
+```json
+{
+  "mcpServers": {
+    "arxiv-research": {
+      "command": "C:\\path\\to\\arxiv_pipeline\\.venv\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "src.mcp_server.server",
+        "--transport",
+        "stdio"
+      ],
+      "cwd": "C:\\path\\to\\arxiv_pipeline",
+      "env": {
+        "RESEARCH_API_URL": "http://localhost:8000"
+      }
+    }
+  }
+}
+```
+
+Client configuration field names vary slightly by harness, but the command,
+environment variable, and MCP URL are transport-standard inputs.
+
+The complete cross-computer handoff for the separate AI harness project,
+including architecture, agent usage guidance, firewall diagnostics, and a
+standalone test with observed data, is
+[`docs/15-external_ai_harness_mcp_handoff.md`](docs/15-external_ai_harness_mcp_handoff.md).
+
+Validate a running Streamable HTTP adapter end to end:
+
+```powershell
+python -m src.pipeline.validate_mcp `
+  --url http://localhost:8001/mcp `
+  --paper-id 2607.02134
+```
 
 Evaluate package invariants over the current corpus:
 
@@ -414,7 +464,34 @@ GET http://localhost:8000/research/search?query=lightweight%20GUI%20containers&p
 Every hit includes its stable paper URI, analysis/model provenance, evidence
 IDs, exact quotes, and source pages. `retrieval_mode` identifies dense versus
 hybrid retrieval, and `score_semantics` distinguishes cosine similarity from
-RRF rank scores.
+RRF rank scores. Hybrid responses also include:
+
+- `relevance`, a normalized 0-1 retriever-agreement signal on every hit;
+- `score_calibration`, including the raw RRF floor/ceiling and its meaning;
+- `result_status=matches|no_match` plus `no_match_reason`;
+- indexed and filter-eligible paper/point counts under `coverage`.
+
+The default `min_relevance=0.05` removes single-retriever nearest-neighbor
+leftovers. Pass `min_relevance=0` only when intentionally inspecting every
+candidate. RRF and normalized relevance are ranking/agreement signals, not
+probabilities that a result is topically applicable.
+
+Evidence lookup returns a complete sentence-aware `quote`, the original exact
+`supporting_quote`, and `truncated`. Search and normal context packages exclude
+records marked truncated. Implementation-idea hits expose their title,
+description, agent use, expected benefit, and risks under
+`implementation_idea`; the indexed `text` contains only one canonical
+description.
+
+Repair and reindex existing canonical analyses after upgrading an older corpus:
+
+```powershell
+docker compose run --rm --no-deps app python -m src.pipeline.repair_research_quality `
+  --config /app/config/default.yaml
+```
+
+Use `--dry-run` first to validate PDF hashes and inspect the proposed corpus
+repair without writing MongoDB or Qdrant.
 
 ### Evaluate retrieval and embedding models
 
@@ -475,7 +552,7 @@ The API and UI publish on all host interfaces by default:
 
 ```powershell
 Copy-Item .env.example .env
-docker compose up -d mongodb qdrant api web-ui
+docker compose up -d mongodb qdrant api mcp web-ui
 
 # Find the research computer's IPv4 address on Windows.
 ipconfig
@@ -487,6 +564,7 @@ From another computer on the same network, open:
 Human workspace: http://<research-host-ip>:3000
 API docs:        http://<research-host-ip>:8000/docs
 OpenAPI:         http://<research-host-ip>:8000/openapi.json
+MCP:             http://<research-host-ip>:8001/mcp
 Health:          http://<research-host-ip>:8000/health
 ```
 
@@ -513,7 +591,7 @@ docker compose run --rm app python -m src.pipeline.summarize_paper `
 
 ## 1. **Build and start persistent services:**
    ```bash
-    docker compose up -d mongodb qdrant api web-ui
+    docker compose up -d mongodb qdrant api mcp web-ui
     # or to rebuild
     docker compose up -d --build
    ```
@@ -530,12 +608,10 @@ start as background services.
   The pipeline includes a script to download the complete arXiv dataset from Kaggle. This is useful for bulk processing or offline analysis.
   
   #### Prerequisites
-  1. Install the required package:
-     ```bash
-     pip install kagglehub
-     ```
-  
-  2. Set up Kaggle credentials:
+  The official `kaggle` client is included in the normal project environment;
+  do not install a separate package for this command.
+
+  1. Set up Kaggle credentials:
      - Create a `secure` directory in your project root (if it doesn't exist)
      - Copy `kaggle.json.example` to `secure/kaggle.json`
      - Update the file with your Kaggle API credentials:
@@ -574,18 +650,27 @@ start as background services.
   is idempotent and can be rerun after an interruption:
 
   ```powershell
-  # Build the small agent/API/ingestion runtime.
+  # Build the small agent/API/MCP/ingestion runtime.
   docker compose build api
-  docker compose up -d mongodb qdrant api web-ui
+  docker compose up -d mongodb qdrant api mcp web-ui
 
-  # 1. Upsert the configured arXiv category pages into MongoDB.
+  # 1. Upsert the configured arXiv category pages into MongoDB. The command
+  # finishes by retaining the latest version in papers and moving older
+  # versions into papers_archive.
   docker compose run --rm --no-deps sync-mongodb
 
   # 2. Download, validate, hash, and record the configured PDF corpus.
   docker compose run --rm --no-deps app python -m src.utils.download_pdfs `
     --config /app/config/default.yaml
 
-  # 3. Analyze and index the bounded cross-category agent test batch.
+  # 3. Preview the next batch. Exact analyses already completed with the
+  # configured PDF hash, schema, prompt, and model are skipped.
+  docker compose run --rm --no-deps app `
+    python -m src.pipeline.process_downloaded_papers `
+    --config /app/config/default.yaml `
+    --dry-run
+
+  # 4. Analyze and index the next bounded cross-category batch.
   docker compose run --rm --no-deps app `
     python -m src.pipeline.process_downloaded_papers `
     --config /app/config/default.yaml
@@ -594,12 +679,38 @@ start as background services.
   Use `--dry-run` on either PDF/batch command to inspect its exact manifest
   without writing anything. `pdf_storage.papers_per_category` bounds the
   downloaded corpus; `research_processing.papers_per_category` separately
-  bounds expensive local-model analysis. Increase the latter only when you
-  intentionally want a longer GPU run.
+  bounds expensive local-model analysis. The default of one per category is a
+  three-paper sequential batch on the 8 GB GPU. Repeat the command to advance
+  the queue, or use `--limit-per-category 2` for up to six papers. Papers run
+  sequentially inside the batch rather than competing for GPU memory.
+
+  Paper metadata uses schema 2.0. `papers` is keyed uniquely by
+  `base_arxiv_id` and contains only the latest observed arXiv version;
+  `papers_archive` retains superseded versions keyed by base ID and numeric
+  version. The import command enforces this invariant after all categories
+  finish. To inspect or rerun that cleanup independently:
+
+  ```powershell
+  # Report the expected move without changing MongoDB.
+  docker compose run --rm --no-deps app `
+    python -m src.pipeline.cleanup_paper_versions `
+    --config /app/config/default.yaml
+
+  # Archive older versions and normalize the current collection.
+  docker compose run --rm --no-deps app `
+    python -m src.pipeline.cleanup_paper_versions `
+    --config /app/config/default.yaml `
+    --apply
+  ```
+
+  A paper is skipped only when its PDF hash, analysis schema, prompt version,
+  and model match a stored analysis. Failed or changed analyses remain eligible
+  on the next run. `--force-analysis` intentionally includes matching papers
+  and starts again from the newest paper in each category.
 
   ### Legacy enrichment workflows (optional)
 
-  These commands support the older graph/topic experiments. They are not
+  These commands support only the older topic/embedding experiments. They are not
   required by agent context or the `research_knowledge_hybrid_v1` index. Build the
   separate legacy image once before running BERTopic, Top2Vec, or the old
   Qdrant experiment:
@@ -608,9 +719,10 @@ start as background services.
   docker compose --profile legacy build legacy-runtime
   ```
 
-  The legacy image contains Torch, Transformers, sentence-transformers,
-  BERTopic, Top2Vec, and the numerical/evaluation stack. Those packages are
-  intentionally absent from `arxiv_pipeline-python:latest`.
+  The legacy image adds only BERTopic, Top2Vec, sentence-transformers,
+  LangChain embedding adapters, and their clustering dependencies. Notebooks,
+  evaluation tools, importers, monitoring, and general data utilities are part
+  of the normal project environment.
 
   ### a. Run sync-neo4j pipeline for new metadata inserted in MongoDB:
   ```bash
@@ -688,8 +800,8 @@ The following services are configured with the `manual` profile in Docker Compos
 
 ### a. Jupyter Notebooks for Data Analysis
 ```bash
-# Build and start the project-owned Python 3.13 notebook image. This image
-# installs the legacy research extra; the core API image remains small.
+# Build and start the project-owned Python 3.13 notebook image. It uses the
+# normal project environment.
 docker compose --profile manual up jupyter-scipy
 # Stop Jupyter SciPy notebook server
 docker compose --profile manual down jupyter-scipy
@@ -1213,14 +1325,9 @@ app:
 ## GPU Support for Embeddings Generation
 * The pipeline can use GPU acceleration for generating embeddings in the `sync_qdrant.py` script:
 
-1. **Install PyTorch with CUDA support**:
-```bash
-
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-
-```
-
-* Choose the appropriate CUDA version (cu118, cu121, etc.) based on your system. Check with `nvidia-smi`.
+1. **Use the locked PyTorch installation from the normal project setup.**
+   Check GPU visibility with `nvidia-smi`; do not replace project packages with
+   an ad hoc pip installation.
 
 2. **Enable GPU in configuration**:
 ```yaml
@@ -1242,10 +1349,7 @@ Using GPU for embeddings: cuda:0
 The Docker setup includes MongoDB, so no additional installation is needed if using Docker Compose.
 #### Option 2: Standalone MongoDB Installation
 1. **Download MongoDB Community Server**: [https://www.mongodb.com/try/download/community](https://www.mongodb.com/try/download/community)
-2. **Install Python driver**:
-   ```bash
-   pip install pymongo>=4.3.0
-   ```
+2. **Use the PyMongo driver included by the normal project setup.**
 
 3. **Test your connection**:
    ```python
@@ -1263,11 +1367,7 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
 #### Option 2: Standalone Neo4j Installation
 1. **Download Neo4j Desktop**: [https://neo4j.com/download/](https://neo4j.com/download/)
 2. **Create a new database** with password 'password' to match configuration
-3. **Install Python driver**:
-
-   ```bash
-   pip install neo4j>=5.5.0
-   ```
+3. **Use the Neo4j driver included by the normal project setup.**
 
 4. **Test your connection**:
    ```python
@@ -1341,11 +1441,12 @@ The following features are 'planned' for future development to enhance the resea
 - **Researcher Networks**: Map collaboration networks among authors
 - **Multi-Modal Analysis**: Extract and analyze figures and tables from papers
 - **Fine-tuning Pipelines**: Fine-tune pipelines for specific use cases
-- **Harness tools**: Add method comparison and project matching over the
-  token-budgeted context service
+- **Research comparison tools**: Add evaluated method-comparison primitives
+  over the token-budgeted context service. Private project-context matching is
+  owned by the separate AI harness project.
 
 ### Infrastructure Improvements
-- **Read-only MCP adapter**: Expose evaluated research-service tools to MCP clients
+- **MCP client coverage**: Validate the read-only adapter with each harness used in production
 - **Retrieval evaluation growth**: Add real harness queries as the curated corpus expands
 - **Export Tools**: Add BibTeX and PDF collection exports
 - **Web Admin Interface**: Add web admin interface for configuration and running pipelines
@@ -1361,7 +1462,7 @@ The following features are 'planned' for future development to enhance the resea
 
 - [ ] **Medium-term Tasks**
   - [ ] Fine-tuning pipelines for specific use cases
-  - [ ] Add a read-only MCP adapter over the token-budgeted harness tools
+  - [x] Add a read-only MCP adapter over the token-budgeted harness tools
   - [ ] Evaluate whether graph-assisted retrieval adds value before extending Neo4j
   - [ ] Add full-text search capabilities
   - [ ] Implement comprehensive citation parsing system

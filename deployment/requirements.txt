@@ -1,24 +1,53 @@
-# Compatibility reference for non-Docker installs. The Docker image resolves
-# the equivalent core + `agent` extra from the repository uv.lock.
-
-# Core dependencies
-pyyaml>=6.0.3,<7
-click>=8.4.2,<9
+# Compatibility reference for non-Docker installs. The canonical environment
+# remains pyproject.toml + uv.lock; this list mirrors normal + agent dependencies.
+absl-py>=2.5.0,<3
 aiohttp>=3.14.3,<4
-python-dotenv>=1.2.2,<2
-
-# Database clients
-pymongo>=4.17.0,<5
-neo4j>=6.2.0,<7
-
-# Git integration
-GitPython>=3.1.57,<4
-
-# For code parsing
 ast-comments>=1.3.0,<2
-
-# Vector search
+beautifulsoup4>=4.15.0,<5
+biopython>=1.87,<2
+click>=8.4.2,<9
+confluent-kafka>=2.15.0,<3
+datasets>=5.0.0,<6
+dill>=0.4.1,<0.4.2
+evaluate>=0.4.6,<0.5
+fastapi>=0.140.0,<1
+fsspec[http]>=2026.4.0,<=2026.4.0
+GitPython>=3.1.57,<4
+httpx>=0.28.1,<1
+ipywidgets>=8.1.8,<9
+jupyter>=1.1.1,<2
+jupyterlab>=4.6.2,<5
+kaggle>=2.2.4,<3
+kagglehub>=1.0.2,<2
+matplotlib>=3.11.1,<4
+mcp>=1.28.1,<2
+motor>=3.7.1,<4
+multiprocess>=0.70.19,<0.70.20
+neo4j>=6.2.0,<7
+nltk>=3.10.0,<4
+numpy>=2.4.3,<2.5
+ollama>=0.6.2,<1
+pandas>=3.0.5,<4
+pillow>=12.3.0,<13
+prometheus-client>=0.26.0,<1
+protobuf>=7.35.1,<8
+pyarrow>=25.0.0,<26
+pycocoevalcap>=1.2,<2
+pycocotools>=2.0.11,<3
+pydantic>=2.13.4,<3
+pymupdf>=1.28.0,<2
+pyyaml>=6.0.3,<7
+python-dotenv>=1.2.2,<2
+pymongo>=4.17.0,<5
+pypdf>=6.14.2,<7
 qdrant-client>=1.18.0,<2
-
-# Progress reporting
+requests>=2.34.2,<3
+rouge-score>=0.1.2,<0.2
+sacrebleu>=2.6.0,<3
+sentencepiece>=0.2.2,<0.3
+tabulate>=0.10.0,<1
+torch>=2.13.0,<3
 tqdm>=4.69.1,<5
+transformers>=5.14.1,<6
+uvicorn>=0.51.0,<1
+xxhash>=3.8.1,<4

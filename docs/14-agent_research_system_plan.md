@@ -249,8 +249,9 @@ The first two slices create these components:
    routes.
 10. A human research workspace for semantic search, filters, ranked
     evidence-aware results, complete paper context, and provenance.
-11. A slim core runtime with BERTopic, Top2Vec, Torch, Transformers, notebooks,
-    and historical evaluation tools isolated in a separate legacy image.
+11. A normal project runtime for supported pipelines, notebooks, importers,
+    monitoring, and evaluation, with only retired BERTopic, Top2Vec, and old
+    Hugging Face/Qdrant embedding processes isolated in the legacy image.
 12. A five-paper, 38-case retrieval suite with immutable-document validation,
     grouped cross-paper relevance, negative controls, and reproducible
     four-model embedding benchmarks.

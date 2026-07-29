@@ -17,10 +17,10 @@ WORKDIR /app
 RUN python -m pip install --no-cache-dir uv==0.11.32
 
 COPY pyproject.toml uv.lock setup.py README.md ./
-RUN uv sync --frozen --no-dev --extra legacy --no-install-project
+RUN uv sync --frozen --no-dev --no-install-project
 
 COPY . .
-RUN uv sync --frozen --no-dev --extra legacy && \
+RUN uv sync --frozen --no-dev && \
     mkdir -p /home/jovyan/work && \
     chown -R jovyan:jovyan /home/jovyan
 

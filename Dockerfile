@@ -8,6 +8,10 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git libgomp1 && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN python -m pip install --no-cache-dir uv==0.11.32
 
 FROM base AS core-dependencies
@@ -29,10 +33,6 @@ FROM core AS test
 RUN uv sync --frozen --extra dev
 
 FROM base AS legacy-dependencies
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends git libgomp1 && \
-    rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml uv.lock setup.py README.md ./
 

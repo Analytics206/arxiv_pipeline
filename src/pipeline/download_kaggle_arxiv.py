@@ -7,7 +7,6 @@ It's designed to work with the ArXiv Pipeline project's architecture.
 Configuration is loaded from config/default.yaml and secure/kaggle.json.
 """
 
-import os
 import sys
 import json
 import logging
@@ -15,13 +14,10 @@ import argparse
 import zipfile
 import shutil
 from pathlib import Path
-from typing import Dict, Any, Optional, Union, List
+from typing import Dict, Any
 
 import yaml
-import kaggle
-from kaggle.api.kaggle_api_extended import KaggleApi
 from dotenv import load_dotenv
-import pandas as pd
 
 # Configure basic logging first
 logging.basicConfig(
@@ -92,7 +88,6 @@ def setup_environment(config: Dict[str, Any]) -> None:
         if creds_path.exists():
             # Copy the credentials to the .kaggle directory
             dest_file = kaggle_dir / "kaggle.json"
-            import shutil
             shutil.copy2(creds_path, dest_file)
             
             # Set proper permissions (read/write for user only)
@@ -147,6 +142,10 @@ def download_dataset(dataset_name: str, download_path: Path, version: str = "1")
         RuntimeError: If the dataset download or extraction fails
     """
     try:
+        # Import after credentials have been configured by setup_environment().
+        # Keeping this local also lets configuration errors remain actionable.
+        from kaggle.api.kaggle_api_extended import KaggleApi
+
         # Initialize Kaggle API
         api = KaggleApi()
         api.authenticate()

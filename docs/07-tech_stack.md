@@ -6,11 +6,12 @@
 | --- | --- | --- |
 | Python | 3.13 | Project constraint is `>=3.13,<3.14`; Python 3.14 is deferred until required packages support it cleanly |
 | Dependency management | `pyproject.toml`, `uv.lock`, uv | Cross-platform locked environment |
-| Containers | Docker Compose | Separate `runtime`, `test`, and `legacy` image targets |
+| Containers | Docker Compose | Normal runtime/test images plus a narrow retired-embedding image |
 | Host OS | Windows or Linux | Project-relative PDF paths avoid drive-letter coupling |
 
-The maintained core has 17 direct Python dependencies. Large local ML and
-notebook packages are isolated in the optional `legacy` extra.
+The normal environment supports the repository's pipelines, notebooks,
+importers, monitoring, and LLM evaluation tools. Only retired embedding and
+topic-model processes are isolated in the optional `legacy` extra.
 
 ## Core application stack
 
@@ -140,7 +141,7 @@ vulnerabilities.
 | --- | --- | --- |
 | `runtime` | Core ingestion, PDF, database, API, retrieval, and Ollama clients | API, app, Mongo sync |
 | `test` | Runtime plus pytest/dev tools | CI and container verification |
-| `legacy` | Runtime plus Torch, Transformers, topic modeling, notebooks, and evaluation | Historical experiments only |
+| `legacy` | Runtime plus retired topic-model and Hugging Face/Qdrant embedding dependencies | Historical embedding experiments only |
 
 ### Compose profiles
 
@@ -150,16 +151,16 @@ vulnerabilities.
 | `manual` | `app`, `sync-mongodb`, `neo4j`, `sync-neo4j`, Jupyter, Kafka utilities |
 | `legacy` | `legacy-runtime`, `sync-bertopic`, `sync-top2vec`, historical `sync-qdrant` |
 
-## Legacy Python stack
+## Retired embedding stack
 
-The optional `legacy` extra contains PyTorch, Transformers,
-sentence-transformers, BERTopic, Top2Vec, NumPy/pandas/scikit-learn/Numba,
-Jupyter, evaluation metrics, Kaggle tools, and historical importers.
+The optional `legacy` extra contains only BERTopic, Top2Vec,
+sentence-transformers, the old LangChain embedding adapters, and their
+clustering dependencies. It exists for `sync-bertopic`, `sync-top2vec`, and the
+historical `sync-qdrant` process.
 
-These dependencies remain locked for reproducibility but are deliberately
-absent from the core runtime. BERTopic and Top2Vec are retired from the active
-research architecture because their clusters did not improve the intended
-agent/graph workflows.
+PyTorch, Transformers, NumPy/pandas, Jupyter, evaluation metrics, Kaggle tools,
+PubMed support, Kafka, monitoring, and other project utilities are normal
+dependencies because non-legacy code still uses them.
 
 ## Network configuration
 

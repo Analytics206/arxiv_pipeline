@@ -24,7 +24,7 @@ for the current product direction and phased implementation plan.
 | **Agent hybrid retrieval** | Combines shared-Ollama embeddings, lexical IDF retrieval, weighted RRF, and paper-diversity reranking. |
 | **Agent interfaces** | Publishes the same read-only capability, catalog, search, token-budgeted context, and evidence contracts through REST/OpenAPI and MCP. |
 | **Human research workspace** | Searches the same curated knowledge and opens complete evidence-aware paper context. |
-| **Reproducible containers** | Separates the small core runtime from optional historical ML/topic-modeling tools. |
+| **Reproducible containers** | Keeps only retired embedding/topic-modeling processes in an optional image. |
 ---
 
 ### Neo4j Graph Database
@@ -48,7 +48,7 @@ for the current product direction and phased implementation plan.
 | **MCP adapter** | Maps the five evaluated GET contracts and stable resources to MCP over Streamable HTTP or stdio |
 | **Web UI** | Provides human semantic search, paper context, evidence, and provenance |
 | **Neo4j** | Optional manual relationship experiment; not a default dependency |
-| **Legacy runtime** | Isolates BERTopic, Top2Vec, historical local-Hugging-Face work, notebooks, and evaluation tools |
+| **Legacy embedding runtime** | Isolates only BERTopic, Top2Vec, and the historical Hugging Face/Qdrant embedding processes |
 
 ---
 ## 🧵 High Level Overview
@@ -173,27 +173,16 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 # Activate the virtual environment
 .\.venv\Scripts\Activate.ps1
 
-# Install the exact locked dependencies, including legacy research tools and
+# Install the exact locked dependencies for the supported pipelines and
 # development tools
-uv sync --python 3.13 --extra agent --extra legacy --extra dev --frozen
-```
-
-If you use a separately installed Python 3.13 instead of `uv`, the original
-standard-library workflow is still supported:
-
-```powershell
-Remove-Item -LiteralPath .venv -Recurse -Force
-py -3.13 -m venv .venv
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -e ".[agent,legacy,dev]"
+uv sync --python 3.13 --extra agent --extra dev --frozen
 ```
 
 Both setup scripts install a uv-managed Python 3.13 runtime and synchronize
-the full local environment from `uv.lock`, including legacy research tools and
-development tools. For a smaller agent/API-only environment, omit
-`--extra legacy`.
+the supported pipelines and development tools from `uv.lock` into `.venv`.
+The uv-managed environment intentionally does not need a separate `pip`
+installation. Retired BERTopic, Top2Vec, and historical local-model workflows
+are available only when explicitly requested with `--extra legacy`.
 
 ## Process a paper end to end (recommended)
 
@@ -541,12 +530,10 @@ start as background services.
   The pipeline includes a script to download the complete arXiv dataset from Kaggle. This is useful for bulk processing or offline analysis.
   
   #### Prerequisites
-  1. Install the required package:
-     ```bash
-     pip install kagglehub
-     ```
-  
-  2. Set up Kaggle credentials:
+  The official `kaggle` client is included in the normal project environment;
+  do not install a separate package for this command.
+
+  1. Set up Kaggle credentials:
      - Create a `secure` directory in your project root (if it doesn't exist)
      - Copy `kaggle.json.example` to `secure/kaggle.json`
      - Update the file with your Kaggle API credentials:
@@ -563,7 +550,7 @@ start as background services.
   python -m src.pipeline.download_kaggle_arxiv
   
   # Override download path (optional)
-  python -m src.pipeline.download_kaggle_arxiv --path "X:/custom/path"
+  python -m src.pipeline.download_kaggle_arxiv --path "C:\Users\mad_p\Downloads"
   ```
   
   #### Configuration
@@ -645,7 +632,7 @@ start as background services.
 
   ### Legacy enrichment workflows (optional)
 
-  These commands support the older graph/topic experiments. They are not
+  These commands support only the older topic/embedding experiments. They are not
   required by agent context or the `research_knowledge_hybrid_v1` index. Build the
   separate legacy image once before running BERTopic, Top2Vec, or the old
   Qdrant experiment:
@@ -654,9 +641,10 @@ start as background services.
   docker compose --profile legacy build legacy-runtime
   ```
 
-  The legacy image contains Torch, Transformers, sentence-transformers,
-  BERTopic, Top2Vec, and the numerical/evaluation stack. Those packages are
-  intentionally absent from `arxiv_pipeline-python:latest`.
+  The legacy image adds only BERTopic, Top2Vec, sentence-transformers,
+  LangChain embedding adapters, and their clustering dependencies. Notebooks,
+  evaluation tools, importers, monitoring, and general data utilities are part
+  of the normal project environment.
 
   ### a. Run sync-neo4j pipeline for new metadata inserted in MongoDB:
   ```bash
@@ -734,8 +722,8 @@ The following services are configured with the `manual` profile in Docker Compos
 
 ### a. Jupyter Notebooks for Data Analysis
 ```bash
-# Build and start the project-owned Python 3.13 notebook image. This image
-# installs the legacy research extra; the core API image remains small.
+# Build and start the project-owned Python 3.13 notebook image. It uses the
+# normal project environment.
 docker compose --profile manual up jupyter-scipy
 # Stop Jupyter SciPy notebook server
 docker compose --profile manual down jupyter-scipy
@@ -1259,14 +1247,9 @@ app:
 ## GPU Support for Embeddings Generation
 * The pipeline can use GPU acceleration for generating embeddings in the `sync_qdrant.py` script:
 
-1. **Install PyTorch with CUDA support**:
-```bash
-
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-
-```
-
-* Choose the appropriate CUDA version (cu118, cu121, etc.) based on your system. Check with `nvidia-smi`.
+1. **Use the locked PyTorch installation from the normal project setup.**
+   Check GPU visibility with `nvidia-smi`; do not replace project packages with
+   an ad hoc pip installation.
 
 2. **Enable GPU in configuration**:
 ```yaml
@@ -1288,10 +1271,7 @@ Using GPU for embeddings: cuda:0
 The Docker setup includes MongoDB, so no additional installation is needed if using Docker Compose.
 #### Option 2: Standalone MongoDB Installation
 1. **Download MongoDB Community Server**: [https://www.mongodb.com/try/download/community](https://www.mongodb.com/try/download/community)
-2. **Install Python driver**:
-   ```bash
-   pip install pymongo>=4.3.0
-   ```
+2. **Use the PyMongo driver included by the normal project setup.**
 
 3. **Test your connection**:
    ```python
@@ -1309,11 +1289,7 @@ The Docker setup includes MongoDB, so no additional installation is needed if us
 #### Option 2: Standalone Neo4j Installation
 1. **Download Neo4j Desktop**: [https://neo4j.com/download/](https://neo4j.com/download/)
 2. **Create a new database** with password 'password' to match configuration
-3. **Install Python driver**:
-
-   ```bash
-   pip install neo4j>=5.5.0
-   ```
+3. **Use the Neo4j driver included by the normal project setup.**
 
 4. **Test your connection**:
    ```python

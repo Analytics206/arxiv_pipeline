@@ -3,6 +3,14 @@
 ---
 ## Version 0.9.0 (July 28, 2026)
 
+### Dependency boundary correction
+
+- Restored notebooks, LLM evaluation, Kaggle/Kaggle Hub, PubMed, Kafka,
+  monitoring, and general data utilities to the normal project environment.
+- Narrowed the `legacy` extra to only BERTopic, Top2Vec, and the historical
+  Hugging Face/Qdrant embedding processes and their clustering dependencies.
+- Removed pip-based setup instructions from uv-managed workflows.
+
 ### Canonical paper version storage
 
 - Added paper metadata schema 2.0 with explicit base ID, versioned ID, numeric

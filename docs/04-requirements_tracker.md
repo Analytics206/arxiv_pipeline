@@ -37,13 +37,13 @@ Status legend: **Complete**, **In progress**, **Planned**, **Legacy**, or
 | FR-GPH-01 | Complete | Neo4j uses the `manual` Compose profile and is not an API dependency |
 | FR-GPH-02..04 | Planned | Build only after retrieval evaluation identifies a graph-shaped failure and define a measurable comparison |
 
-## Legacy and deferred work
+## Retired embedding and deferred work
 
 | Area | Status | Decision |
 | --- | --- | --- |
 | BERTopic | Legacy | Retained under the `legacy` profile; not used by the research API or Qdrant research index |
 | Top2Vec | Legacy | Retained under the `legacy` profile; not used by the research API or Qdrant research index |
-| Original author/category Neo4j graph | Legacy | Available manually for reference; too shallow for the active use case |
+| Original author/category Neo4j graph | Optional | Available manually for reference; too shallow for the active use case |
 | Historical Hugging Face PDF/Qdrant pipeline | Legacy | Superseded by shared-Ollama evidence/claim/idea indexing |
 | Kafka and Zookeeper | Deferred | Unnecessary for current single-host bounded workflows |
 | Generic autonomous-agent platform | Deferred | External agents consume the curated research service |

@@ -204,9 +204,8 @@ services:
       - mongodb
       - qdrant
 
-  # Build owner for optional Torch/topic-model/evaluation dependencies.
-  # Other legacy services reuse this image without making core API rebuilds pay
-  # the storage and export cost.
+  # Build owner only for the retired BERTopic, Top2Vec, and historical
+  # Hugging Face/Qdrant embedding processes.
   legacy-runtime:
     profiles:
       - legacy

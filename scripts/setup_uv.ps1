@@ -11,7 +11,7 @@ Write-Output "Installing Python 3.13..."
 uv python install 3.13
 
 Write-Output "Creating the environment and installing locked dependencies..."
-uv sync --python 3.13 --extra agent --extra legacy --extra dev --frozen
+uv sync --python 3.13 --extra agent --extra dev --frozen
 
 Write-Output "Setup complete! You can activate the virtual environment with:"
 Write-Output "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass  # Only if scripts are disabled"

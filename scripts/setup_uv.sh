@@ -28,7 +28,7 @@ echo "Installing Python 3.13..."
 uv python install 3.13
 
 echo "Creating the environment and installing locked dependencies..."
-uv sync --python 3.13 --extra agent --extra legacy --extra dev --frozen
+uv sync --python 3.13 --extra agent --extra dev --frozen
 
 echo "Setup complete! Activate the virtual environment with:"
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then

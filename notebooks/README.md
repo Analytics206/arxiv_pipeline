@@ -16,17 +16,12 @@ This directory contains Jupyter notebooks for interactive exploration, testing, 
 
 ### Installation
 
-1. Install Jupyter if not already installed:
-   ```bash
-   pip install jupyter jupyterlab
-   ```
+The normal project setup installs Jupyter and the notebook dependencies into
+`.venv`; do not install a separate notebook environment:
 
-2. Install required Python packages:
-   ```bash
-   pip install pymongo neo4j qdrant-client pandas matplotlib ipywidgets python-dotenv
-   ```
-   
-   Note: The notebooks will attempt to install missing packages automatically, but it's recommended to install them beforehand.
+```powershell
+.\scripts\setup_uv.ps1
+```
 
 ### Running the Notebooks
 
@@ -37,7 +32,7 @@ This directory contains Jupyter notebooks for interactive exploration, testing, 
 
 2. Launch Jupyter Lab:
    ```bash
-   jupyter lab
+   uv run jupyter lab
    ```
 
 3. Navigate to the notebooks directory and open the desired notebook.
