@@ -7,10 +7,10 @@ Status legend: **Complete**, **In progress**, **Planned**, **Legacy**, or
 
 | Requirement | Status | Evidence or remaining work |
 | --- | --- | --- |
-| FR-ING-01..02 | Complete | Configurable arXiv ingestion and normalized MongoDB upserts |
+| FR-ING-01..02,06 | Complete | Configurable arXiv ingestion, canonical base/version identity, latest-only `papers`, automatic version cleanup, and recoverable `papers_archive` history |
 | FR-ING-03..04 | Complete | Exact-version PDF download, validation, hashing, and portable paths |
 | FR-ING-05 | Complete | `process_paper` and bounded `process_downloaded_papers` workflows |
-| FR-DAT-01..05 | Complete | Canonical MongoDB analysis repository and rebuildable Qdrant index |
+| FR-DAT-01..06 | Complete | Canonical MongoDB paper/analysis schemas, explicit paper version fields, and rebuildable Qdrant index |
 | FR-ANL-01..07 | Complete | Page-aware parsing, structured schema, sentence-aware verification spans, stable evidence IDs, explicit truncation, provenance, cache, and quality gates |
 | FR-RET-01..05,07..09 | Complete | `research_knowledge_hybrid_v1`, named dense/lexical vectors, deterministic IDs, structured idea payloads, clean canonical embeddings, weighted RRF, calibrated relevance/no-match behavior, coverage, diversity reranking, and provenance |
 | FR-RET-06 | Complete | Five-paper reviewed suite, four-model benchmark, hybrid/RRF strategy benchmark, and cutoff-sensitive grouped recall |

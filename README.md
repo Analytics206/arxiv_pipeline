@@ -589,7 +589,9 @@ start as background services.
   docker compose build api
   docker compose up -d mongodb qdrant api mcp web-ui
 
-  # 1. Upsert the configured arXiv category pages into MongoDB.
+  # 1. Upsert the configured arXiv category pages into MongoDB. The command
+  # finishes by retaining the latest version in papers and moving older
+  # versions into papers_archive.
   docker compose run --rm --no-deps sync-mongodb
 
   # 2. Download, validate, hash, and record the configured PDF corpus.
@@ -616,6 +618,25 @@ start as background services.
   three-paper sequential batch on the 8 GB GPU. Repeat the command to advance
   the queue, or use `--limit-per-category 2` for up to six papers. Papers run
   sequentially inside the batch rather than competing for GPU memory.
+
+  Paper metadata uses schema 2.0. `papers` is keyed uniquely by
+  `base_arxiv_id` and contains only the latest observed arXiv version;
+  `papers_archive` retains superseded versions keyed by base ID and numeric
+  version. The import command enforces this invariant after all categories
+  finish. To inspect or rerun that cleanup independently:
+
+  ```powershell
+  # Report the expected move without changing MongoDB.
+  docker compose run --rm --no-deps app `
+    python -m src.pipeline.cleanup_paper_versions `
+    --config /app/config/default.yaml
+
+  # Archive older versions and normalize the current collection.
+  docker compose run --rm --no-deps app `
+    python -m src.pipeline.cleanup_paper_versions `
+    --config /app/config/default.yaml `
+    --apply
+  ```
 
   A paper is skipped only when its PDF hash, analysis schema, prompt version,
   and model match a stored analysis. Failed or changed analyses remain eligible

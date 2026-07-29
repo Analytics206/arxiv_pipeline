@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.analysis.identity import normalize_arxiv_id
+from src.ingestion.schema import canonicalize_paper_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -80,9 +81,7 @@ class ArxivClient:
                 f"arXiv returned {returned.version_id} for requested "
                 f"{requested.version_id}"
             )
-        papers[0]["arxiv_id"] = returned.version_id
-        papers[0]["base_arxiv_id"] = returned.base_id
-        return papers[0]
+        return canonicalize_paper_metadata(papers[0])
 
     def _fetch_paper_page(self, version_id: str) -> Dict:
         """Fallback to citation metadata embedded in the official abs page."""
@@ -262,8 +261,8 @@ class ArxivClient:
             )
             paper["categories"] = list(dict.fromkeys(categories))
 
-            # Add to results
-            results.append(paper)
+            # Add to results using the canonical version-aware storage schema.
+            results.append(canonicalize_paper_metadata(paper))
 
         logger.info("Parsed %d papers from arXiv response", len(results))
         return results

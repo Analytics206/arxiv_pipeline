@@ -15,6 +15,9 @@ listed separately so it is not mistaken for the current critical path.
   state.
 - **FR-ING-05:** Support bounded, resumable single-paper and multi-paper
   workflows.
+- **FR-ING-06:** Keep exactly one latest-version document per base arXiv ID in
+  `papers`, archive superseded versions in `papers_archive`, and enforce this
+  invariant after every metadata import.
 
 ## Canonical data (FR-DAT)
 
@@ -27,6 +30,8 @@ listed separately so it is not mistaken for the current critical path.
   fields in public contracts.
 - **FR-DAT-05:** Treat Qdrant and any future graph as rebuildable indexes, not
   sources of truth.
+- **FR-DAT-06:** Store canonical `base_arxiv_id`, `arxiv_id`,
+  `arxiv_version`, and paper-schema provenance on every paper document.
 
 ## Evidence-aware analysis (FR-ANL)
 

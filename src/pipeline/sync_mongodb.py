@@ -97,6 +97,7 @@ def run_ingestion_pipeline(config: dict[str, Any]) -> dict[str, Any]:
 
     grand_total = 0
     category_totals: dict[str, int] = {}
+    cleanup_result: dict[str, Any] | None = None
     try:
         for category in arxiv_config["categories"]:
             logger.info("Processing category: %s", category)
@@ -168,12 +169,14 @@ def run_ingestion_pipeline(config: dict[str, Any]) -> dict[str, Any]:
                 if rate_limit > 0 and iteration + 1 < max_iterations:
                     time.sleep(rate_limit)
             category_totals[category] = total_papers
+        cleanup_result = mongo_storage.cleanup_paper_versions()
     finally:
         mongo_storage.close()
 
     result = {
         "total_processed": grand_total,
         "category_totals": category_totals,
+        "version_cleanup": cleanup_result,
     }
     logger.info("Ingestion pipeline completed: %s", result)
     return result

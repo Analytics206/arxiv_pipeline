@@ -32,13 +32,17 @@ notebook packages are isolated in the optional `legacy` extra.
 
 MongoDB is canonical for:
 
-- normalized arXiv paper metadata;
+- normalized latest-version arXiv paper metadata in `papers`;
+- superseded version history in `papers_archive`;
 - local PDF path, hash, validation, and processing state;
 - complete immutable analysis documents;
 - current-analysis pointers and model/prompt/schema provenance.
 
 The API repository creates indexes for analysis identity, current-paper lookup,
-and evidence IDs.
+and evidence IDs. Paper ingestion records schema `2.0` identity fields
+(`base_arxiv_id`, versioned `arxiv_id`, and numeric `arxiv_version`);
+`base_arxiv_id` is unique in `papers`, while
+`(base_arxiv_id, arxiv_version)` is unique in `papers_archive`.
 
 ### Qdrant
 

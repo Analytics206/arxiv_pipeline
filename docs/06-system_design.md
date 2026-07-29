@@ -10,7 +10,8 @@ service, not any individual database or model.
 
 ```mermaid
 flowchart LR
-    A["arXiv metadata"] --> M["MongoDB papers"]
+    A["arXiv metadata"] --> M["MongoDB papers (latest version only)"]
+    M -. "superseded versions" .-> MA["MongoDB papers_archive"]
     A --> D["Validated PDF storage"]
     D --> P["Page-aware parser"]
     P --> L["Evidence-aware analysis via shared Ollama"]
@@ -43,7 +44,9 @@ and port.
 
 | Store | Responsibility | Authority |
 | --- | --- | --- |
-| MongoDB | Source metadata, PDF state, immutable analyses, prompt/model/schema provenance, and corrections | Canonical |
+| MongoDB `papers` | One latest metadata/PDF-state document per base arXiv ID | Canonical current state |
+| MongoDB `papers_archive` | Superseded metadata and version-specific PDF state | Canonical version history |
+| MongoDB `paper_analyses` | Immutable analyses, prompt/model/schema provenance, and corrections | Canonical derived knowledge |
 | PDF storage | Exact validated source documents under portable project-relative paths by default | Canonical source artifact |
 | Qdrant | Evidence, claims, findings, limitations, and implementation ideas embedded for search | Rebuildable index |
 | Neo4j | A future relationship index if graph retrieval proves useful | Optional experiment |
@@ -53,8 +56,11 @@ build the current Qdrant collection, agent context, catalog, or UI.
 
 ## Identity and provenance
 
-- A paper uses a normalized base arXiv ID and retains an exact `vN` version when
-  available.
+- Every paper document records `base_arxiv_id`, exact `arxiv_id`,
+  numeric `arxiv_version`, and `paper_schema_version`.
+- `papers` has a unique base-ID index and retains only the highest observed
+  arXiv version. Older or late-arriving versions are upserted into
+  `papers_archive`.
 - The stable public resource identifier is `paper://arxiv/<base-id>`.
 - An analysis identity includes the paper, PDF hash, schema version, prompt
   version, and model.
@@ -120,6 +126,15 @@ sequenceDiagram
 
 Existing valid PDFs, matching analyses, and matching Qdrant point identities
 are reused. Force flags are required to intentionally regenerate work.
+
+### Metadata import and version rollover
+
+Category ingestion canonicalizes every Atom record before storage. Receiving a
+newer version archives the existing current document before replacing it;
+receiving an older version archives it without changing the current document.
+After all configured categories finish, the importer runs a full invariant
+check that archives any legacy duplicates, normalizes retained documents, and
+reasserts the unique `base_arxiv_id` index.
 
 ### Bounded corpus
 

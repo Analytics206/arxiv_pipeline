@@ -3,6 +3,20 @@
 ---
 ## Version 0.9.0 (July 28, 2026)
 
+### Canonical paper version storage
+
+- Added paper metadata schema 2.0 with explicit base ID, versioned ID, numeric
+  arXiv version, and schema provenance.
+- Changed ingestion to retain one latest version per base paper in `papers`;
+  newer versions archive the replaced document and late older versions cannot
+  regress current state.
+- Added recoverable `papers_archive` history with a unique
+  `(base_arxiv_id, arxiv_version)` index.
+- Added a dry-run/apply cleanup command and made the full cleanup run after
+  every configured arXiv metadata import.
+- Migrated 20,644 live documents into 20,516 current papers and 128 archived
+  superseded versions with zero invalid identities or duplicate base IDs.
+
 ### Citation and retrieval quality
 
 - Expanded exact supporting substrings to complete, bounded sentence-aware
