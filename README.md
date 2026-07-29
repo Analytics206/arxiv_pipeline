@@ -21,7 +21,7 @@ for the current product direction and phased implementation plan.
 | **Evidence-backed analysis** | Produces structured methods, findings, limitations, and implementation ideas with verified page quotes. |
 | **ArXiv ingestion** | Fetches normalized metadata and exact PDF versions from configurable categories/date ranges. |
 | **Canonical MongoDB storage** | Stores paper state and immutable, versioned analyses with full provenance. |
-| **Agent hybrid retrieval** | Combines shared-Ollama embeddings, lexical IDF retrieval, weighted RRF, and paper-diversity reranking. |
+| **Agent hybrid retrieval** | Combines shared-Ollama embeddings, lexical IDF retrieval, weighted RRF, and paper-diversity reranking across separate evidence-backed and metadata-discovery tiers. |
 | **Agent interfaces** | Publishes the same read-only capability, catalog, search, token-budgeted context, and evidence contracts through REST/OpenAPI and MCP. |
 | **Human research workspace** | Searches the same curated knowledge and opens complete evidence-aware paper context. |
 | **Reproducible containers** | Keeps only retired embedding/topic-modeling processes in an optional image. |
@@ -42,10 +42,10 @@ for the current product direction and phased implementation plan.
 | -------------------------- | -------------------------------------------- |
 | **Ingestion and PDF pipeline** | Fetches metadata, validates exact PDFs, analyzes, and indexes papers |
 | **MongoDB** | Stores canonical metadata, PDF state, and versioned analyses |
-| **Qdrant** | Stores the rebuildable `research_knowledge_hybrid_v1` dense/lexical index |
+| **Qdrant** | Stores separate rebuildable evidence-backed and paper-discovery dense/lexical indexes |
 | **Shared Ollama** | Runs configurable analysis and embedding models from the separate `ai-services` project |
 | **Research API** | Serves stable read-only REST/OpenAPI tools to UI and external agents |
-| **MCP adapter** | Maps the five evaluated GET contracts and stable resources to MCP over Streamable HTTP or stdio |
+| **MCP adapter** | Maps seven read-only research/discovery contracts and stable resources to MCP over Streamable HTTP or stdio |
 | **Web UI** | Provides human semantic search, paper context, evidence, and provenance |
 | **Neo4j** | Optional manual relationship experiment; not a default dependency |
 | **Legacy embedding runtime** | Isolates only BERTopic, Top2Vec, and the historical Hugging Face/Qdrant embedding processes |
@@ -565,6 +565,24 @@ start as background services.
       level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
   ```
   > **Note**: The `secure` directory is in `.gitignore` to protect your credentials.
+
+  ### b. Prepare a full Kaggle import for discovery
+
+  The post-import workflow retains exact configured categories, validates and
+  atomically replaces the MongoDB production collection, then resumably builds
+  a separate metadata-only Qdrant index:
+
+  ```powershell
+  # Read-only count and retention preview
+  python -m src.pipeline.prepare_kaggle_corpus
+
+  # Cleanup plus complete discovery index and alias activation
+  python -m src.pipeline.prepare_kaggle_corpus --apply --index
+  ```
+
+  See
+  [`docs/16-kaggle_discovery_workflow.md`](docs/16-kaggle_discovery_workflow.md)
+  for guardrails, staging imports, Docker usage, query tiers, and evaluation.
 
   ### Bulk agent-first test workflow
 

@@ -129,6 +129,34 @@ services:
       - ./data:/app/data
       - ./evals:/app/evals:ro
       - ./src:/app/src:ro
+
+  # Post-import corpus preparation. It is read-only unless --apply is passed;
+  # --index additionally builds a complete physical discovery collection and
+  # activates its stable alias only after count validation succeeds.
+  prepare-kaggle:
+    profiles:
+      - manual
+    image: arxiv_pipeline-python:latest
+    build:
+      context: .
+      target: runtime
+    entrypoint:
+      - python
+      - -m
+      - src.pipeline.prepare_kaggle_corpus
+    depends_on:
+      - mongodb
+      - qdrant
+    environment:
+      - MONGO_CONNECTION_STRING=mongodb://mongodb:27017/
+      - MONGO_DB=arxiv_papers
+      - QDRANT_URL=http://qdrant:6333
+      - AI_SERVICES_HOST=${AI_SERVICES_DOCKER_HOST:-host.docker.internal}
+      - AI_SERVICES_OLLAMA_PORT=${AI_SERVICES_OLLAMA_PORT:-11434}
+      - OLLAMA_EMBEDDING_MODEL=${OLLAMA_EMBEDDING_MODEL:-mxbai-embed-large:latest}
+    volumes:
+      - ./config:/app/config:ro
+      - ./src:/app/src:ro
       
   sync-mongodb:
     profiles:

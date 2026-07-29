@@ -53,7 +53,13 @@ research_processing:
   process_categories:
     - "cs.AI"
     - "cs.CV"
-    - "cs.LG"
+    - "cs.DB"
+    - "cs.DS"
+    - "cs.LG" 
+    - "cs.MA"
+    - "cs.NE"
+    - "cs.RO"
+    - "cs.SE"
   papers_per_category: 1
   
 # Optional legacy graph settings. Neo4j is not part of the default agent-facing
@@ -75,7 +81,7 @@ qdrant:
     - "cs.AI"
     # - "cs.CV" 
     # - "cs.LG"
-  papers_per_category: 99 # Maximum number of papers to process into vectors per category (0 for unlimited)
+  papers_per_category: 9 # Maximum number of papers to process into vectors per category (0 for unlimited)
   default_pdf_path: "data/pdfs" # Portable project-local PDF storage
   gpu_enabled: false # Disable GPU for vector operations
   gpu_device: 1 # Use the second GPU (index 1)
@@ -117,20 +123,20 @@ arxiv:
     # - "cs.CR"
     - "cs.CV"
     # - "cs.CY"
-    # - "cs.DB"
+    - "cs.DB"
     # - "cs.DC"
-    # - "cs.DS"
+    - "cs.DS"
     # - "cs.GR"
     # - "cs.GT"
     # - "cs.IR"
     # - "cs.IT"
     - "cs.LG" 
     # - "cs.LO"
-    # - "cs.MA"
-    # - "cs.NE"
-    # - "cs.RO"
+    - "cs.MA"
+    - "cs.NE"
+    - "cs.RO"
     # - "cs.SD"
-    # - "cs.SE"
+    - "cs.SE"
     # - "cs.SI"
     # - "math.AP"
     # - "math.PR"
@@ -146,10 +152,10 @@ arxiv:
   max_results: 200 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 500 # Number of times to loop the pipeline for each category above
-  rate_limit_seconds: 9 # seconds to wait between api calls
+  max_iterations: 5 # Number of times to loop the pipeline for each category above
+  rate_limit_seconds: 3 # seconds to wait between api calls
   start_date: "2026-01-01" # Inclusive submittedDate lower bound sent to the arXiv API
-  end_date: "2026-08-31" # Inclusive submittedDate upper bound sent to the arXiv API
+  end_date: "2026-03-31" # Inclusive submittedDate upper bound sent to the arXiv API
   max_no_papers: 25 # Maximum number of no paper fetches before breaking loop for category
 # Embedding model settings
 embedding:
@@ -165,43 +171,19 @@ pdf_storage:
   # Categories to prioritize for PDF downloads - if empty, all papers in MongoDB will be considered
   process_categories: # used in download_pdfs.py - comment out categories you don't want to download
     - "cs.AI"
-    # - "cs.AR"
-    # - "cs.CC"
-    # - "cs.CL"
-    # - "cs.CE"
-    # - "cs.CR"
     - "cs.CV"
-    # - "cs.CY"
-    # - "cs.DB"
-    # - "cs.DC"
-    # - "cs.DS"
-    # - "cs.GR"
-    # - "cs.GT" 
-    # - "cs.IR"
-    # - "cs.IT"
+    - "cs.DB"
+    - "cs.DS"
     - "cs.LG" 
-    # - "cs.LO"
-    # - "cs.MA"
-    # - "cs.NE"
-    # - "cs.RO"
-    # - "cs.SD"
-    # - "cs.SE"
-    # - "cs.SI"
-    # - "math.AP"
-    # - "math.PR"
-    # - "math.ST"
-    # - "physics.data-an"
-    # - "q-bio.NC"
-    # - "stat.AP"
-    # - "stat.CO"
-    # - "stat.ME"
-    # - "stat.ML"
-    # - "stat.OT"
+    - "cs.MA"
+    - "cs.NE"
+    - "cs.RO"
+    - "cs.SE"
   # Date filters for downloading PDFs
   download_date_filter:
     enabled: true         # Set to false to disable date filtering
     start_date: "2026-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2026-08-31"   # Download papers published on or before this date (format: YYYY-MM-DD)
+    end_date: "2026-03-31"   # Download papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
 
 # Retired topic-modeling experiment. This is available only through the
@@ -221,12 +203,18 @@ bertopic:
   categories:
     - "cs.AI"
     - "cs.CV"
-    - "cs.LG"
+    - "cs.DB"
+    - "cs.DS"
+    - "cs.LG" 
+    - "cs.MA"
+    - "cs.NE"
+    - "cs.RO"
+    - "cs.SE"
   # Date filter
   date_filter:
     enabled: true
     start_date: "2026-01-01"  # Process papers published on or after this date
-    end_date: "2026-08-31"    # Process papers published on or before this date
+    end_date: "2026-03-31"    # Process papers published on or before this date
 
 # Retired topic-modeling experiment. This is available only through the
 # Docker Compose `legacy` profile and is not used by the research API/index.
@@ -250,12 +238,72 @@ top2vec:
   categories:
     - "cs.AI"
     - "cs.CV"
-    - "cs.LG"
+    - "cs.DB"
+    - "cs.DS"
+    - "cs.LG" 
+    - "cs.MA"
+    - "cs.NE"
+    - "cs.RO"
+    - "cs.SE"
   # Date filter
   date_filter:
     enabled: true
     start_date: "2026-01-01"  # Process papers published on or after this date
-    end_date: "2026-08-31"    # Process papers published on or before this date
+    end_date: "2026-03-31"    # Process papers published on or before this date
+
+# Filtered Kaggle corpus used for paper discovery.
+kaggle_corpus:
+  # Full Kaggle imports are filtered into a temporary collection, validated,
+  # indexed, and atomically swapped into this name. The cleanup CLI is a dry
+  # run unless --apply is provided.
+  # For a future zero-downtime refresh, import the full dataset into a staging
+  # collection and set import_collection to that name.
+  import_collection: "arxiv_kaggle"
+  collection_name: "arxiv_kaggle"
+  retained_categories:
+    - "cs.AI"
+    - "cs.CV"
+    - "cs.DB"
+    - "cs.DS"
+    - "cs.LG" 
+    - "cs.MA"
+    - "cs.NE"
+    - "cs.RO"
+    - "cs.SE"
+  category_match: "any"
+  # Category-only retention is the default. Enable this later only when a
+  # rolling discovery window is intentional.
+  date_filter:
+    enabled: false
+    start_date: "2021-01-01"
+    end_date: "2026-03-31"
+  # Destructive replacement stops when a surprising import or policy falls
+  # outside this expected range.
+  retention_guard:
+    minimum_fraction: 0.01
+    maximum_fraction: 0.30
+
+# Paper-level metadata discovery remains separate from the evidence-backed
+# research index. Physical collections include a corpus snapshot suffix and
+# become queryable only after the stable alias is atomically updated.
+discovery_index:
+  collection_prefix: "arxiv_discovery_hybrid_v1"
+  alias_name: "arxiv_discovery_current"
+  schema_version: "1.0"
+  embedding_model: "mxbai-embed-large:latest"
+  # Benchmarked locally at ~31 papers/second; 512 provided no improvement.
+  embedding_batch_size: 256
+  source_collection: "arxiv_kaggle"
+  checkpoint_collection: "discovery_index_runs"
+  query_prefix: "Represent this sentence for searching relevant passages: "
+  retrieval_mode: "hybrid"
+  hybrid:
+    candidate_multiplier: 4
+    candidate_minimum: 50
+    dense_weight: 1.1
+    sparse_weight: 1.0
+    rrf_k: 60
+    default_min_relevance: 0.05
 
 # Kaggle Dataset Downloader settings
 kaggle:

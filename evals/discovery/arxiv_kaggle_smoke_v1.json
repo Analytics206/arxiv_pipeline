@@ -1,0 +1,48 @@
+{
+  "suite_id": "arxiv-kaggle-smoke-v1",
+  "description": "Stable exact-title and empty-filter checks for the metadata-only discovery tier.",
+  "cases": [
+    {
+      "case_id": "compressed-observations",
+      "query": "learning from compressed observations",
+      "expected_paper_ids": [
+        "0704.0671"
+      ],
+      "categories": [
+        "cs.LG"
+      ],
+      "limit": 8
+    },
+    {
+      "case_id": "ordinal-regression",
+      "query": "neural network approach to ordinal regression",
+      "expected_paper_ids": [
+        "0704.1028"
+      ],
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "limit": 8
+    },
+    {
+      "case_id": "evolving-information",
+      "query": "the world as evolving information",
+      "expected_paper_ids": [
+        "0704.0304"
+      ],
+      "categories": [
+        "cs.AI"
+      ],
+      "limit": 8
+    },
+    {
+      "case_id": "future-empty-window",
+      "query": "machine learning",
+      "case_type": "negative",
+      "start_year": 2100,
+      "limit": 8,
+      "note": "The retained snapshot should not contain papers updated in 2100."
+    }
+  ]
+}

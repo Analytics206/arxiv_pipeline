@@ -23,10 +23,12 @@ McpTransport = Literal["stdio", "streamable-http"]
 
 SERVER_NAME = "arxiv_research_mcp"
 SERVER_INSTRUCTIONS = (
-    "Read-only access to curated AI-paper analyses. Search first when the "
-    "paper is unknown; use get_paper_context_package for normal agent work; "
-    "resolve evidence IDs before making source-sensitive claims. No tool can "
-    "modify papers, databases, indexes, or software projects."
+    "Read-only access to curated AI-paper analyses and metadata-only paper "
+    "discovery. Use search_federated_research when the paper is unknown; "
+    "treat metadata_only hits as discovery leads, not verified evidence; use "
+    "get_paper_context_package for normal work on curated papers; resolve "
+    "evidence IDs before making source-sensitive claims. No tool can modify "
+    "papers, databases, indexes, or software projects."
 )
 
 
@@ -76,7 +78,7 @@ def create_mcp_server(
     server = FastMCP(
         name=SERVER_NAME,
         instructions=SERVER_INSTRUCTIONS,
-        host=host or os.getenv("RESEARCH_MCP_BIND", "127.0.0.1"),
+        host=host or os.getenv("RESEARCH_MCP_BIND") or "127.0.0.1",
         port=port or int(os.getenv("RESEARCH_MCP_PORT", "8001")),
         streamable_http_path="/mcp",
         stateless_http=True,
@@ -144,6 +146,108 @@ def create_mcp_server(
                 "limit": limit,
                 "paper_id": paper_id,
                 "kind": kind,
+                "min_relevance": min_relevance,
+            },
+        )
+
+    @server.tool(
+        name="search_paper_discovery",
+        title="Discover candidate papers",
+        annotations=_read_only_annotations("Discover candidate papers"),
+    )
+    async def search_paper_discovery(
+        query: Annotated[
+            str,
+            Field(
+                min_length=3,
+                max_length=2000,
+                description="Natural-language paper discovery query",
+            ),
+        ],
+        ctx: Context,
+        limit: Annotated[
+            int,
+            Field(ge=1, le=50, description="Maximum metadata-only hits"),
+        ] = 10,
+        category: Annotated[
+            list[str] | None,
+            Field(description=("Optional exact arXiv category filters, such as cs.AI")),
+        ] = None,
+        start_year: Annotated[
+            int | None,
+            Field(ge=1990, le=2100),
+        ] = None,
+        end_year: Annotated[
+            int | None,
+            Field(ge=1990, le=2100),
+        ] = None,
+        min_relevance: Annotated[
+            float | None,
+            Field(ge=0, le=1),
+        ] = None,
+    ) -> dict[str, Any]:
+        """Find title/abstract candidates without claiming evidence coverage."""
+
+        return await _tool_get(
+            ctx,
+            "/research/discovery/search",
+            params={
+                "query": query,
+                "limit": limit,
+                "category": category,
+                "start_year": start_year,
+                "end_year": end_year,
+                "min_relevance": min_relevance,
+            },
+        )
+
+    @server.tool(
+        name="search_federated_research",
+        title="Search research and discovery",
+        annotations=_read_only_annotations("Search research and discovery"),
+    )
+    async def search_federated_research(
+        query: Annotated[
+            str,
+            Field(
+                min_length=3,
+                max_length=2000,
+                description="Natural-language implementation or research question",
+            ),
+        ],
+        ctx: Context,
+        limit: Annotated[
+            int,
+            Field(ge=1, le=50, description="Maximum hits in each result tier"),
+        ] = 8,
+        category: Annotated[
+            list[str] | None,
+            Field(description="Optional metadata-only arXiv category filters"),
+        ] = None,
+        start_year: Annotated[
+            int | None,
+            Field(ge=1990, le=2100),
+        ] = None,
+        end_year: Annotated[
+            int | None,
+            Field(ge=1990, le=2100),
+        ] = None,
+        min_relevance: Annotated[
+            float | None,
+            Field(ge=0, le=1),
+        ] = None,
+    ) -> dict[str, Any]:
+        """Return evidence-backed and metadata-only results as separate tiers."""
+
+        return await _tool_get(
+            ctx,
+            "/research/federated-search",
+            params={
+                "query": query,
+                "limit": limit,
+                "category": category,
+                "start_year": start_year,
+                "end_year": end_year,
                 "min_relevance": min_relevance,
             },
         )

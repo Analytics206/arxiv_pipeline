@@ -121,7 +121,7 @@ async def test_research_api_client_surfaces_api_error_detail():
 
 
 @pytest.mark.anyio
-async def test_mcp_discovers_only_the_five_read_only_tools():
+async def test_mcp_discovers_only_the_seven_read_only_tools():
     api = FakeResearchApi()
     server = create_mcp_server(
         client_factory=fake_client_factory(api),
@@ -132,6 +132,8 @@ async def test_mcp_discovers_only_the_five_read_only_tools():
 
     assert {tool.name for tool in result.tools} == {
         "search_research",
+        "search_paper_discovery",
+        "search_federated_research",
         "list_curated_papers",
         "get_paper_context",
         "get_paper_context_package",
@@ -149,6 +151,13 @@ async def test_mcp_discovers_only_the_five_read_only_tools():
     properties = package_tool.inputSchema["properties"]
     assert properties["profile"]["default"] == "standard"
     assert properties["token_budget"]["anyOf"][0]["minimum"] == 512
+
+    discovery_tool = next(
+        tool for tool in result.tools if tool.name == "search_paper_discovery"
+    )
+    discovery_properties = discovery_tool.inputSchema["properties"]
+    assert discovery_properties["category"]["anyOf"][0]["items"]["type"] == "string"
+    assert discovery_properties["start_year"]["anyOf"][0]["minimum"] == 1990
 
 
 @pytest.mark.anyio
@@ -177,6 +186,39 @@ async def test_mcp_tool_call_returns_structured_rest_contract():
                 "paper_id": "2607.02134",
                 "profile": "brief",
                 "token_budget": None,
+            },
+        )
+    ]
+
+
+@pytest.mark.anyio
+async def test_mcp_federated_search_preserves_repeated_category_filters():
+    api = FakeResearchApi()
+    server = create_mcp_server(
+        client_factory=fake_client_factory(api),
+    )
+
+    async with create_connected_server_and_client_session(server) as session:
+        result = await session.call_tool(
+            "search_federated_research",
+            {
+                "query": "retrieval augmented agents",
+                "category": ["cs.AI", "cs.LG"],
+                "start_year": 2024,
+            },
+        )
+
+    assert result.isError is False
+    assert api.calls == [
+        (
+            "/research/federated-search",
+            {
+                "query": "retrieval augmented agents",
+                "limit": 8,
+                "category": ["cs.AI", "cs.LG"],
+                "start_year": 2024,
+                "end_year": None,
+                "min_relevance": None,
             },
         )
     ]

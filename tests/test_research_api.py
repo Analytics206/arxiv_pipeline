@@ -1,9 +1,7 @@
 from src.api.main import app
 from src.api.models import research_capabilities
 from src.pipeline.index_research import build_parser as build_index_parser
-from src.pipeline.process_downloaded_papers import (
-    build_parser as build_batch_parser,
-)
+from src.pipeline.process_downloaded_papers import build_parser as build_batch_parser
 from src.pipeline.process_paper import build_parser as build_process_parser
 from src.pipeline.summarize_paper import build_parser
 
@@ -19,6 +17,8 @@ def test_research_routes_are_registered():
     assert "/research/capabilities" in paths
     assert "/research/evidence/{evidence_id}" in paths
     assert "/research/search" in paths
+    assert "/research/discovery/search" in paths
+    assert "/research/federated-search" in paths
     assert "/health" in paths
 
 
@@ -29,6 +29,8 @@ def test_capabilities_are_read_only_and_harness_discoverable():
     assert capabilities.openapi_path == "/openapi.json"
     assert {tool.name for tool in capabilities.tools} == {
         "search_research",
+        "search_paper_discovery",
+        "search_federated_research",
         "list_curated_papers",
         "get_paper_context",
         "get_paper_context_package",

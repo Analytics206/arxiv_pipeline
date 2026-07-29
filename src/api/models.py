@@ -47,6 +47,24 @@ def research_capabilities(version: str) -> ResearchCapabilities:
                 ),
             ),
             ResearchToolDescriptor(
+                name="search_paper_discovery",
+                method="GET",
+                path="/research/discovery/search",
+                purpose=(
+                    "Find metadata-only candidate papers by title and abstract "
+                    "with category and recency filters."
+                ),
+            ),
+            ResearchToolDescriptor(
+                name="search_federated_research",
+                method="GET",
+                path="/research/federated-search",
+                purpose=(
+                    "Search evidence-backed and metadata-only corpora in "
+                    "separate score and provenance tiers."
+                ),
+            ),
+            ResearchToolDescriptor(
                 name="list_curated_papers",
                 method="GET",
                 path="/research/papers",

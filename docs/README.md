@@ -11,6 +11,7 @@ This directory contains comprehensive documentation for the ArXiv Pipeline proje
 | [release_notes.md](./release_notes.md) | Chronological record of all releases, with version details, features, enhancements, and dependencies for each update. Current version is 0.3.0 (May 4, 2025). |
 | [business_requirements.md](./business_requirements.md) | Business requirements document (BRD) outlining the business goals, stakeholder needs, and success criteria for the project. |
 | [product_requirements.md](./product_requirements.md) | Product requirements document (PRD) detailing specific product features, acceptance criteria, and prioritization. |
+| [Kaggle discovery workflow](./16-kaggle_discovery_workflow.md) | Safe category retention, atomic MongoDB replacement, resumable metadata discovery indexing, query tiers, and daily-import staging. |
 
 ## Monitoring & Deployment Documentation
 

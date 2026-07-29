@@ -8,13 +8,11 @@ from typing import Any
 
 import yaml
 
-from src.retrieval.ollama_embeddings import OllamaEmbeddingModel
 from src.retrieval.models import RetrievalMode
+from src.retrieval.ollama_embeddings import OllamaEmbeddingModel
+from src.retrieval.qdrant_discovery import QdrantDiscoveryIndex
 from src.retrieval.qdrant_index import QdrantResearchIndex
-from src.utils.ai_services import (
-    resolve_ollama_embedding_model,
-    resolve_ollama_url,
-)
+from src.utils.ai_services import resolve_ollama_embedding_model, resolve_ollama_url
 
 DEFAULT_CONFIG_PATH = Path("config/default.yaml")
 
@@ -117,6 +115,58 @@ def create_research_index(
             if default_min_relevance is not None
             else hybrid_settings.get("default_min_relevance", 0.05)
         ),
+    )
+
+
+def create_discovery_index(
+    config: dict[str, Any],
+    *,
+    qdrant_url: str | None = None,
+    ollama_url: str | None = None,
+    embedding_model: str | None = None,
+    collection_name: str | None = None,
+    use_alias: bool = True,
+) -> QdrantDiscoveryIndex:
+    """Create the paper-level metadata discovery index."""
+
+    settings = config.get("discovery_index", {})
+    hybrid = settings.get("hybrid", {})
+    selected_model = resolve_ollama_embedding_model(
+        config,
+        explicit_model=embedding_model or settings.get("embedding_model"),
+    )
+    embedder = OllamaEmbeddingModel(
+        model_name=selected_model,
+        host=resolve_ollama_url(config, explicit_url=ollama_url),
+        query_prefix=settings.get(
+            "query_prefix",
+            "Represent this sentence for searching relevant passages: ",
+        ),
+        document_prefix=settings.get("document_prefix", ""),
+    )
+    alias_name = str(
+        os.getenv("QDRANT_DISCOVERY_ALIAS")
+        or settings.get("alias_name")
+        or "arxiv_discovery_current"
+    )
+    selected_collection = (
+        collection_name
+        or (alias_name if use_alias else settings.get("collection_prefix"))
+        or "arxiv_discovery_hybrid_v1"
+    )
+    return QdrantDiscoveryIndex(
+        url=resolve_qdrant_url(config, explicit_url=qdrant_url),
+        collection_name=str(selected_collection),
+        alias_name=alias_name,
+        embedder=embedder,
+        index_schema_version=str(settings.get("schema_version", "1.0")),
+        batch_size=int(settings.get("embedding_batch_size", 32)),
+        candidate_multiplier=int(hybrid.get("candidate_multiplier", 4)),
+        candidate_minimum=int(hybrid.get("candidate_minimum", 50)),
+        rrf_dense_weight=float(hybrid.get("dense_weight", 1.1)),
+        rrf_sparse_weight=float(hybrid.get("sparse_weight", 1.0)),
+        rrf_k=int(hybrid.get("rrf_k", 60)),
+        default_min_relevance=float(hybrid.get("default_min_relevance", 0.05)),
     )
 
 
