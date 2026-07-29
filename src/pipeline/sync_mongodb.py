@@ -12,7 +12,7 @@ from typing import Any
 
 import yaml
 
-from src.ingestion.fetch import ArxivClient, ArxivFetchError
+from src.ingestion.fetch import ArxivClient, ArxivFetchError, ArxivPage
 from src.storage.mongo import MongoStorage
 
 logging.basicConfig(
@@ -52,14 +52,18 @@ def _fetch_with_retries(
     category: str,
     search_query: str | None,
     start: int,
+    start_date: str | None,
+    end_date: str | None,
     attempts: int = 3,
-) -> list[dict[str, Any]]:
+) -> ArxivPage:
     for attempt in range(1, attempts + 1):
         try:
-            return client.fetch_papers(
+            return client.fetch_papers_page(
                 category=category,
                 search_query=search_query,
                 start=start,
+                start_date=start_date,
+                end_date=end_date,
             )
         except ArxivFetchError:
             if attempt >= attempts:
@@ -72,7 +76,7 @@ def _fetch_with_retries(
                 delay,
             )
             time.sleep(delay)
-    return []
+    raise AssertionError("arXiv retry loop exited without returning or raising")
 
 
 def run_ingestion_pipeline(config: dict[str, Any]) -> dict[str, Any]:
@@ -106,6 +110,8 @@ def run_ingestion_pipeline(config: dict[str, Any]) -> dict[str, Any]:
             max_results = int(arxiv_config["max_results"])
             total_papers = 0
             empty_batches = 0
+            start_date = arxiv_config.get("start_date")
+            end_date = arxiv_config.get("end_date")
 
             for iteration in range(max_iterations):
                 logger.info(
@@ -114,19 +120,24 @@ def run_ingestion_pipeline(config: dict[str, Any]) -> dict[str, Any]:
                     max_iterations,
                     start,
                 )
-                papers = _fetch_with_retries(
+                page = _fetch_with_retries(
                     arxiv_client,
                     category=category,
                     search_query=arxiv_config.get("search_query"),
                     start=start,
+                    start_date=start_date,
+                    end_date=end_date,
                 )
+                papers = page.papers
+                fetched_count = len(papers)
                 logger.info(
-                    "Fetched %d papers from arXiv before filtering",
-                    len(papers),
+                    "Fetched %d papers from arXiv before filtering "
+                    "(offset=%d, total=%s)",
+                    fetched_count,
+                    page.start_index,
+                    page.total_results,
                 )
 
-                start_date = arxiv_config.get("start_date")
-                end_date = arxiv_config.get("end_date")
                 if start_date and end_date:
                     before_filter = len(papers)
                     papers = filter_papers_by_date(
@@ -152,7 +163,18 @@ def run_ingestion_pipeline(config: dict[str, Any]) -> dict[str, Any]:
                     empty_batches += 1
                     logger.info("Empty batch %d", empty_batches)
 
-                start += max_results
+                page_advance = fetched_count or page.items_per_page or max_results
+                start = max(
+                    start + page_advance,
+                    page.start_index + page_advance,
+                )
+                if page.total_results is not None and start >= page.total_results:
+                    logger.info(
+                        "Reached the end of %s results at offset %d",
+                        category,
+                        start,
+                    )
+                    break
                 if empty_batches >= int(arxiv_config["max_no_papers"]):
                     logger.info(
                         "No more papers after %d empty batches",

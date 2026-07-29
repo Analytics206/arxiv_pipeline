@@ -98,7 +98,7 @@ paper_summaries:
   date_filter:
     enabled: true         # Set to false to disable date filtering
     start_date: "2026-01-01" # Process papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2026-07-31"   # Process papers published on or before this date (format: YYYY-MM-DD)
+    end_date: "2026-03-31"   # Process papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
   # Tracking settings for processed summaries
   tracking:
@@ -147,9 +147,9 @@ arxiv:
   sort_by: "submittedDate"
   sort_order: "descending"
   max_iterations: 500 # Number of times to loop the pipeline for each category above
-  rate_limit_seconds: 85 # seconds to wait between api calls
-  start_date: "2026-01-01" # start_date is used in arxiv api call and save pdfs filters
-  end_date: "2026-07-31" # end_date is not used in arxiv api call, only have start_date, used when saving pdfs
+  rate_limit_seconds: 9 # seconds to wait between api calls
+  start_date: "2026-01-01" # Inclusive submittedDate lower bound sent to the arXiv API
+  end_date: "2026-08-31" # Inclusive submittedDate upper bound sent to the arXiv API
   max_no_papers: 25 # Maximum number of no paper fetches before breaking loop for category
 # Embedding model settings
 embedding:
@@ -161,7 +161,7 @@ embedding:
 pdf_storage:
   directory: "data/pdfs" # ignored runtime data; mounted at /app/data/pdfs in containers
   papers_per_category: 200 # Maximum number of papers to download per category (0 for unlimited)
-  request_interval_seconds: 1 # Be polite to arXiv between new PDF requests
+  request_interval_seconds: 3 # Be polite to arXiv between new PDF requests
   # Categories to prioritize for PDF downloads - if empty, all papers in MongoDB will be considered
   process_categories: # used in download_pdfs.py - comment out categories you don't want to download
     - "cs.AI"
@@ -201,7 +201,7 @@ pdf_storage:
   download_date_filter:
     enabled: true         # Set to false to disable date filtering
     start_date: "2026-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2026-07-31"   # Download papers published on or before this date (format: YYYY-MM-DD)
+    end_date: "2026-08-31"   # Download papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
 
 # Retired topic-modeling experiment. This is available only through the
@@ -226,7 +226,7 @@ bertopic:
   date_filter:
     enabled: true
     start_date: "2026-01-01"  # Process papers published on or after this date
-    end_date: "2026-07-31"    # Process papers published on or before this date
+    end_date: "2026-08-31"    # Process papers published on or before this date
 
 # Retired topic-modeling experiment. This is available only through the
 # Docker Compose `legacy` profile and is not used by the research API/index.
@@ -255,7 +255,7 @@ top2vec:
   date_filter:
     enabled: true
     start_date: "2026-01-01"  # Process papers published on or after this date
-    end_date: "2026-07-31"    # Process papers published on or before this date
+    end_date: "2026-08-31"    # Process papers published on or before this date
 
 # Kaggle Dataset Downloader settings
 kaggle:

@@ -1,6 +1,8 @@
 import logging
 import re
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
+from datetime import date
 from typing import Dict, List, Optional
 
 import requests
@@ -14,6 +16,16 @@ logger = logging.getLogger(__name__)
 
 class ArxivFetchError(RuntimeError):
     """Raised when an exact arXiv metadata request cannot be completed."""
+
+
+@dataclass(frozen=True, slots=True)
+class ArxivPage:
+    """One parsed arXiv result page and its OpenSearch pagination metadata."""
+
+    papers: List[Dict]
+    total_results: Optional[int]
+    start_index: int
+    items_per_page: int
 
 
 class ArxivClient:
@@ -40,7 +52,10 @@ class ArxivClient:
         """Fetch one exact paper, retaining the version returned by arXiv."""
 
         requested = normalize_arxiv_id(paper_id)
-        params = {"id_list": requested.version_id, "max_results": 1}
+        params: dict[str, str | int] = {
+            "id_list": requested.version_id,
+            "max_results": 1,
+        }
         api_error: Exception | None = None
         try:
             response = self._session.get(
@@ -64,7 +79,17 @@ class ArxivClient:
             )
             papers = []
         else:
-            papers = self._parse_response(response.text)
+            try:
+                papers = self._parse_response(response.text)
+            except ET.ParseError as error:
+                api_error = error
+                logger.warning(
+                    "arXiv returned malformed Atom XML for %s; "
+                    "trying the paper page: %s",
+                    requested.version_id,
+                    error,
+                )
+                papers = []
 
         if not papers:
             try:
@@ -79,6 +104,14 @@ class ArxivClient:
         if returned.base_id != requested.base_id:
             raise ArxivFetchError(
                 f"arXiv returned {returned.version_id} for requested "
+                f"{requested.version_id}"
+            )
+        if (
+            requested.version is not None
+            and returned.version_id != requested.version_id
+        ):
+            raise ArxivFetchError(
+                f"arXiv returned {returned.version_id} for exact version request "
                 f"{requested.version_id}"
             )
         return canonicalize_paper_metadata(papers[0])
@@ -151,6 +184,8 @@ class ArxivClient:
         category: str = "cs.AI",
         search_query: Optional[str] = None,
         start: int = 0,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
     ) -> List[Dict]:
         """
         Fetch papers from arXiv API.
@@ -159,21 +194,45 @@ class ArxivClient:
             category: arXiv category (default: cs.AI)
             search_query: Optional search terms
             start: Starting index for pagination
+            start_date: Optional inclusive submission date in YYYY-MM-DD format
+            end_date: Optional inclusive submission date in YYYY-MM-DD format
 
         Returns:
             List of paper metadata dictionaries
         """
+        return self.fetch_papers_page(
+            category=category,
+            search_query=search_query,
+            start=start,
+            start_date=start_date,
+            end_date=end_date,
+        ).papers
+
+    def fetch_papers_page(
+        self,
+        category: str = "cs.AI",
+        search_query: Optional[str] = None,
+        start: int = 0,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> ArxivPage:
+        """Fetch one result page together with arXiv pagination metadata."""
+
         # Build query
         query_parts = []
         if category:
             query_parts.append(f"cat:{category}")
         if search_query:
             query_parts.append(search_query)
+        if (start_date is None) != (end_date is None):
+            raise ValueError("start_date and end_date must be provided together")
+        if start_date and end_date:
+            query_parts.append(_submitted_date_query(start_date, end_date))
 
         search_query_str = " AND ".join(query_parts)
 
         # Build request params
-        params = {
+        params: dict[str, str | int] = {
             "search_query": search_query_str,
             "start": start,
             "max_results": self.max_results,
@@ -206,20 +265,61 @@ class ArxivClient:
                 f"arXiv returned HTTP {response.status_code} for "
                 f"{search_query_str}: {response.text[:500]}"
             )
-            return []
 
         # Parse XML response
-        return self._parse_response(response.text)
+        try:
+            page = self._parse_page(response.text, requested_start=start)
+        except ET.ParseError as error:
+            raise ArxivFetchError(
+                f"arXiv returned malformed Atom XML for {search_query_str}: {error}"
+            ) from error
+        if (
+            page.total_results is not None
+            and start < page.total_results
+            and not page.papers
+        ):
+            raise ArxivFetchError(
+                f"arXiv returned an unexpectedly empty page at offset {start} "
+                f"for {search_query_str} with {page.total_results} total results"
+            )
+        return page
 
     def _parse_response(self, xml_data: str) -> List[Dict]:
         """Parse arXiv API XML response into list of dictionaries."""
+        return self._parse_page(xml_data).papers
+
+    def _parse_page(
+        self,
+        xml_data: str,
+        *,
+        requested_start: int = 0,
+    ) -> ArxivPage:
+        """Parse papers and OpenSearch pagination fields from an Atom feed."""
+
         root = ET.fromstring(xml_data)
 
         # Define XML namespaces
         namespaces = {
             "atom": "http://www.w3.org/2005/Atom",
             "arxiv": "http://arxiv.org/schemas/atom",
+            "opensearch": "http://a9.com/-/spec/opensearch/1.1/",
         }
+
+        total_results = self._get_int(
+            root,
+            "opensearch:totalResults",
+            namespaces,
+        )
+        start_index = self._get_int(
+            root,
+            "opensearch:startIndex",
+            namespaces,
+        )
+        items_per_page = self._get_int(
+            root,
+            "opensearch:itemsPerPage",
+            namespaces,
+        )
 
         results = []
 
@@ -265,7 +365,14 @@ class ArxivClient:
             results.append(canonicalize_paper_metadata(paper))
 
         logger.info("Parsed %d papers from arXiv response", len(results))
-        return results
+        return ArxivPage(
+            papers=results,
+            total_results=total_results,
+            start_index=(start_index if start_index is not None else requested_start),
+            items_per_page=(
+                items_per_page if items_per_page is not None else len(results)
+            ),
+        )
 
     @staticmethod
     def _get_text(element, xpath, namespaces, default=""):
@@ -275,6 +382,31 @@ class ArxivClient:
         except (AttributeError, TypeError):
             return default
 
+    @classmethod
+    def _get_int(cls, element, xpath, namespaces) -> Optional[int]:
+        """Extract an optional integer field from an XML element."""
+
+        value = cls._get_text(element, xpath, namespaces)
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
+
 
 def _clean_whitespace(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip()
+
+
+def _submitted_date_query(start_date: str, end_date: str) -> str:
+    """Build an inclusive arXiv submittedDate query from ISO calendar dates."""
+
+    try:
+        start = date.fromisoformat(start_date)
+        end = date.fromisoformat(end_date)
+    except ValueError as error:
+        raise ValueError(
+            "arXiv start_date and end_date must use YYYY-MM-DD format"
+        ) from error
+    if start > end:
+        raise ValueError("arXiv start_date must not be after end_date")
+    return f"submittedDate:[{start:%Y%m%d}0000 TO " f"{end:%Y%m%d}2359]"
