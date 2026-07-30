@@ -1,4 +1,4 @@
-FROM node:18-alpine AS build
+FROM node:24.18.1-alpine AS build
 
 WORKDIR /app
 
@@ -15,11 +15,11 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:24.18.1-alpine AS production
 WORKDIR /app
 
-# Install serve for production
-RUN npm install -g serve
+# Pin the production server so Docker builds stay reproducible.
+RUN npm install -g serve@14.2.6
 
 # Copy build files from the build stage
 COPY --from=build /app/build ./build

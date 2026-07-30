@@ -4,6 +4,8 @@ __pycache__/
 .git/
 .venv/
 venv/
+.pytest_cache/
+.codex-test-tmp-*/
 node_modules/
 data/
 docker_volumes/

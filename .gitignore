@@ -9,6 +9,8 @@ ENV/
 venv/
 .venv/
 .env
+.pytest_cache/
+.codex-test-tmp-*/
 
 # Data
 data/
