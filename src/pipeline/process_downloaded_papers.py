@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 
 from src.analysis.identity import normalize_arxiv_id
+from src.ingestion.kaggle_corpus import retained_categories_from_env
 from src.pipeline.process_paper import main as process_paper
 from src.retrieval.factory import load_project_config
 from src.utils.ai_services import resolve_ollama_model
@@ -54,11 +55,7 @@ def select_downloaded_papers(
     max_papers: int | None = None,
 ) -> list[dict[str, Any]]:
     processing = config.get("research_processing", {})
-    target_categories = (
-        categories
-        or list(processing.get("process_categories") or [])
-        or list(config.get("pdf_storage", {}).get("process_categories") or [])
-    )
+    target_categories = categories or retained_categories_from_env()
     configured_limit = int(processing.get("papers_per_category", 1))
     category_limit = (
         configured_limit if limit_per_category is None else limit_per_category

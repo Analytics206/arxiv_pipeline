@@ -10,6 +10,7 @@ from src.ingestion.kaggle_corpus import (
     build_retention_query,
     document_matches_policy,
     normalize_category_tokens,
+    retained_categories_from_env,
 )
 from src.pipeline.clean_kaggle_collection import build_parser
 
@@ -37,6 +38,22 @@ def test_category_tokens_are_exact_and_deduplicated():
         {"categories": "cs.AI2 math.OC"},
         make_policy(),
     )
+
+
+def test_retained_categories_come_from_one_environment_list(monkeypatch):
+    monkeypatch.setenv(
+        "KAGGLE_RETAINED_CATEGORIES",
+        "cs.AI, cs.CV cs.AI,cs.LG",
+    )
+
+    assert retained_categories_from_env() == ["cs.AI", "cs.CV", "cs.LG"]
+
+
+def test_retained_categories_environment_list_is_required(monkeypatch):
+    monkeypatch.delenv("KAGGLE_RETAINED_CATEGORIES", raising=False)
+
+    with pytest.raises(ValueError, match="KAGGLE_RETAINED_CATEGORIES"):
+        retained_categories_from_env()
 
 
 def test_any_and_all_category_modes_are_distinct():
@@ -150,10 +167,6 @@ def test_cleanup_cli_is_dry_run_by_default():
     default = build_parser().parse_args([])
     applied = build_parser().parse_args(
         [
-            "--category",
-            "cs.AI",
-            "--category",
-            "cs.LG",
             "--source-collection",
             "arxiv_kaggle_import",
             "--target-collection",
@@ -164,7 +177,6 @@ def test_cleanup_cli_is_dry_run_by_default():
 
     assert default.apply is False
     assert applied.apply is True
-    assert applied.categories == ["cs.AI", "cs.LG"]
     assert applied.source_collection == "arxiv_kaggle_import"
     assert applied.target_collection == "arxiv_kaggle"
 

@@ -70,7 +70,6 @@ CONFIG = {
         },
     },
     "research_processing": {
-        "process_categories": ["cs.AI", "cs.LG"],
         "papers_per_category": 1,
     },
     "analysis": {
@@ -129,7 +128,11 @@ def test_pdf_selection_is_bounded_and_deduplicated():
 
 
 def test_analysis_selection_requires_download_and_spans_categories():
-    papers = select_downloaded_papers(FakeCollection(PAPERS), CONFIG)
+    papers = select_downloaded_papers(
+        FakeCollection(PAPERS),
+        CONFIG,
+        categories=["cs.AI", "cs.LG"],
+    )
 
     assert [paper["_selected_category"] for paper in papers] == [
         "cs.AI",
@@ -156,6 +159,7 @@ def test_analysis_selection_advances_past_matching_current_work():
         FakeCollection(PAPERS),
         CONFIG,
         analyses_collection=analyses,
+        categories=["cs.AI", "cs.LG"],
     )
 
     assert [paper["id"] for paper in papers] == [
@@ -182,6 +186,7 @@ def test_forced_analysis_can_reselect_matching_work():
         CONFIG,
         analyses_collection=analyses,
         skip_matching_analyses=False,
+        categories=["cs.AI", "cs.LG"],
     )
 
     assert papers[0]["id"] == "https://arxiv.org/abs/2607.00001v1"

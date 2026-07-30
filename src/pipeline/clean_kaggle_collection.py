@@ -9,9 +9,14 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from dotenv import load_dotenv
 from pymongo import MongoClient
 
-from src.ingestion.kaggle_corpus import KaggleCorpusCleaner, KaggleRetentionPolicy
+from src.ingestion.kaggle_corpus import (
+    KaggleCorpusCleaner,
+    KaggleRetentionPolicy,
+    retained_categories_from_env,
+)
 
 
 def load_config(path: str | Path) -> dict[str, Any]:
@@ -27,15 +32,6 @@ def build_parser() -> argparse.ArgumentParser:
         )
     )
     parser.add_argument("--config", default="config/default.yaml")
-    parser.add_argument(
-        "--category",
-        action="append",
-        dest="categories",
-        help=(
-            "Exact category token to retain; repeat to override configured "
-            "retained_categories"
-        ),
-    )
     parser.add_argument(
         "--collection",
         help="Legacy shorthand overriding both source and target collection",
@@ -60,13 +56,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    load_dotenv()
     args = build_parser().parse_args(argv)
     config = load_config(args.config)
     mongo = config.get("mongo", {})
     settings = config.get("kaggle_corpus", {})
     policy = KaggleRetentionPolicy.from_config(
         settings,
-        categories=args.categories,
+        categories=retained_categories_from_env(),
     )
     connection_string = (
         os.getenv("MONGO_CONNECTION_STRING")

@@ -108,6 +108,12 @@ def run_discovery_index(
             "source_collection",
             "arxiv_kaggle",
         ),
+        "eligibility_collection": snapshot.get("eligibility_collection", "papers"),
+        "eligibility_id_field": snapshot.get(
+            "eligibility_id_field",
+            "base_arxiv_id",
+        ),
+        "candidate_documents": snapshot.get("candidate_documents", source_count),
         "source_documents": source_count,
         "selected_documents": selected_limit,
         "source_snapshot": snapshot,
@@ -126,6 +132,11 @@ def run_discovery_index(
         raise RuntimeError(
             "The discovery source is not a validated Kaggle cleanup output; "
             "run clean_kaggle_collection --apply first"
+        )
+    if source_count < 1:
+        raise RuntimeError(
+            "No arxiv_kaggle papers match the configured papers collection; "
+            "nothing is eligible for discovery indexing"
         )
     if max_papers is not None and max_papers < 1:
         raise ValueError("max_papers must be positive")
@@ -175,6 +186,9 @@ def run_discovery_index(
                 "created_at": datetime.now(timezone.utc),
                 "processed": processed,
             },
+            "$unset": {
+                "error": "",
+            },
         },
         upsert=True,
     )
@@ -193,6 +207,7 @@ def run_discovery_index(
                     "$set": {
                         "status": "running",
                         "processed": processed,
+                        "points": processed,
                         "last_id": last_id,
                         "updated_at": datetime.now(timezone.utc),
                     }
@@ -268,6 +283,12 @@ def main(argv: list[str] | None = None) -> int:
         repository = KaggleDiscoveryRepository(
             database=database,
             collection_name=str(settings.get("source_collection") or "arxiv_kaggle"),
+            eligibility_collection_name=str(
+                settings.get("eligibility_collection") or "papers"
+            ),
+            eligibility_id_field=str(
+                settings.get("eligibility_id_field") or "base_arxiv_id"
+            ),
         )
         report = run_discovery_index(
             config,

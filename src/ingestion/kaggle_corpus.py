@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import uuid
 from dataclasses import dataclass
@@ -14,10 +15,31 @@ from pymongo import ASCENDING, DESCENDING
 
 CategoryMatchMode = Literal["any", "all"]
 _COLLECTION_NAME = re.compile(r"^[A-Za-z0-9_.-]+$")
+KAGGLE_CATEGORIES_ENV = "KAGGLE_RETAINED_CATEGORIES"
 
 
 class KaggleCorpusError(RuntimeError):
     """Raised when the imported corpus cannot be filtered safely."""
+
+
+def retained_categories_from_env(
+    variable: str = KAGGLE_CATEGORIES_ENV,
+) -> list[str]:
+    """Read the authoritative exact-token category list from the environment."""
+
+    raw_categories = os.getenv(variable, "")
+    categories = list(
+        dict.fromkeys(
+            category
+            for category in re.split(r"[\s,]+", raw_categories.strip())
+            if category
+        )
+    )
+    if not categories:
+        raise ValueError(
+            f"{variable} must contain at least one comma-separated arXiv category"
+        )
+    return categories
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,7 +80,7 @@ class KaggleRetentionPolicy:
         cls,
         settings: dict[str, Any],
         *,
-        categories: list[str] | None = None,
+        categories: list[str],
     ) -> "KaggleRetentionPolicy":
         date_filter = settings.get("date_filter", {})
         date_enabled = bool(date_filter.get("enabled", False))
@@ -67,11 +89,7 @@ class KaggleRetentionPolicy:
         if category_match not in {"any", "all"}:
             raise ValueError("category_match must be 'any' or 'all'")
         return cls(
-            retained_categories=tuple(
-                categories
-                if categories is not None
-                else settings.get("retained_categories", [])
-            ),
+            retained_categories=tuple(categories),
             category_match=cast(CategoryMatchMode, category_match),
             start_date=(
                 str(date_filter["start_date"])

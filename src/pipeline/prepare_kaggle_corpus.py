@@ -9,9 +9,14 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from dotenv import load_dotenv
 from pymongo import MongoClient
 
-from src.ingestion.kaggle_corpus import KaggleCorpusCleaner, KaggleRetentionPolicy
+from src.ingestion.kaggle_corpus import (
+    KaggleCorpusCleaner,
+    KaggleRetentionPolicy,
+    retained_categories_from_env,
+)
 from src.pipeline.index_arxiv_discovery import run_discovery_index
 from src.retrieval.discovery_repository import KaggleDiscoveryRepository
 
@@ -29,7 +34,6 @@ def build_parser() -> argparse.ArgumentParser:
         )
     )
     parser.add_argument("--config", default="config/default.yaml")
-    parser.add_argument("--category", action="append", dest="categories")
     parser.add_argument(
         "--source-collection",
         help="Full imported collection to read",
@@ -56,6 +60,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    load_dotenv()
     args = build_parser().parse_args(argv)
     if args.index and not args.apply:
         raise SystemExit("--index requires --apply")
@@ -65,7 +70,7 @@ def main(argv: list[str] | None = None) -> int:
     discovery_settings = config.get("discovery_index", {})
     policy = KaggleRetentionPolicy.from_config(
         corpus_settings,
-        categories=args.categories,
+        categories=retained_categories_from_env(),
     )
     connection_string = (
         os.getenv("MONGO_CONNECTION_STRING")
@@ -104,6 +109,13 @@ def main(argv: list[str] | None = None) -> int:
                 database=database,
                 collection_name=str(
                     discovery_settings.get("source_collection") or target_collection
+                ),
+                eligibility_collection_name=str(
+                    discovery_settings.get("eligibility_collection") or "papers"
+                ),
+                eligibility_id_field=str(
+                    discovery_settings.get("eligibility_id_field")
+                    or "base_arxiv_id"
                 ),
             )
             indexing = run_discovery_index(

@@ -7,15 +7,17 @@ curated, PDF-derived research index:
 
 - `research_knowledge_hybrid_v1` contains evidence-backed claims, quotations,
   and implementation ideas.
-- `arxiv_discovery_current` contains one lean title/abstract point per paper
-  and returns explicitly labeled `metadata_only` leads.
+- `arxiv_discovery_current` contains one lean title/abstract point for each
+  Kaggle paper whose versionless ID also exists in the curated MongoDB
+  `papers` collection, and returns explicitly labeled `metadata_only` leads.
 - Federated search returns both tiers separately and removes metadata-only
   duplicates when an evidence-backed result exists for the same paper.
 
-The retained MongoDB corpus is controlled by `kaggle_corpus` in
-`config/default.yaml`. Category matching uses exact arXiv tokens, so `cs.AI`
-does not accidentally match a longer value. The default policy retains papers
-with any of `cs.AI`, `cs.CV`, or `cs.LG`; its date filter is disabled.
+The retained MongoDB corpus categories come only from the comma-separated
+`KAGGLE_RETAINED_CATEGORIES` value in `.env`. Other cleanup policy and safety
+settings remain under `kaggle_corpus` in `config/default.yaml`. Category
+matching uses exact arXiv tokens, so `cs.AI` does not accidentally match a
+longer value. The date filter is disabled by default.
 
 ## Safe post-import sequence
 
@@ -36,11 +38,19 @@ Apply only the MongoDB cleanup:
 python -m src.pipeline.prepare_kaggle_corpus --apply
 ```
 
-Apply cleanup and build the complete discovery index:
+Apply cleanup and build the complete discovery index only when explicitly
+wanted:
 
 ```powershell
 python -m src.pipeline.prepare_kaggle_corpus --apply --index
 ```
+
+Discovery indexing does not embed the whole cleaned Kaggle collection. Its
+source snapshot is the exact intersection of `arxiv_kaggle.id` and
+`papers.base_arxiv_id`. Cleanup never removes the nonmatching Kaggle records;
+they remain available in MongoDB. The intersection count and ID hash are part
+of the physical Qdrant collection identity, so changing `papers` selects a new
+physical collection instead of resuming an incompatible checkpoint.
 
 The indexer is resumable. A bounded smoke pass does not activate the alias:
 
@@ -56,13 +66,24 @@ docker compose --profile manual run --rm prepare-kaggle
 docker compose --profile manual run --rm prepare-kaggle --apply --index
 ```
 
-Repeated `--category` arguments override the configured category list for one
-run:
+After MongoDB cleanup has already completed, run the restartable
+discovery-only worker in the background:
 
 ```powershell
-python -m src.pipeline.prepare_kaggle_corpus --apply `
-  --category cs.AI --category cs.LG
+docker compose --profile manual up -d index-kaggle
+docker compose --profile manual logs -f index-kaggle
 ```
+
+`index-kaggle` resumes from `discovery_index_runs` after a transient failure.
+It restarts only on failure and remains stopped after successful completion.
+
+Set the category list once in `.env` before previewing or applying cleanup:
+
+```dotenv
+KAGGLE_RETAINED_CATEGORIES=<comma-separated exact category tokens>
+```
+
+The cleanup commands fail closed when this value is absent or empty.
 
 ## Replacement safety
 
@@ -113,7 +134,8 @@ hook a scheduler can call later.
 
 ## Discovery index contract
 
-Each paper produces a deterministic Qdrant point containing:
+Each paper in the MongoDB intersection produces a deterministic Qdrant point
+containing:
 
 - a dense title/abstract embedding;
 - an IDF sparse title/abstract vector;
@@ -128,6 +150,12 @@ Physical collection names include a hash of the cleaned corpus snapshot,
 embedding model, and schema version. Progress is checkpointed in MongoDB
 `discovery_index_runs`. The `arxiv_discovery_current` alias moves only after
 the physical point count exactly matches the cleaned source count.
+
+Qdrant uses the Docker-managed `qdrant_native_data` volume. Keep active Qdrant
+storage off Windows/OneDrive bind mounts: Qdrant segment optimization depends
+on atomic filesystem renames, which those mounts can intermittently reject.
+The legacy `qdrant_data` bind-volume declaration is retained only as a
+non-destructive rollback source for existing installations.
 
 ## Query and evaluation surfaces
 

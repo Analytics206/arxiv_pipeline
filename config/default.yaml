@@ -50,16 +50,7 @@ research_index:
 # One paper per category is a safe three-paper batch on the 8 GB GPU. Completed
 # analysis identities are skipped, so each rerun advances to the next papers.
 research_processing:
-  process_categories:
-    - "cs.AI"
-    - "cs.CV"
-    - "cs.DB"
-    - "cs.DS"
-    - "cs.LG" 
-    - "cs.MA"
-    - "cs.NE"
-    - "cs.RO"
-    - "cs.SE"
+  # Category selection comes only from KAGGLE_RETAINED_CATEGORIES in .env.
   papers_per_category: 1
   
 # Optional legacy graph settings. Neo4j is not part of the default agent-facing
@@ -115,48 +106,23 @@ paper_summaries:
 # ArXiv API settings 
 arxiv:
   categories: # used in sync_mongodb.py
-    - "cs.AI"
-    # - "cs.AR"
-    # - "cs.CC"
-    # - "cs.CL"
-    # - "cs.CE"
-    # - "cs.CR"
-    - "cs.CV"
-    # - "cs.CY"
-    - "cs.DB"
-    # - "cs.DC"
-    - "cs.DS"
-    # - "cs.GR"
-    # - "cs.GT"
-    # - "cs.IR"
-    # - "cs.IT"
-    - "cs.LG" 
-    # - "cs.LO"
-    - "cs.MA"
-    - "cs.NE"
-    - "cs.RO"
-    # - "cs.SD"
+    # - "cs.AI"
+    # - "cs.CV"
+    # - "cs.DB"
+    # - "cs.DS"
+    # - "cs.LG" 
+    # - "cs.MA"
+    # - "cs.NE"
+    # - "cs.RO"
     - "cs.SE"
-    # - "cs.SI"
-    # - "math.AP"
-    # - "math.PR"
-    # - "math.ST"
-    # - "physics.data-an"
-    # - "q-bio.NC"
-    # - "stat.AP"
-    # - "stat.CO"
-    # - "stat.ME"
-    # - "stat.ML"
-    # - "stat.OT"
-    # 306,828 papers in arxiv_papers.papers
   max_results: 200 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
   sort_by: "submittedDate"
   sort_order: "descending"
-  max_iterations: 5 # Number of times to loop the pipeline for each category above
+  max_iterations: 50 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 3 # seconds to wait between api calls
   start_date: "2026-01-01" # Inclusive submittedDate lower bound sent to the arXiv API
-  end_date: "2026-03-31" # Inclusive submittedDate upper bound sent to the arXiv API
-  max_no_papers: 25 # Maximum number of no paper fetches before breaking loop for category
+  end_date: "2026-07-31" # Inclusive submittedDate upper bound sent to the arXiv API
+  max_no_papers: 10 # Maximum number of no paper fetches before breaking loop for category
 # Embedding model settings
 embedding:
   model_name: "all-MiniLM-L6-v2"  # Smaller model to start with
@@ -260,16 +226,7 @@ kaggle_corpus:
   # collection and set import_collection to that name.
   import_collection: "arxiv_kaggle"
   collection_name: "arxiv_kaggle"
-  retained_categories:
-    - "cs.AI"
-    - "cs.CV"
-    - "cs.DB"
-    - "cs.DS"
-    - "cs.LG" 
-    - "cs.MA"
-    - "cs.NE"
-    - "cs.RO"
-    - "cs.SE"
+  # Required category selection comes from KAGGLE_RETAINED_CATEGORIES in .env.
   category_match: "any"
   # Category-only retention is the default. Enable this later only when a
   # rolling discovery window is intentional.
@@ -294,6 +251,10 @@ discovery_index:
   # Benchmarked locally at ~31 papers/second; 512 provided no improvement.
   embedding_batch_size: 256
   source_collection: "arxiv_kaggle"
+  # Only Kaggle papers whose exact versionless ID exists here are embedded.
+  # The Kaggle collection itself is not modified by this intersection.
+  eligibility_collection: "papers"
+  eligibility_id_field: "base_arxiv_id"
   checkpoint_collection: "discovery_index_runs"
   query_prefix: "Represent this sentence for searching relevant passages: "
   retrieval_mode: "hybrid"
@@ -326,3 +287,37 @@ kaggle:
 logging:
   level: "INFO"
   file: "logs/pipeline.log"
+
+    # - "cs.AI"
+    # - "cs.AR"
+    # - "cs.CC"
+    # - "cs.CL"
+    # - "cs.CE"
+    # - "cs.CR"
+    # - "cs.CV"
+    # - "cs.CY"
+    # - "cs.DB"
+    # - "cs.DC"
+    # - "cs.DS"
+    # - "cs.GR"
+    # - "cs.GT"
+    # - "cs.IR"
+    # - "cs.IT"
+    # - "cs.LG" 
+    # - "cs.LO"
+    # - "cs.MA"
+    # - "cs.NE"
+    # - "cs.RO"
+    # - "cs.SD"
+    # - "cs.SE"
+    # - "cs.SI"
+    # - "math.AP"
+    # - "math.PR"
+    # - "math.ST"
+    # - "physics.data-an"
+    # - "q-bio.NC"
+    # - "stat.AP"
+    # - "stat.CO"
+    # - "stat.ME"
+    # - "stat.ML"
+    # - "stat.OT"

@@ -56,6 +56,12 @@ def get_discovery_repository() -> Iterator[KaggleDiscoveryRepository]:
             mongo.get("db_name", "arxiv_papers"),
         ),
         collection_name=str(discovery.get("source_collection") or "arxiv_kaggle"),
+        eligibility_collection_name=str(
+            discovery.get("eligibility_collection") or "papers"
+        ),
+        eligibility_id_field=str(
+            discovery.get("eligibility_id_field") or "base_arxiv_id"
+        ),
     )
     try:
         yield repository

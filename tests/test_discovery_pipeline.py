@@ -35,15 +35,20 @@ class FakeDatabase:
 
 
 class FakeRepository:
-    def __init__(self, prepared=True):
+    def __init__(self, prepared=True, documents=2):
         self.prepared = prepared
+        self.documents = documents
         self.batch_calls = []
 
     def snapshot_identity(self):
         return {
             "corpus_run_id": "run-1" if self.prepared else None,
             "retention_policy_hash": "hash",
-            "documents": 2,
+            "documents": self.documents,
+            "candidate_documents": 10,
+            "eligibility_documents": self.documents,
+            "eligibility_collection": "papers",
+            "eligibility_id_field": "base_arxiv_id",
             "snapshot_token": "snapshot",
             "prepared": self.prepared,
         }
@@ -125,6 +130,8 @@ def test_index_dry_run_does_not_require_prepared_source_or_services():
 
     assert report["status"] == "dry-run"
     assert report["source_documents"] == 2
+    assert report["candidate_documents"] == 10
+    assert report["eligibility_collection"] == "papers"
 
 
 def test_unprepared_source_is_rejected_before_index_creation():
@@ -132,6 +139,15 @@ def test_unprepared_source_is_rejected_before_index_creation():
         run_discovery_index(
             CONFIG,
             repository=FakeRepository(prepared=False),
+            database=FakeDatabase(),
+        )
+
+
+def test_empty_papers_intersection_is_rejected_before_index_creation():
+    with pytest.raises(RuntimeError, match="nothing is eligible"):
+        run_discovery_index(
+            CONFIG,
+            repository=FakeRepository(documents=0),
             database=FakeDatabase(),
         )
 

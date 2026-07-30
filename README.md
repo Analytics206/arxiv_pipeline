@@ -570,7 +570,9 @@ start as background services.
 
   The post-import workflow retains exact configured categories, validates and
   atomically replaces the MongoDB production collection, then resumably builds
-  a separate metadata-only Qdrant index:
+  a separate metadata-only Qdrant index. Qdrant includes only Kaggle papers
+  whose versionless ID is also present in MongoDB `papers`; nonmatching Kaggle
+  records remain in MongoDB:
 
   ```powershell
   # Read-only count and retention preview
@@ -578,6 +580,9 @@ start as background services.
 
   # Cleanup plus complete discovery index and alias activation
   python -m src.pipeline.prepare_kaggle_corpus --apply --index
+
+  # Or, after cleanup, run the resumable/restartable index worker in Docker
+  docker compose --profile manual up -d index-kaggle
   ```
 
   See
@@ -619,9 +624,10 @@ start as background services.
   Use `--dry-run` on either PDF/batch command to inspect its exact manifest
   without writing anything. `pdf_storage.papers_per_category` bounds the
   downloaded corpus; `research_processing.papers_per_category` separately
-  bounds expensive local-model analysis. The default of one per category is a
-  three-paper sequential batch on the 8 GB GPU. Repeat the command to advance
-  the queue, or use `--limit-per-category 2` for up to six papers. Papers run
+  bounds expensive local-model analysis. The category set comes from
+  `KAGGLE_RETAINED_CATEGORIES` in `.env`. The default processes at most one
+  paper per selected category. Repeat the command to advance the queue, or use
+  `--limit-per-category 2` to take up to two per selected category. Papers run
   sequentially inside the batch rather than competing for GPU memory.
 
   Paper metadata uses schema 2.0. `papers` is keyed uniquely by
@@ -1157,7 +1163,7 @@ default does not.
    - pdf_storage.download_date_filter: Published-date range and sorting
 
    ## process_downloaded_papers pipeline
-   - research_processing.process_categories: Categories represented in the agent test
+   - KAGGLE_RETAINED_CATEGORIES in `.env`: Categories retained by Kaggle cleanup and represented in the bounded agent test
    - research_processing.papers_per_category: Maximum analyses selected per category
    - The command requires a recorded `local_pdf_path`, skips matching immutable
      analyses, and idempotently indexes stable points in
