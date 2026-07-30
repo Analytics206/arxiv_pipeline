@@ -55,9 +55,21 @@ physical collection instead of resuming an incompatible checkpoint.
 The indexer is resumable. A bounded smoke pass does not activate the alias:
 
 ```powershell
-python -m src.pipeline.index_arxiv_discovery --max-papers 32
+python -m src.pipeline.index_arxiv_discovery --run-papers 32
 python -m src.pipeline.index_arxiv_discovery
 ```
+
+For bounded work sessions, stop at a batch boundary after approximately the
+requested embedding time:
+
+```powershell
+python -m src.pipeline.index_arxiv_discovery --run-minutes 75
+```
+
+Repeat the same command to resume. Each report records the documents processed
+in that invocation, elapsed embedding time, observed papers/second, and
+remaining documents. The alias remains unchanged after partial runs and moves
+only when the full intersection count is present and validated.
 
 The equivalent container entry point is read-only unless `--apply` is passed:
 
@@ -76,6 +88,12 @@ docker compose --profile manual logs -f index-kaggle
 
 `index-kaggle` resumes from `discovery_index_runs` after a transient failure.
 It restarts only on failure and remains stopped after successful completion.
+
+For a bounded Docker invocation, use `run`:
+
+```powershell
+docker compose --profile manual run --rm index-kaggle --run-minutes 75
+```
 
 Set the category list once in `.env` before previewing or applying cleanup:
 

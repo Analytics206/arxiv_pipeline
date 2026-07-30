@@ -52,7 +52,10 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Build and activate discovery only after cleanup succeeds",
     )
-    parser.add_argument("--max-papers", type=int)
+    run_limit = parser.add_mutually_exclusive_group()
+    run_limit.add_argument("--max-papers", type=int)
+    run_limit.add_argument("--run-papers", type=int)
+    run_limit.add_argument("--run-minutes", type=float)
     parser.add_argument("--qdrant-url")
     parser.add_argument("--ollama-url")
     parser.add_argument("--embedding-model")
@@ -126,6 +129,8 @@ def main(argv: list[str] | None = None) -> int:
                 ollama_url=args.ollama_url,
                 embedding_model=args.embedding_model,
                 max_papers=args.max_papers,
+                run_papers=args.run_papers,
+                run_minutes=args.run_minutes,
             )
         print(
             json.dumps(

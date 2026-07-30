@@ -583,6 +583,9 @@ start as background services.
 
   # Or, after cleanup, run the resumable/restartable index worker in Docker
   docker compose --profile manual up -d index-kaggle
+
+  # Bound one resumable invocation to about 75 embedding minutes
+  docker compose --profile manual run --rm index-kaggle --run-minutes 75
   ```
 
   See

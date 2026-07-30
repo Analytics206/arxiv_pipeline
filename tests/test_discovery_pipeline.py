@@ -55,7 +55,10 @@ class FakeRepository:
 
     def iter_batches(self, **kwargs):
         self.batch_calls.append(kwargs)
-        documents = [{"id": "1"}, {"id": "2"}]
+        documents = [
+            {"id": str(position)}
+            for position in range(1, self.documents + 1)
+        ]
         if kwargs.get("after_id"):
             documents = [
                 document
@@ -65,8 +68,9 @@ class FakeRepository:
         limit = kwargs.get("limit")
         if limit is not None:
             documents = documents[:limit]
-        if documents:
-            yield documents
+        batch_size = kwargs["batch_size"]
+        for offset in range(0, len(documents), batch_size):
+            yield documents[offset : offset + batch_size]
 
 
 class FakeIndex:
@@ -77,6 +81,7 @@ class FakeIndex:
         self.activated = False
 
     def index_documents(self, documents):
+        self.collection_exists = True
         self.points += len(documents)
         return {"points": len(documents)}
 
@@ -205,13 +210,83 @@ def test_missing_qdrant_collection_restarts_stale_checkpoint(monkeypatch):
     assert repository.batch_calls[0]["after_id"] is None
 
 
+def test_run_papers_limits_only_this_invocation_and_keeps_alias_inactive(
+    monkeypatch,
+):
+    repository = FakeRepository(documents=3)
+    database = FakeDatabase()
+    index = FakeIndex()
+    monkeypatch.setattr(
+        discovery_pipeline,
+        "create_discovery_index",
+        lambda *args, **kwargs: index,
+    )
+
+    first = run_discovery_index(
+        CONFIG,
+        repository=repository,
+        database=database,
+        run_papers=1,
+    )
+    second = run_discovery_index(
+        CONFIG,
+        repository=repository,
+        database=database,
+        run_papers=1,
+    )
+
+    assert first["status"] == "partial"
+    assert first["run_processed"] == 1
+    assert first["remaining_documents"] == 2
+    assert first["alias_activated"] is False
+    assert second["processed"] == 2
+    assert second["run_started_processed"] == 1
+    assert second["run_processed"] == 1
+    assert second["remaining_documents"] == 1
+    assert index.activated is False
+
+
+def test_run_minutes_stops_at_a_batch_boundary(monkeypatch):
+    repository = FakeRepository(documents=3)
+    database = FakeDatabase()
+    index = FakeIndex()
+    clock = iter([0.0, 61.0, 61.0])
+    monkeypatch.setattr(
+        discovery_pipeline,
+        "create_discovery_index",
+        lambda *args, **kwargs: index,
+    )
+    monkeypatch.setattr(
+        discovery_pipeline,
+        "perf_counter",
+        lambda: next(clock),
+    )
+
+    report = run_discovery_index(
+        CONFIG,
+        repository=repository,
+        database=database,
+        batch_size=1,
+        run_minutes=1,
+    )
+
+    assert report["status"] == "partial"
+    assert report["run_processed"] == 1
+    assert report["run_elapsed_seconds"] == 61
+    assert report["remaining_documents"] == 2
+    assert report["alias_activated"] is False
+
+
 def test_index_and_prepare_clis_are_import_safe():
-    index_args = build_index_parser().parse_args(["--dry-run"])
+    index_args = build_index_parser().parse_args(
+        ["--dry-run", "--run-minutes", "75"]
+    )
     prepare_args = build_prepare_parser().parse_args(
         ["--apply", "--index", "--max-papers", "10"]
     )
 
     assert index_args.dry_run is True
+    assert index_args.run_minutes == 75
     assert prepare_args.apply is True
     assert prepare_args.index is True
     assert prepare_args.max_papers == 10
