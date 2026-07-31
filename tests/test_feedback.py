@@ -8,6 +8,7 @@ from src.api.routes.feedback import get_feedback_repository
 from src.feedback.models import validate_record
 from src.feedback.repository import (
     FEEDBACK_SCHEMA_VERSION,
+    FeedbackTargetError,
     MongoFeedbackRepository,
 )
 
@@ -55,6 +56,14 @@ class FakeFeedbackRepository:
             "record": deepcopy(record),
         }
         return True, resolved
+
+    def validate_archived_target(self, record):
+        if record["feedback_id"] in self.records:
+            return
+        if record.get("request_id") == "rs_missing":
+            raise FeedbackTargetError(
+                "request_id 'rs_missing' has no archived curated output"
+            )
 
 
 def test_feedback_endpoint_accepts_valid_records_and_rejects_only_invalid_ones(
@@ -120,6 +129,36 @@ def test_feedback_endpoint_replay_is_a_successful_duplicate(monkeypatch):
     assert replay.json()["accepted"] == 0
     assert replay.json()["duplicates"] == 1
     assert len(repository.records) == 1
+
+
+def test_feedback_endpoint_rejects_only_the_unresolvable_request_target(
+    monkeypatch,
+):
+    repository = FakeFeedbackRepository()
+    app.dependency_overrides[get_feedback_repository] = lambda: repository
+    monkeypatch.delenv("RESEARCH_FEEDBACK_BEARER_TOKEN", raising=False)
+    client = TestClient(app)
+    rejected = record("fb:missing-request")
+    rejected["request_id"] = "rs_missing"
+
+    try:
+        response = client.post(
+            "/research/feedback",
+            json=batch([rejected, record()]),
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    assert response.json()["accepted"] == 1
+    assert response.json()["duplicates"] == 0
+    assert response.json()["errors"] == [
+        {
+            "index": 0,
+            "feedback_id": "fb:missing-request",
+            "error": "request_id 'rs_missing' has no archived curated output",
+        }
+    ]
 
 
 def test_feedback_endpoint_enforces_optional_bearer_token(monkeypatch):
@@ -199,6 +238,43 @@ def test_outcome_follow_ups_require_a_human_source_and_pointer():
         raise AssertionError("Expected a missing follow-up pointer to fail")
 
 
+def test_request_and_point_identifiers_must_be_non_empty_when_present():
+    feedback = record()
+    feedback["request_id"] = ""
+
+    try:
+        validate_record(feedback)
+    except ValueError as error:
+        assert str(error) == "request_id must be a non-empty string"
+    else:
+        raise AssertionError("Expected a blank request_id to fail")
+
+    feedback = record(reason="evidence_mismatch")
+    feedback["subject"] = {
+        "kind": "evidence",
+        "paper_id": "2607.21557",
+        "evidence_id": "ev-test",
+        "point_id": "",
+    }
+    try:
+        validate_record(feedback)
+    except ValueError as error:
+        assert str(error) == "subject.point_id must be a non-empty string"
+    else:
+        raise AssertionError("Expected a blank point_id to fail")
+
+    feedback = record()
+    feedback["subject"]["point_id"] = "point-1"
+    try:
+        validate_record(feedback)
+    except ValueError as error:
+        assert str(error) == (
+            "subject.point_id is only valid for subject.kind 'idea' or 'evidence'"
+        )
+    else:
+        raise AssertionError("Expected a paper point_id to fail")
+
+
 class FakeCollection:
     def __init__(self, documents=None):
         self.documents = deepcopy(documents or [])
@@ -229,6 +305,23 @@ class FakeDatabase:
             "papers": FakeCollection([{"_id": "p1", "base_arxiv_id": "2607.21557"}]),
             "arxiv_kaggle": FakeCollection([{"_id": "k1", "id": "2607.21557"}]),
             "paper_analyses": FakeCollection([{"_id": "a1", "paper_id": "2607.21557"}]),
+            "research_search_outputs": FakeCollection(
+                [
+                    {
+                        "_id": "rs_delivered",
+                        "request_id": "rs_delivered",
+                        "response": {
+                            "request_id": "rs_delivered",
+                            "papers": [
+                                {
+                                    "paper_id": "2607.21557",
+                                    "research_items": [{"point_id": "point-delivered"}],
+                                }
+                            ],
+                        },
+                    }
+                ]
+            ),
         }
 
     def __getitem__(self, name):
@@ -272,6 +365,8 @@ def test_repository_stores_append_only_feedback_and_source_resolution():
     assert {
         "feedback_identity",
         "feedback_paper",
+        "feedback_request",
+        "feedback_point",
         "feedback_reason",
         "feedback_project",
         "feedback_occurred",
@@ -290,6 +385,67 @@ def test_repository_stores_append_only_feedback_and_source_resolution():
     assert repository.feedback.documents[-1]["signal_scope"] == "project_only"
 
 
+def test_repository_validates_targets_against_the_archived_curated_output():
+    database = FakeDatabase()
+    repository = MongoFeedbackRepository(database=database)
+
+    delivered_paper = record("fb:delivered-paper")
+    delivered_paper["request_id"] = "rs_delivered"
+    repository.validate_archived_target(delivered_paper)
+
+    delivered_point = record(
+        "fb:delivered-point",
+        reason="evidence_mismatch",
+    )
+    delivered_point["request_id"] = "rs_delivered"
+    delivered_point["subject"] = {
+        "kind": "evidence",
+        "paper_id": "2607.21557",
+        "evidence_id": "ev-delivered",
+        "point_id": "point-delivered",
+    }
+    repository.validate_archived_target(delivered_point)
+
+    missing_request = record("fb:missing-request")
+    missing_request["request_id"] = "rs_missing"
+    _assert_target_error(
+        repository,
+        missing_request,
+        "request_id 'rs_missing' has no archived curated output",
+    )
+
+    missing_paper = record("fb:missing-paper", paper_id="2607.99999")
+    missing_paper["request_id"] = "rs_delivered"
+    _assert_target_error(
+        repository,
+        missing_paper,
+        "request_id 'rs_delivered' did not deliver " "subject.paper_id '2607.99999'",
+    )
+
+    missing_point = record(
+        "fb:missing-point",
+        reason="evidence_mismatch",
+    )
+    missing_point["request_id"] = "rs_delivered"
+    missing_point["subject"] = {
+        "kind": "evidence",
+        "paper_id": "2607.21557",
+        "evidence_id": "ev-missing",
+        "point_id": "point-missing",
+    }
+    _assert_target_error(
+        repository,
+        missing_point,
+        "request_id 'rs_delivered' did not deliver "
+        "subject.point_id 'point-missing' for paper '2607.21557'",
+    )
+
+    duplicate = record()
+    repository.append(envelope=batch([]), record=duplicate)
+    duplicate["request_id"] = "rs_missing"
+    repository.validate_archived_target(duplicate)
+
+
 def _matches(document, query):
     if "$or" in query:
         return any(_matches(document, item) for item in query["$or"])
@@ -301,3 +457,12 @@ def _matches(document, query):
         elif actual != expected:
             return False
     return True
+
+
+def _assert_target_error(repository, feedback, expected):
+    try:
+        repository.validate_archived_target(feedback)
+    except FeedbackTargetError as error:
+        assert str(error) == expected
+    else:
+        raise AssertionError("Expected archived target validation to fail")

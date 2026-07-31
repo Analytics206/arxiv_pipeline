@@ -91,6 +91,7 @@ research_feedback:
   papers_collection: "papers"
   kaggle_collection: "arxiv_kaggle"
   analyses_collection: "paper_analyses"
+  search_outputs_collection: "research_search_outputs"
 
 # ArXiv API settings 
 arxiv:

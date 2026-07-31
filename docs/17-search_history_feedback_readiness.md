@@ -26,12 +26,11 @@ The identifiers available for feedback correlation are:
 `rs_6b81712a73ad4dd1a9c42e1a1ca95039`.
 
 The feedback v1 contract requires a subject `paper_id`, `evidence_id`, or
-harness-side `idea_ref`, depending on the judgment. It does not require a
-search `request_id` or research `point_id`. The harness should retain the
-request ID in its own run/report and may send it as an extension field; the
-endpoint stores unknown fields unchanged. This keeps the exact delivered
-search output available for later cross-reading without making old feedback
-invalid when a search trace is unavailable.
+harness-side `idea_ref`, depending on the judgment. It recommends the search
+`request_id` and accepts an optional research `point_id`. When `request_id` is
+present, the endpoint resolves the immutable archived response and rejects a
+paper or point that was not delivered by that request. Records without a
+request ID remain valid for older senders and human follow-ups.
 
 Project fit and content quality must remain separate feedback dimensions. For
 example, “does not fit this project” must not be interpreted as low-quality or
@@ -130,8 +129,7 @@ retrieval and feedback evaluation.
 not marked idempotent in MCP because each invocation creates a new evaluation
 trace and returns a new `request_id`. A transport retry can therefore produce
 two separate run records. The feedback sender should use the
-`request_id` from the response it actually evaluated in its own run/report,
-even though feedback contract v1 does not require that identifier.
+`request_id` from the response it actually evaluated.
 
 ## Implemented feedback boundary
 
@@ -139,11 +137,16 @@ even though feedback contract v1 does not require that identifier.
 `harness_feedback`. It intentionally bypasses the five-tool read-only MCP
 adapter.
 
-The feedback contract does not reject a record because its paper is absent
-from the current corpus. A paper can be removed or a delayed spool can arrive
-after a corpus rebuild; the feedback is still real. Instead, the response
-flags the paper under `unresolved_papers`. This replaces the earlier
-pre-contract idea of requiring every target to appear in a saved output.
+When a record carries `request_id`, its target is checked against
+`research_search_outputs`: the request must exist, its `paper_id` must have
+been delivered, and an optional `point_id` must belong to that delivered
+paper. A mismatch is a per-record error and does not reject valid neighbors in
+the same batch.
+
+When `request_id` is absent, the feedback contract does not reject a record
+because its paper is absent from the current corpus. A paper can be removed or
+a delayed spool can arrive after a corpus rebuild; the feedback is still real.
+Instead, the response flags the paper under `unresolved_papers`.
 
 Project-relative reasons such as `not_project_fit` are stored with
 `signal_scope="project_only"`. They remain separate from retrieval,

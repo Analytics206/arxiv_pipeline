@@ -236,8 +236,10 @@ Per-record checks:
   curated output for that request (docs/17 `research_search_outputs`): a
   `paper_id` — or `point_id` for an idea/evidence subject — that was not
   actually delivered in that response is **rejected per-record** with a clear
-  error, per docs/17's rule. This is the one existence check worth doing,
-  because the archive is immutable and the check is exact;
+  error, per docs/17's rule. An unknown `request_id` is likewise rejected
+  because there is no archived response against which to interpret it. This is
+  the one existence check worth doing, because the archive is immutable and
+  the check is exact;
 - **when `request_id` is absent** (older senders, human records), **do not**
   validate that `paper_id` exists in the corpus — a paper may have been
   removed since the scan ran, and the feedback about it is still real. Store
@@ -497,7 +499,7 @@ same body: `accepted: 0, duplicates: 1`. A record with `"reason":
       records in the same batch are accepted.
 - [x] A `paper_id` absent from the corpus is stored and flagged, not rejected
       (when the record carries no `request_id`).
-- [ ] A record whose `request_id` resolves to an archived curated output, but
+- [x] A record whose `request_id` resolves to an archived curated output, but
       whose `paper_id`/`point_id` was not delivered in that response, is
       rejected per-record (docs/17 rule).
 - [x] Records land append-only in `harness_feedback`; no API path updates or
@@ -513,7 +515,6 @@ same body: `accepted: 0, duplicates: 1`. A record with `"reason":
 
 The unchecked network items require verification from the harness computer and
 the owner's network perimeter; they cannot be proven by the service host alone.
-The `request_id` cross-check (docs/17 rule) is not yet implemented service-side.
 
 ## Failure semantics
 

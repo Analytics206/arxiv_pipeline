@@ -218,9 +218,10 @@ Important fields:
 
 The example identifiers and counts are illustrative, not fixed expectations.
 Retain the `request_id` in the harness run/report so a judgment can be
-cross-read against the exact stored search output. Feedback contract v1 does
-not require this field, but the endpoint preserves it as an extension when a
-sender includes it.
+cross-read against the exact stored search output. Feedback contract v1
+recommends this field. When supplied, the endpoint verifies that the
+`paper_id` and optional `point_id` were actually delivered in that archived
+response before storing the judgment.
 
 ### Trust tiers
 

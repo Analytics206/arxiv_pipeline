@@ -30,6 +30,8 @@ extension fields, plus:
 
 - `schema_version`, `received_at`, client, project, contract, and taxonomy
   provenance;
+- the optional `request_id` and `subject.point_id` used to verify the target
+  against the immutable `research_search_outputs` response before insertion;
 - `reason_known`, `reason_group`, and `signal_scope`;
 - a normalized `resolved_paper_id` when the subject has a paper;
 - `resolved_ingestion_sources`, drawn from `papers`, `arxiv_kaggle`, and
@@ -40,8 +42,9 @@ An unresolved paper is still stored. Project-relative signals including
 `signal_scope="project_only"` and must never enter global paper-quality
 metrics.
 
-Indexes cover `feedback_id`, `subject.paper_id`, `reason`, `project.id`,
-`occurred_at`, and the compound ingestion-source/reason/project rollup.
+Indexes cover `feedback_id`, `request_id`, `subject.paper_id`,
+`subject.point_id`, `reason`, `project.id`, `occurred_at`, and the compound
+ingestion-source/reason/project rollup.
 
 The API has no feedback update or delete route. Corrections and later trial
 outcomes are new records connected with `follow_up_of`.

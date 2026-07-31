@@ -20,7 +20,7 @@ from src.feedback.models import (
     validate_envelope,
     validate_record,
 )
-from src.feedback.repository import MongoFeedbackRepository
+from src.feedback.repository import FeedbackTargetError, MongoFeedbackRepository
 from src.retrieval.factory import load_project_config
 
 router = APIRouter()
@@ -51,6 +51,7 @@ def get_feedback_repository() -> Iterator[MongoFeedbackRepository]:
     feedback = config.get("research_feedback", {})
     analysis = config.get("analysis", {})
     discovery = config.get("discovery_index", {})
+    search_history = config.get("research_search", {}).get("history", {})
     repository = MongoFeedbackRepository(
         connection_string=os.getenv(
             "MONGO_CONNECTION_STRING",
@@ -71,6 +72,14 @@ def get_feedback_repository() -> Iterator[MongoFeedbackRepository]:
             feedback.get("analyses_collection")
             or analysis.get("collection_name")
             or "paper_analyses"
+        ),
+        search_outputs_collection=os.getenv(
+            "MONGO_SEARCH_OUTPUTS_COLLECTION",
+            str(
+                feedback.get("search_outputs_collection")
+                or search_history.get("outputs_collection")
+                or "research_search_outputs"
+            ),
         ),
     )
     try:
@@ -156,10 +165,10 @@ async def submit_research_feedback(
         ) from error
 
     errors: list[FeedbackRecordError] = []
-    valid_records: list[dict[str, Any]] = []
+    valid_records: list[tuple[int, dict[str, Any]]] = []
     for index, record in enumerate(envelope["records"]):
         try:
-            valid_records.append(validate_record(record))
+            valid_records.append((index, validate_record(record)))
         except ValueError as error:
             errors.append(
                 FeedbackRecordError(
@@ -173,7 +182,18 @@ async def submit_research_feedback(
     duplicates = 0
     unresolved_papers: list[str] = []
     try:
-        for record in valid_records:
+        for index, record in valid_records:
+            try:
+                repository.validate_archived_target(record)
+            except FeedbackTargetError as error:
+                errors.append(
+                    FeedbackRecordError(
+                        index=index,
+                        feedback_id=feedback_id_from(record),
+                        error=str(error),
+                    )
+                )
+                continue
             inserted, paper_resolved = repository.append(
                 envelope=envelope,
                 record=record,
@@ -194,14 +214,16 @@ async def submit_research_feedback(
 
     unknown_reasons = [
         reason
-        for reason in dict.fromkeys(str(record["reason"]) for record in valid_records)
+        for reason in dict.fromkeys(
+            str(record["reason"]) for _, record in valid_records
+        )
         if reason not in KNOWN_REASONS
     ]
     return FeedbackAck(
         received=len(envelope["records"]),
         accepted=accepted,
         duplicates=duplicates,
-        errors=errors,
+        errors=sorted(errors, key=lambda item: item.index),
         unknown_reasons=unknown_reasons,
         unresolved_papers=list(dict.fromkeys(unresolved_papers)),
     )
