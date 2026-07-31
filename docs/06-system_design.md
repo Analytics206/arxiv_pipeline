@@ -168,8 +168,14 @@ credentials. Each tool makes a GET request to one canonical REST operation, so
 errors, validation, retrieval, context budgeting, and response schemas still
 have one implementation.
 
-MCP exposes the five operation names above. All tools declare read-only,
-non-destructive, idempotent annotations. Resources expose
+The separate `POST /research/feedback` REST operation is the only external
+write contract. It accepts bounded harness evaluation batches and appends them
+to MongoDB `harness_feedback`. It is deliberately absent from MCP and cannot
+change research records, indexes, or read responses.
+
+MCP exposes the five operation names above. All tools declare read-only and
+non-destructive annotations. Four lookup tools are idempotent;
+`search_research` creates a new append-only request trace. Resources expose
 `research://capabilities`, `paper://arxiv/{paper_id}` as the standard context
 package, and `evidence://arxiv/{evidence_id}` as an evidence lookup alias.
 Streamable HTTP is the LAN transport; stdio is available for a client running
@@ -231,6 +237,8 @@ authorization, and rate limiting before crossing the trusted boundary.
 ## Safety boundaries
 
 - Research discovery endpoints are read-only.
+- Harness feedback is isolated to `POST /research/feedback` and an append-only
+  MongoDB collection; it has no update or delete route.
 - The MCP container receives only `RESEARCH_API_URL`; it has no database,
   Qdrant, Ollama, mounted data directory, or project-write capability.
 - Arbitrary Cypher is disabled unless `ENABLE_LEGACY_CYPHER_API=true`.

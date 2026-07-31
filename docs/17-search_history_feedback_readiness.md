@@ -1,4 +1,4 @@
-# Research search history and feedback readiness
+# Research search history and feedback correlation
 
 ## Outcome
 
@@ -12,7 +12,7 @@ Qdrant collections, ranking configuration, or future search results.
 
 ## Correlation identifiers
 
-The identifiers needed by the upcoming feedback workflow already exist:
+The identifiers available for feedback correlation are:
 
 | Scope | Identifier |
 | --- | --- |
@@ -25,11 +25,13 @@ The identifiers needed by the upcoming feedback workflow already exist:
 `X-Research-Request-ID` HTTP response header. A typical value is
 `rs_6b81712a73ad4dd1a9c42e1a1ca95039`.
 
-The future feedback payload can reference a paper with
-`request_id + paper_id` and a specific idea with
-`request_id + paper_id + point_id`. The search history deliberately does not
-define feedback labels yet; those will be added after the external coding
-agent's return contract is finalized.
+The feedback v1 contract requires a subject `paper_id`, `evidence_id`, or
+harness-side `idea_ref`, depending on the judgment. It does not require a
+search `request_id` or research `point_id`. The harness should retain the
+request ID in its own run/report and may send it as an extension field; the
+endpoint stores unknown fields unchanged. This keeps the exact delivered
+search output available for later cross-reading without making old feedback
+invalid when a search trace is unavailable.
 
 Project fit and content quality must remain separate feedback dimensions. For
 example, “does not fit this project” must not be interpreted as low-quality or
@@ -127,19 +129,27 @@ retrieval and feedback evaluation.
 `search_research` remains read-only with respect to research data, but it is
 not marked idempotent in MCP because each invocation creates a new evaluation
 trace and returns a new `request_id`. A transport retry can therefore produce
-two separate run records. The future feedback sender should use the
-`request_id` from the response it actually evaluated.
+two separate run records. The feedback sender should use the
+`request_id` from the response it actually evaluated in its own run/report,
+even though feedback contract v1 does not require that identifier.
 
-## Next feedback implementation
+## Implemented feedback boundary
 
-Once the coding agent's feedback contract is available:
+`POST /research/feedback` on REST port 8000 stores immutable events in MongoDB
+`harness_feedback`. It intentionally bypasses the five-tool read-only MCP
+adapter.
 
-1. Validate it without flattening project fit into content quality.
-2. Store immutable feedback events in a separate collection.
-3. Resolve every target against the saved curated output for its `request_id`.
-4. Reject feedback for papers or point IDs that were not actually delivered.
-5. Preserve the agent, project/context identity, timestamps, and schema
-   version needed for later evaluation.
-6. Derive aggregates or ranking experiments from raw events; do not overwrite
-   the original search trace or feedback.
+The feedback contract does not reject a record because its paper is absent
+from the current corpus. A paper can be removed or a delayed spool can arrive
+after a corpus rebuild; the feedback is still real. Instead, the response
+flags the paper under `unresolved_papers`. This replaces the earlier
+pre-contract idea of requiring every target to appear in a saved output.
 
+Project-relative reasons such as `not_project_fit` are stored with
+`signal_scope="project_only"`. They remain separate from retrieval,
+evidence/analysis, and corpus-quality signals. Raw feedback events and raw
+search traces are never overwritten by later aggregates or experiments.
+
+The full feedback envelope, reason taxonomy, validation behavior, and retry
+contract are documented in
+[External AI Harness Feedback Endpoint Specification](16-harness_feedback_endpoint_spec.md).

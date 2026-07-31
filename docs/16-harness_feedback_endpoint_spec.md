@@ -476,25 +476,28 @@ same body: `accepted: 0, duplicates: 1`. A record with `"reason":
 ## Acceptance checklist
 
 - [ ] The harness computer can open TCP port 8000 on `RAZOR-001`.
-- [ ] `POST /research/feedback` accepts the example batch and returns the
+- [x] `POST /research/feedback` accepts the example batch and returns the
       `research-feedback-ack` contract.
-- [ ] Replaying an identical batch reports `duplicates` and stores nothing
+- [x] Replaying an identical batch reports `duplicates` and stores nothing
       twice (unique index on `feedback_id` verified in Mongo).
-- [ ] An unknown reason code is accepted, stored verbatim, and flagged in
+- [x] An unknown reason code is accepted, stored verbatim, and flagged in
       `unknown_reasons`.
-- [ ] An invalid record is rejected individually with index + error; valid
+- [x] An invalid record is rejected individually with index + error; valid
       records in the same batch are accepted.
-- [ ] A `paper_id` absent from the corpus is stored and flagged, not rejected.
-- [ ] Records land append-only in `harness_feedback`; no API path updates or
+- [x] A `paper_id` absent from the corpus is stored and flagged, not rejected.
+- [x] Records land append-only in `harness_feedback`; no API path updates or
       deletes them.
-- [ ] Ingestion source is resolved and stored server-side for records whose
+- [x] Ingestion source is resolved and stored server-side for records whose
       `paper_id` is known.
-- [ ] The MCP adapter still discovers exactly five tools, all read-only and
+- [x] The MCP adapter still discovers exactly five tools, all read-only and
       non-destructive (the harness `health()` check still passes untouched).
-- [ ] Search/context/evidence responses are byte-identical before and after
+- [x] Search/context/evidence responses are byte-identical before and after
       feedback exists in the store (v1 changes no read behaviour).
 - [ ] The endpoint is not exposed outside the trusted LAN.
-- [ ] Owner can produce counts per reason × source × project from Mongo.
+- [x] Owner can produce counts per reason × source × project from Mongo.
+
+The unchecked items require verification from the harness computer and the
+owner's network perimeter; they cannot be proven by the service host alone.
 
 ## Failure semantics
 
