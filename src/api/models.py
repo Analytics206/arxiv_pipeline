@@ -42,26 +42,12 @@ def research_capabilities(version: str) -> ResearchCapabilities:
                 method="GET",
                 path="/research/search",
                 purpose=(
-                    "Find cited claims, source evidence, and implementation "
-                    "ideas using evaluated hybrid retrieval."
-                ),
-            ),
-            ResearchToolDescriptor(
-                name="search_paper_discovery",
-                method="GET",
-                path="/research/discovery/search",
-                purpose=(
-                    "Find metadata-only candidate papers by title and abstract "
-                    "with category and recency filters."
-                ),
-            ),
-            ResearchToolDescriptor(
-                name="search_federated_research",
-                method="GET",
-                path="/research/federated-search",
-                purpose=(
-                    "Search evidence-backed and metadata-only corpora in "
-                    "separate score and provenance tiers."
+                    "Search both complementary Qdrant collections, merge each "
+                    "paper with MongoDB metadata, and return one bounded, "
+                    "paper-centric result set with verified evidence kept "
+                    "distinct from metadata-only discovery leads. The response "
+                    "includes a request ID linked to an append-only evaluation "
+                    "trace."
                 ),
             ),
             ResearchToolDescriptor(

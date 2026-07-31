@@ -10,8 +10,10 @@ curated, PDF-derived research index:
 - `arxiv_discovery_current` contains one lean title/abstract point for each
   Kaggle paper whose versionless ID also exists in the curated MongoDB
   `papers` collection, and returns explicitly labeled `metadata_only` leads.
-- Federated search returns both tiers separately and removes metadata-only
-  duplicates when an evidence-backed result exists for the same paper.
+- The canonical `search_research` workflow searches both complementary
+  collections, merges matches by versionless paper ID, enriches them from both
+  MongoDB collections, and keeps evidence-backed material distinct from
+  metadata-only leads.
 
 The retained MongoDB corpus categories come only from the comma-separated
 `KAGGLE_RETAINED_CATEGORIES` value in `.env`. Other cleanup policy and safety
@@ -177,13 +179,17 @@ non-destructive rollback source for existing installations.
 
 ## Query and evaluation surfaces
 
-REST/OpenAPI and MCP expose:
+REST/OpenAPI and MCP expose one search surface: `search_research`. It returns a
+single ranked `papers` array built from the evidence and discovery collections.
+Each paper appears at most once. A paper found in both sources is returned as
+`evidence_backed`, retains its curated research items, and receives the richer
+metadata available from `papers` and `arxiv_kaggle`.
 
-- `search_research`: evidence-backed research only;
-- `search_paper_discovery`: broad metadata-only candidates;
-- `search_federated_research`: both tiers, kept separate.
+There are no separate discovery or federated endpoints. The response reports
+per-source status under `coverage.sources`, so clients can distinguish a full
+search from a useful partial result.
 
-Run the smoke evaluation after alias activation:
+Run the discovery-index smoke evaluation after alias activation:
 
 ```powershell
 python -m src.pipeline.evaluate_discovery `
@@ -191,5 +197,13 @@ python -m src.pipeline.evaluate_discovery `
   --output data/evaluations/arxiv_kaggle_smoke_v1.json
 ```
 
-The report includes recall at the requested limit, mean reciprocal rank,
-negative no-match rate, and latency.
+Then evaluate the complete paper-centric serving workflow:
+
+```powershell
+python -m src.pipeline.evaluate_curated_search `
+  --output data/evaluations/curated_research.json
+```
+
+Together, the reports cover discovery recall, reciprocal rank, negative
+filtering, unique paper IDs, token-budget compliance, trust-tier invariants,
+and participation by both complementary sources.

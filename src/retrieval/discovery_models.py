@@ -6,8 +6,6 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from src.retrieval.models import ResearchSearchResponse
-
 
 class DiscoveryContract(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -74,10 +72,3 @@ class DiscoverySearchResponse(DiscoveryContract):
     no_match_reason: str | None = None
     coverage: DiscoveryCorpusCoverage
     hits: list[DiscoverySearchHit]
-
-
-class FederatedResearchSearchResponse(DiscoveryContract):
-    contract: Literal["federated-research-search"] = "federated-research-search"
-    query: str
-    evidence_backed: ResearchSearchResponse
-    metadata_only: DiscoverySearchResponse

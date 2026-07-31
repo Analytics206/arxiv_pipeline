@@ -210,6 +210,7 @@ class QdrantResearchIndex:
         paper_id: str | None = None,
         kinds: Sequence[ResearchPointKind] | None = None,
         min_relevance: float | None = None,
+        query_vector: Sequence[float] | None = None,
     ) -> ResearchSearchResponse:
         effective_min_relevance = (
             self.default_min_relevance
@@ -224,6 +225,7 @@ class QdrantResearchIndex:
                 query,
                 limit=limit,
                 query_filter=query_filter,
+                query_vector=query_vector,
             )
         else:
             candidate_limit = min(
@@ -232,7 +234,11 @@ class QdrantResearchIndex:
             )
             result = self.client.query_points(
                 collection_name=self.collection_name,
-                query=self.embedder.embed_query(query),
+                query=(
+                    list(query_vector)
+                    if query_vector is not None
+                    else self.embedder.embed_query(query)
+                ),
                 query_filter=query_filter,
                 limit=candidate_limit,
                 with_payload=True,
@@ -287,6 +293,7 @@ class QdrantResearchIndex:
         *,
         limit: int,
         query_filter: models.Filter | None,
+        query_vector: Sequence[float] | None = None,
     ) -> list[Any]:
         candidate_limit = min(
             200,
@@ -300,7 +307,11 @@ class QdrantResearchIndex:
             collection_name=self.collection_name,
             prefetch=[
                 models.Prefetch(
-                    query=self.embedder.embed_query(query),
+                    query=(
+                        list(query_vector)
+                        if query_vector is not None
+                        else self.embedder.embed_query(query)
+                    ),
                     using=DENSE_VECTOR_NAME,
                     filter=query_filter,
                     limit=candidate_limit,

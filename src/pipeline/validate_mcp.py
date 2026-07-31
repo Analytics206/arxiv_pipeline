@@ -60,6 +60,21 @@ async def validate(url: str, paper_id: str) -> dict:
             package = package_result.structuredContent
             if not isinstance(package, dict):
                 raise RuntimeError("Context package did not return structured content")
+            paper_title = package.get("paper", {}).get("title")
+            search_result = await session.call_tool(
+                "search_research",
+                {
+                    "query": paper_title or "implementation evidence",
+                    "paper_id": paper_id,
+                    "limit": 3,
+                    "token_budget": 6000,
+                },
+            )
+            if search_result.isError:
+                raise RuntimeError(search_result.content[0].text)
+            search = search_result.structuredContent
+            if not isinstance(search, dict):
+                raise RuntimeError("Research search did not return structured content")
             evidence_items = package.get("analysis", {}).get("evidence", [])
             if not evidence_items:
                 raise RuntimeError("Context package did not include evidence")
@@ -81,6 +96,16 @@ async def validate(url: str, paper_id: str) -> dict:
     capabilities_payload = _resource_json(capabilities_resource)
     paper_payload = _resource_json(paper_resource)
     evidence_payload = _resource_json(evidence_resource)
+    search_papers = search.get("papers", [])
+    search_paper_ids = [
+        item.get("paper_id") for item in search_papers if isinstance(item, dict)
+    ]
+    search_sources = {
+        item.get("source")
+        for item in search.get("coverage", {}).get("sources", [])
+        if isinstance(item, dict)
+    }
+    search_budget = search.get("budget", {})
     all_read_only = all(
         tool.annotations is not None
         and tool.annotations.readOnlyHint is True
@@ -90,6 +115,31 @@ async def validate(url: str, paper_id: str) -> dict:
     checks = {
         "expected_tools": tool_names == EXPECTED_TOOLS,
         "all_tools_read_only": all_read_only,
+        "search_contract": search.get("contract") == "curated-research-results",
+        "search_trace_identifiers": (
+            str(search.get("request_id", "")).startswith("rs_")
+            and bool(search.get("generated_at"))
+        ),
+        "search_unique_papers": (
+            len(search_paper_ids) == len(set(search_paper_ids))
+            and all(search_paper_ids)
+        ),
+        "search_requested_paper": package["paper"]["paper_id"] in search_paper_ids,
+        "search_complementary_sources": search_sources == {"evidence", "discovery"},
+        "search_full_coverage": search.get("coverage", {}).get("partial") is False,
+        "search_budget": (
+            search_budget.get("estimated_tokens", 6001)
+            <= search_budget.get("requested_tokens", 0)
+            == 6000
+        ),
+        "search_tiers": all(
+            paper.get("tier") in {"evidence_backed", "metadata_only"}
+            and (
+                paper.get("tier") != "metadata_only" or not paper.get("research_items")
+            )
+            for paper in search_papers
+            if isinstance(paper, dict)
+        ),
         "context_contract": package.get("contract") == "agent-context-package",
         "evidence_contract": evidence.get("contract") == "research-evidence",
         "capabilities_resource": (
@@ -115,6 +165,15 @@ async def validate(url: str, paper_id: str) -> dict:
             template.uriTemplate for template in templates_result.resourceTemplates
         ),
         "paper_id": package["paper"]["paper_id"],
+        "search_request_id": search.get("request_id"),
+        "search_status": search.get("result_status"),
+        "search_paper_ids": search_paper_ids,
+        "search_source_status": {
+            source.get("source"): source.get("status")
+            for source in search.get("coverage", {}).get("sources", [])
+            if isinstance(source, dict)
+        },
+        "search_estimated_tokens": search_budget.get("estimated_tokens"),
         "context_profile": package["budget"]["profile"],
         "context_requested_tokens": package["budget"]["requested_tokens"],
         "context_estimated_tokens": package["budget"]["estimated_tokens"],

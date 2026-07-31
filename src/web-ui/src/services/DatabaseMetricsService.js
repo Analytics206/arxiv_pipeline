@@ -56,8 +56,7 @@ export const checkMongoDBConnection = async () => {
 // Check Qdrant connection
 export const checkQdrantConnection = async () => {
   try {
-    console.log(`Attempting to connect to Qdrant API at: ${apiConfig.API_BASE_URL}/metrics/qdrant/test-connection`);
-    const response = await fetch(`${apiConfig.API_BASE_URL}/metrics/qdrant/test-connection`);
+    const response = await fetch(`${apiConfig.API_BASE_URL}/metrics/qdrant/status`);
     
     if (!response.ok) {
       console.error(`Qdrant API not reachable. Status: ${response.status}, StatusText: ${response.statusText}`);
@@ -65,14 +64,11 @@ export const checkQdrantConnection = async () => {
     }
     
     const data = await response.json();
-    console.log('Qdrant connection response:', data);
-    
-    // Return connected true only if status is success
-    const isConnected = data.status === 'success';
+    const isConnected = data.status === 'healthy' || data.status === 'degraded';
     return { 
       connected: isConnected,
-      message: data.message || '',
-      status: data.status || 'unknown'
+      status: data.status || 'unknown',
+      collections: data.collections || [],
     };
   } catch (error) {
     console.error('Qdrant connection check failed:', error);
@@ -88,8 +84,7 @@ export const getQdrantMetrics = async (isConnected) => {
   }
   
   try {
-    console.log(`Fetching Qdrant metrics from: ${apiConfig.API_BASE_URL}/metrics/qdrant/paper-stats`);
-    const response = await fetch(`${apiConfig.API_BASE_URL}/metrics/qdrant/paper-stats`);
+    const response = await fetch(`${apiConfig.API_BASE_URL}/metrics/qdrant/status`);
     
     if (!response.ok) {
       console.error(`Failed to fetch Qdrant metrics. Status: ${response.status}, StatusText: ${response.statusText}`);
@@ -97,12 +92,12 @@ export const getQdrantMetrics = async (isConnected) => {
     }
     
     const stats = await response.json();
-    console.log('Received Qdrant metrics:', stats);
-    
+    const evidence = stats.collections.find((item) => item.role === 'evidence');
+    const discovery = stats.collections.find((item) => item.role === 'discovery');
     return {
-      papers: stats.papers || 0,
-      authors: stats.authors || 0,
-      categories: stats.categories || 0
+      papers: discovery?.points || 0,
+      authors: evidence?.points || 0,
+      categories: stats.collections.length,
     };
   } catch (error) {
     console.error('Failed to fetch Qdrant metrics:', error);

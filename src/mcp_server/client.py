@@ -36,7 +36,10 @@ class ResearchApiClient:
             base_url=self.base_url,
             timeout=timeout_seconds,
             transport=transport,
-            headers={"User-Agent": "arxiv-research-mcp/0.9.0"},
+            headers={
+                "User-Agent": "arxiv-research-mcp/0.9.0",
+                "X-Research-Client": "mcp",
+            },
         )
 
     async def __aenter__(self) -> "ResearchApiClient":
@@ -83,9 +86,10 @@ class ResearchApiClient:
 def resolve_research_api_url(explicit_url: str | None = None) -> str:
     """Resolve and validate the REST service used by the MCP adapter."""
 
-    value = explicit_url or os.getenv(
-        "RESEARCH_API_URL",
-        DEFAULT_RESEARCH_API_URL,
+    value = (
+        explicit_url
+        if explicit_url is not None
+        else os.getenv("RESEARCH_API_URL") or DEFAULT_RESEARCH_API_URL
     )
     normalized = value.strip().rstrip("/")
     parsed = urlparse(normalized)

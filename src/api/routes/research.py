@@ -3,19 +3,20 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from collections.abc import Iterator
-from typing import Annotated
+from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 
-from src.analysis.identity import normalize_arxiv_id
 from src.analysis.models import EvidenceResource
 from src.api.models import ResearchCapabilities, research_capabilities
 from src.api.routes.papers import Repository
-from src.retrieval.discovery_models import (
-    DiscoverySearchResponse,
-    FederatedResearchSearchResponse,
+from src.retrieval.curated_models import CuratedResearchSearchResponse
+from src.retrieval.curated_service import (
+    CuratedResearchService,
+    CuratedSearchUnavailableError,
 )
 from src.retrieval.discovery_repository import KaggleDiscoveryRepository
 from src.retrieval.factory import (
@@ -23,12 +24,14 @@ from src.retrieval.factory import (
     create_research_index,
     load_project_config,
 )
-from src.retrieval.models import ResearchPointKind, ResearchSearchResponse
+from src.retrieval.models import ResearchPointKind
 from src.retrieval.qdrant_discovery import QdrantDiscoveryIndex
 from src.retrieval.qdrant_index import QdrantResearchIndex
+from src.retrieval.search_history import MongoSearchHistoryRepository
 
 router = APIRouter()
 SERVICE_VERSION = "0.9.0"
+logger = logging.getLogger(__name__)
 
 
 def get_research_index() -> QdrantResearchIndex:
@@ -104,16 +107,23 @@ def get_evidence(
 
 @router.get(
     "/search",
-    response_model=ResearchSearchResponse,
+    response_model=CuratedResearchSearchResponse,
     operation_id="search_research",
-    summary="Search curated claims, evidence, and implementation ideas",
+    summary="Search and curate both complementary research collections",
 )
 def search_research(
-    index: ResearchIndex,
+    request: Request,
+    response: Response,
+    research_index: ResearchIndex,
+    discovery_index: DiscoveryIndex,
+    discovery_repository: DiscoveryRepository,
     query: Annotated[str, Query(min_length=3, max_length=2000)],
     limit: Annotated[int, Query(ge=1, le=50)] = 8,
     paper_id: Annotated[str | None, Query(min_length=3)] = None,
     kind: Annotated[list[ResearchPointKind] | None, Query()] = None,
+    category: Annotated[list[str] | None, Query()] = None,
+    start_year: Annotated[int | None, Query(ge=1990, le=2100)] = None,
+    end_year: Annotated[int | None, Query(ge=1990, le=2100)] = None,
     min_relevance: Annotated[
         float | None,
         Query(
@@ -125,148 +135,118 @@ def search_research(
             ),
         ),
     ] = None,
-) -> ResearchSearchResponse:
-    try:
-        normalized_paper_id = normalize_arxiv_id(paper_id).base_id if paper_id else None
-        return index.search(
-            query,
-            limit=limit,
-            paper_id=normalized_paper_id,
-            kinds=kind,
-            min_relevance=min_relevance,
-        )
-    except ValueError as error:
-        raise HTTPException(status_code=422, detail=str(error)) from error
-    except Exception as error:
-        raise HTTPException(
-            status_code=503,
-            detail=f"Research index unavailable: {error}",
-        ) from error
-
-
-@router.get(
-    "/discovery/search",
-    response_model=DiscoverySearchResponse,
-    operation_id="search_paper_discovery",
-    summary="Search metadata-only title and abstract paper discovery",
-)
-def search_paper_discovery(
-    index: DiscoveryIndex,
-    repository: DiscoveryRepository,
-    query: Annotated[str, Query(min_length=3, max_length=2000)],
-    limit: Annotated[int, Query(ge=1, le=50)] = 10,
-    category: Annotated[list[str] | None, Query()] = None,
-    start_year: Annotated[int | None, Query(ge=1990, le=2100)] = None,
-    end_year: Annotated[int | None, Query(ge=1990, le=2100)] = None,
-    min_relevance: Annotated[float | None, Query(ge=0, le=1)] = None,
-) -> DiscoverySearchResponse:
+    evidence_per_paper: Annotated[int, Query(ge=1, le=8)] = 3,
+    token_budget: Annotated[int, Query(ge=2000, le=32768)] = 12000,
+) -> CuratedResearchSearchResponse:
     if start_year is not None and end_year is not None and start_year > end_year:
         raise HTTPException(
             status_code=422,
             detail="start_year cannot be later than end_year",
         )
     try:
-        response = index.search(
+        config = load_project_config()
+        settings = config.get("research_search", {})
+        history_recorder = _create_history_recorder(
+            settings=settings,
+            database=discovery_repository.db,
+        )
+        service = CuratedResearchService(
+            research_index=research_index,
+            discovery_index=discovery_index,
+            metadata_repository=discovery_repository,
+            candidate_multiplier=int(settings.get("candidate_multiplier", 6)),
+            candidate_minimum=int(settings.get("candidate_minimum", 50)),
+            evidence_weight=float(settings.get("evidence_weight", 1.0)),
+            discovery_weight=float(settings.get("discovery_weight", 1.0)),
+            rrf_k=int(settings.get("rrf_k", 60)),
+            default_evidence_items_per_paper=int(
+                settings.get("evidence_items_per_paper", 3)
+            ),
+            default_token_budget=int(settings.get("token_budget", 12000)),
+            maximum_abstract_chars=int(settings.get("maximum_abstract_chars", 2400)),
+            history_recorder=history_recorder,
+        )
+        result = service.search(
             query,
             limit=limit,
+            paper_id=paper_id,
+            kinds=kind,
             categories=category,
             start_year=start_year,
             end_year=end_year,
             min_relevance=min_relevance,
+            evidence_items_per_paper=evidence_per_paper,
+            token_budget=token_budget,
+            client=_client_context(request),
         )
-        return repository.hydrate(response)
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["X-Research-Request-ID"] = result.request_id
+        return result
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+    except CuratedSearchUnavailableError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
     except Exception as error:
         raise HTTPException(
             status_code=503,
-            detail=f"Discovery index unavailable: {error}",
+            detail=f"Research search unavailable: {error}",
         ) from error
 
 
-@router.get(
-    "/federated-search",
-    response_model=FederatedResearchSearchResponse,
-    operation_id="search_federated_research",
-    summary="Search evidence-backed and metadata-only corpora separately",
-)
-def search_federated_research(
-    research_index: ResearchIndex,
-    discovery_index: DiscoveryIndex,
-    discovery_repository: DiscoveryRepository,
-    query: Annotated[str, Query(min_length=3, max_length=2000)],
-    limit: Annotated[int, Query(ge=1, le=50)] = 8,
-    category: Annotated[list[str] | None, Query()] = None,
-    start_year: Annotated[int | None, Query(ge=1990, le=2100)] = None,
-    end_year: Annotated[int | None, Query(ge=1990, le=2100)] = None,
-    min_relevance: Annotated[float | None, Query(ge=0, le=1)] = None,
-) -> FederatedResearchSearchResponse:
-    if start_year is not None and end_year is not None and start_year > end_year:
-        raise HTTPException(
-            status_code=422,
-            detail="start_year cannot be later than end_year",
-        )
-    try:
-        evidence = research_index.search(
-            query,
-            limit=limit,
-            min_relevance=min_relevance,
-        )
-        discovery = discovery_repository.hydrate(
-            discovery_index.search(
-                query,
-                limit=limit,
-                categories=category,
-                start_year=start_year,
-                end_year=end_year,
-                min_relevance=min_relevance,
-            )
-        )
-        return federate_search_results(
-            query=query,
-            evidence=evidence,
-            discovery=discovery,
-        )
-    except ValueError as error:
-        raise HTTPException(status_code=422, detail=str(error)) from error
-    except Exception as error:
-        raise HTTPException(
-            status_code=503,
-            detail=f"Federated search unavailable: {error}",
-        ) from error
-
-
-def federate_search_results(
+def _create_history_recorder(
     *,
-    query: str,
-    evidence: ResearchSearchResponse,
-    discovery: DiscoverySearchResponse,
-) -> FederatedResearchSearchResponse:
-    """Deduplicate by paper while preserving independent score semantics."""
+    settings: dict[str, Any],
+    database: Any,
+) -> MongoSearchHistoryRepository | None:
+    history = settings.get("history", {})
+    configured = history.get("enabled", True)
+    enabled = _environment_bool(
+        "RESEARCH_SEARCH_HISTORY_ENABLED",
+        default=bool(configured),
+    )
+    if not enabled:
+        return None
+    try:
+        return MongoSearchHistoryRepository(
+            database=database,
+            runs_collection=os.getenv(
+                "MONGO_SEARCH_RUNS_COLLECTION",
+                str(history.get("runs_collection") or "research_search_runs"),
+            ),
+            source_pulls_collection=os.getenv(
+                "MONGO_SEARCH_PULLS_COLLECTION",
+                str(
+                    history.get("source_pulls_collection")
+                    or "research_search_source_pulls"
+                ),
+            ),
+            outputs_collection=os.getenv(
+                "MONGO_SEARCH_OUTPUTS_COLLECTION",
+                str(history.get("outputs_collection") or "research_search_outputs"),
+            ),
+        )
+    except Exception:
+        logger.exception("Research search history repository is unavailable")
+        return None
 
-    evidence_papers = {hit.paper_id for hit in evidence.hits}
-    metadata_hits = [
-        hit for hit in discovery.hits if hit.paper_id not in evidence_papers
-    ]
-    metadata_response = discovery.model_copy(
-        update={
-            "hits": metadata_hits,
-            "coverage": discovery.coverage.model_copy(
-                update={"returned_hits": len(metadata_hits)}
-            ),
-            "result_status": "matches" if metadata_hits else "no_match",
-            "no_match_reason": (
-                discovery.no_match_reason
-                if metadata_hits or not discovery.hits
-                else (
-                    "All metadata-only hits were removed because the same "
-                    "papers had evidence-backed results."
-                )
-            ),
-        }
-    )
-    return FederatedResearchSearchResponse(
-        query=query,
-        evidence_backed=evidence,
-        metadata_only=metadata_response,
-    )
+
+def _client_context(request: Request) -> dict[str, str]:
+    user_agent = request.headers.get("user-agent", "")
+    declared = request.headers.get("x-research-client", "").strip()
+    if declared:
+        channel = declared[:64]
+    elif user_agent.startswith("arxiv-research-mcp/"):
+        channel = "mcp"
+    else:
+        channel = "rest"
+    return {
+        "channel": channel,
+        "user_agent": user_agent[:512],
+    }
+
+
+def _environment_bool(name: str, *, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}

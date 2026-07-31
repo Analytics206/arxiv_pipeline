@@ -250,10 +250,12 @@ class QdrantDiscoveryIndex:
         query: str,
         *,
         limit: int = 10,
+        paper_id: str | None = None,
         categories: Sequence[str] | None = None,
         start_year: int | None = None,
         end_year: int | None = None,
         min_relevance: float | None = None,
+        query_vector: Sequence[float] | None = None,
     ) -> DiscoverySearchResponse:
         if limit < 1:
             raise ValueError("limit must be positive")
@@ -267,6 +269,7 @@ class QdrantDiscoveryIndex:
         if not 0 <= effective_minimum <= 1:
             raise ValueError("min_relevance must be between 0 and 1")
         query_filter = _discovery_filter(
+            paper_id=paper_id,
             categories=categories,
             start_year=start_year,
             end_year=end_year,
@@ -283,7 +286,11 @@ class QdrantDiscoveryIndex:
             collection_name=self.collection_name,
             prefetch=[
                 models.Prefetch(
-                    query=self.embedder.embed_query(query),
+                    query=(
+                        list(query_vector)
+                        if query_vector is not None
+                        else self.embedder.embed_query(query)
+                    ),
                     using=DENSE_VECTOR_NAME,
                     filter=query_filter,
                     limit=candidate_limit,
@@ -434,11 +441,19 @@ def _sparse_vector(text: str) -> models.SparseVector:
 
 def _discovery_filter(
     *,
+    paper_id: str | None,
     categories: Sequence[str] | None,
     start_year: int | None,
     end_year: int | None,
 ) -> models.Filter | None:
     conditions: list[Any] = []
+    if paper_id:
+        conditions.append(
+            models.FieldCondition(
+                key="paper_id",
+                match=models.MatchValue(value=normalize_arxiv_id(paper_id).base_id),
+            )
+        )
     selected_categories = [
         category.strip()
         for category in categories or []

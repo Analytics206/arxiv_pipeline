@@ -26,8 +26,7 @@ class FakeCollection:
 
     def find(self, query, projection):
         return FakeCursor(
-            self._project(document, projection)
-            for document in self._matching(query)
+            self._project(document, projection) for document in self._matching(query)
         )
 
     def _matching(self, query):
@@ -42,17 +41,13 @@ class FakeCollection:
             ]
         selected = set(condition["$in"])
         return [
-            document
-            for document in self.documents
-            if document.get(field) in selected
+            document for document in self.documents if document.get(field) in selected
         ]
 
     @staticmethod
     def _project(document, projection):
         return {
-            field: value
-            for field, value in document.items()
-            if projection.get(field)
+            field: value for field, value in document.items() if projection.get(field)
         }
 
 
@@ -86,10 +81,7 @@ def make_repository(paper_ids):
             kaggle_document("2607.00002"),
             kaggle_document("2607.00003"),
         ],
-        papers=[
-            {"base_arxiv_id": paper_id}
-            for paper_id in paper_ids
-        ],
+        papers=[{"base_arxiv_id": paper_id} for paper_id in paper_ids],
     )
     return KaggleDiscoveryRepository(database=database)
 
@@ -136,3 +128,41 @@ def test_resume_cursor_applies_to_the_intersection_not_all_kaggle_documents():
     assert [[document["id"] for document in batch] for batch in batches] == [
         ["2607.00003"]
     ]
+
+
+def test_metadata_hydration_merges_both_mongodb_collections():
+    database = FakeDatabase(
+        kaggle=[
+            {
+                **kaggle_document("2607.00001"),
+                "authors": "Ada Lovelace and Grace Hopper",
+                "doi": "10.1234/example",
+                "license": "https://example.test/license",
+                "latest_version": "v2",
+                "primary_category": "cs.AI",
+            }
+        ],
+        papers=[
+            {
+                "base_arxiv_id": "2607.00001",
+                "title": "Canonical title",
+                "summary": "Canonical abstract",
+                "authors": ["Ada Lovelace", "Grace Hopper"],
+                "categories": ["cs.AI"],
+                "published": "2026-07-01T00:00:00Z",
+                "updated": "2026-07-30T00:00:00Z",
+                "arxiv_url": "https://arxiv.org/abs/2607.00001v2",
+                "pdf_url": "https://arxiv.org/pdf/2607.00001v2",
+            }
+        ],
+    )
+    repository = KaggleDiscoveryRepository(database=database)
+
+    metadata = repository.hydrate_paper_metadata(["2607.00001"])["2607.00001"]
+
+    assert metadata.metadata_sources == ["papers", "arxiv_kaggle"]
+    assert metadata.authors == ["Ada Lovelace", "Grace Hopper"]
+    assert metadata.doi == "10.1234/example"
+    assert metadata.latest_version == "v2"
+    assert metadata.abstract == "Abstract"
+    assert metadata.arxiv_url.endswith("2607.00001v2")

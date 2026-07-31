@@ -11,6 +11,7 @@ from typing import Any
 from pymongo import ASCENDING, MongoClient
 
 from src.analysis.identity import normalize_arxiv_id
+from src.retrieval.curated_models import PaperSearchMetadata
 from src.retrieval.discovery_models import DiscoverySearchHit, DiscoverySearchResponse
 
 _MATCH_POLICY_VERSION = "papers-base-id-intersection-v1"
@@ -183,8 +184,7 @@ class KaggleDiscoveryRepository:
                 self.collection.find(
                     {"id": {"$in": list(selected_ids)}},
                     projection,
-                )
-                .sort("id", ASCENDING)
+                ).sort("id", ASCENDING)
             )
             if len(batch) != len(selected_ids):
                 raise RuntimeError(
@@ -235,6 +235,110 @@ class KaggleDiscoveryRepository:
             )
         return response.model_copy(update={"hits": hydrated})
 
+    def hydrate_paper_metadata(
+        self,
+        paper_ids: list[str],
+    ) -> dict[str, PaperSearchMetadata]:
+        """Merge canonical API-paper fields with richer Kaggle metadata."""
+
+        normalized_ids = list(
+            dict.fromkeys(
+                normalize_arxiv_id(paper_id).base_id for paper_id in paper_ids
+            )
+        )
+        if not normalized_ids:
+            return {}
+        paper_documents = {
+            str(document[self.eligibility_id_field]): document
+            for document in self.eligibility_collection.find(
+                {self.eligibility_id_field: {"$in": normalized_ids}},
+                {
+                    "_id": 0,
+                    self.eligibility_id_field: 1,
+                    "title": 1,
+                    "summary": 1,
+                    "authors": 1,
+                    "categories": 1,
+                    "published": 1,
+                    "updated": 1,
+                    "arxiv_version": 1,
+                    "arxiv_url": 1,
+                    "pdf_url": 1,
+                },
+            )
+        }
+        kaggle_documents = {
+            str(document["id"]): document
+            for document in self.collection.find(
+                {"id": {"$in": normalized_ids}},
+                {
+                    "_id": 0,
+                    "id": 1,
+                    "title": 1,
+                    "abstract": 1,
+                    "authors": 1,
+                    "category_codes": 1,
+                    "categories": 1,
+                    "primary_category": 1,
+                    "update_date": 1,
+                    "update_year": 1,
+                    "latest_version": 1,
+                    "doi": 1,
+                    "journal-ref": 1,
+                    "license": 1,
+                    "comments": 1,
+                    "corpus_run_id": 1,
+                },
+            )
+        }
+        hydrated: dict[str, PaperSearchMetadata] = {}
+        for paper_id in normalized_ids:
+            paper = paper_documents.get(paper_id, {})
+            kaggle = kaggle_documents.get(paper_id, {})
+            if not paper and not kaggle:
+                continue
+            categories = _metadata_categories(paper, kaggle)
+            latest_version = kaggle.get("latest_version") or paper.get("arxiv_version")
+            sources = []
+            if paper:
+                sources.append("papers")
+            if kaggle:
+                sources.append("arxiv_kaggle")
+            hydrated[paper_id] = PaperSearchMetadata(
+                paper_id=paper_id,
+                title=str(kaggle.get("title") or paper.get("title") or paper_id),
+                abstract=_clean_text(kaggle.get("abstract") or paper.get("summary")),
+                authors=_metadata_authors(
+                    paper.get("authors") or kaggle.get("authors")
+                ),
+                categories=categories,
+                primary_category=(
+                    str(kaggle["primary_category"])
+                    if kaggle.get("primary_category")
+                    else (categories[0] if categories else None)
+                ),
+                published=_string_or_none(paper.get("published")),
+                updated=_string_or_none(paper.get("updated")),
+                update_date=_string_or_none(kaggle.get("update_date")),
+                update_year=_metadata_year(paper, kaggle),
+                latest_version=(
+                    str(latest_version) if latest_version is not None else None
+                ),
+                doi=_string_or_none(kaggle.get("doi")),
+                journal_ref=_string_or_none(kaggle.get("journal-ref")),
+                license=_string_or_none(kaggle.get("license")),
+                comments=_string_or_none(kaggle.get("comments")),
+                arxiv_url=str(
+                    paper.get("arxiv_url") or f"https://arxiv.org/abs/{paper_id}"
+                ),
+                pdf_url=str(
+                    paper.get("pdf_url") or f"https://arxiv.org/pdf/{paper_id}"
+                ),
+                corpus_run_id=_string_or_none(kaggle.get("corpus_run_id")),
+                metadata_sources=sources,
+            )
+        return hydrated
+
     def close(self) -> None:
         if self._client is not None:
             self._client.close()
@@ -244,3 +348,54 @@ class KaggleDiscoveryRepository:
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self.close()
+
+
+def _clean_text(value: Any) -> str | None:
+    text = " ".join(str(value or "").split())
+    return text or None
+
+
+def _string_or_none(value: Any) -> str | None:
+    return str(value) if value is not None and str(value).strip() else None
+
+
+def _metadata_authors(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()]
+    text = _clean_text(value)
+    if not text:
+        return []
+    return [item.strip() for item in text.split(" and ") if item.strip()]
+
+
+def _metadata_categories(
+    paper: dict[str, Any],
+    kaggle: dict[str, Any],
+) -> list[str]:
+    raw = kaggle.get("category_codes") or paper.get("categories")
+    if isinstance(raw, list):
+        return list(
+            dict.fromkeys(str(item).strip() for item in raw if str(item).strip())
+        )
+    text = _clean_text(raw or kaggle.get("categories"))
+    return list(dict.fromkeys(text.split())) if text else []
+
+
+def _metadata_year(
+    paper: dict[str, Any],
+    kaggle: dict[str, Any],
+) -> int | None:
+    if kaggle.get("update_year") is not None:
+        try:
+            return int(kaggle["update_year"])
+        except (TypeError, ValueError):
+            pass
+    for value in (
+        kaggle.get("update_date"),
+        paper.get("updated"),
+        paper.get("published"),
+    ):
+        text = str(value or "")
+        if len(text) >= 4 and text[:4].isdigit():
+            return int(text[:4])
+    return None

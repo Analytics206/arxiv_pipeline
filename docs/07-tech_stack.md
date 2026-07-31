@@ -149,14 +149,15 @@ vulnerabilities.
 | --- | --- |
 | Default | `mongodb`, `qdrant`, `api`, `web-ui` |
 | `manual` | `app`, `sync-mongodb`, `neo4j`, `sync-neo4j`, Jupyter, Kafka utilities |
-| `legacy` | `legacy-runtime`, `sync-bertopic`, `sync-top2vec`, historical `sync-qdrant` |
+| `legacy` | `legacy-runtime`, `sync-bertopic`, `sync-top2vec` |
 
 ## Retired embedding stack
 
 The optional `legacy` extra contains only BERTopic, Top2Vec,
 sentence-transformers, the old LangChain embedding adapters, and their
 clustering dependencies. It exists for `sync-bertopic`, `sync-top2vec`, and the
-historical `sync-qdrant` process.
+archived topic-modeling experiments. The historical PDF-chunk Qdrant sync is
+not exposed as a Compose service and is not part of the active retrieval path.
 
 PyTorch, Transformers, NumPy/pandas, Jupyter, evaluation metrics, Kaggle tools,
 PubMed support, Kafka, monitoring, and other project utilities are normal

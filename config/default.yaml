@@ -61,47 +61,28 @@ neo4j:
   user: "neo4j"
   password: "password"
 
-# Qdrant settings
+# Shared Qdrant service. The canonical serving path owns two complementary
+# collections through research_index and discovery_index below; the retired
+# arxiv_papers PDF-vector collection is not created or queried.
 qdrant:
   url: "http://qdrant:6333"
   url_local: "http://localhost:6333"
-  collection_name: "arxiv_papers"
-  vector_size: 768  # For sentence-transformers models
-  # Categories to prioritize for vector storage - these will be processed into Qdrant
-  process_categories: # used in sync_qdrant.py
-    - "cs.AI"
-    # - "cs.CV" 
-    # - "cs.LG"
-  papers_per_category: 9 # Maximum number of papers to process into vectors per category (0 for unlimited)
-  default_pdf_path: "data/pdfs" # Portable project-local PDF storage
-  gpu_enabled: false # Disable GPU for vector operations
-  gpu_device: 1 # Use the second GPU (index 1)
-  tracking:
-    enabled: true # Whether to track processed PDFs
-    collection_name: "vector_processed_pdfs" # MongoDB collection to store tracking information
-    sync_with_qdrant: true # Whether to sync tracking with actual Qdrant contents
 
-# Qdrant Paper Summary Vector settings
-paper_summaries:
-  enabled: true
-  qdrant:
-    collection_name: "papers_summary" # Name of the Qdrant collection for paper summaries
-    vector_size: 768  # For sentence-transformers models
-  # Categories to prioritize for summary vector processing
-  process_categories: # used in sync_summary_vectors.py
-    - "cs.AI"
-    # - "cs.LG"
-  papers_per_category: 10 # Maximum number of papers to process into summary vectors per category (0 for unlimited)
-  date_filter:
-    enabled: true         # Set to false to disable date filtering
-    start_date: "2026-01-01" # Process papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2026-03-31"   # Process papers published on or before this date (format: YYYY-MM-DD)
-    sort_by_date: true    # Sort MongoDB query by published date
-  # Tracking settings for processed summaries
-  tracking:
-    enabled: true # Whether to track processed summaries
-    collection_name: "vector_processed_summary" # MongoDB collection to store tracking information
-    sync_with_qdrant: true # Whether to sync tracking with actual Qdrant contents
+# One paper-centric serving policy over both complementary Qdrant collections.
+research_search:
+  candidate_multiplier: 6
+  candidate_minimum: 50
+  evidence_weight: 1.0
+  discovery_weight: 1.0
+  rrf_k: 60
+  evidence_items_per_paper: 3
+  token_budget: 12000
+  maximum_abstract_chars: 2400
+  history:
+    enabled: true
+    runs_collection: "research_search_runs"
+    source_pulls_collection: "research_search_source_pulls"
+    outputs_collection: "research_search_outputs"
 
 # ArXiv API settings 
 arxiv:

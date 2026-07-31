@@ -1,0 +1,37 @@
+{
+  "suite_id": "curated-research",
+  "description": "Paper-level fusion checks across the complementary evidence and discovery collections.",
+  "cases": [
+    {
+      "case_id": "paper-replication",
+      "query": "Coding-agents can replicate scientific machine learning papers",
+      "expected_paper_ids": ["2607.02134"],
+      "limit": 8
+    },
+    {
+      "case_id": "openforge-harness-training",
+      "query": "How can harness-native coding agents record trajectories for reinforcement learning?",
+      "expected_paper_ids": ["2607.21557"],
+      "limit": 8
+    },
+    {
+      "case_id": "quality-diversity-ideas",
+      "query": "agentic quality diversity search for research idea generation",
+      "expected_paper_ids": ["2607.22375"],
+      "limit": 8
+    },
+    {
+      "case_id": "metadata-scientific-curation",
+      "query": "Building Agent Harnesses for Scientific Curation from Multimodal Sources",
+      "expected_paper_ids": ["2606.21005"],
+      "limit": 8
+    },
+    {
+      "case_id": "future-empty-window",
+      "query": "machine learning",
+      "case_type": "negative",
+      "start_year": 2100,
+      "limit": 8
+    }
+  ]
+}

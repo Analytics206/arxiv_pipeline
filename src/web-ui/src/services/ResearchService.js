@@ -1,7 +1,11 @@
 import apiConfig from '../config/api-config';
 
 const requestJson = async (path) => {
-  const response = await fetch(`${apiConfig.API_BASE_URL}${path}`);
+  const response = await fetch(`${apiConfig.API_BASE_URL}${path}`, {
+    headers: {
+      'X-Research-Client': 'web-ui',
+    },
+  });
   let payload = null;
   try {
     payload = await response.json();
@@ -34,13 +38,23 @@ export const searchResearch = ({
   limit = 8,
   paperId = '',
   kind = '',
+  categories = [],
+  startYear = null,
+  endYear = null,
+  evidencePerPaper = 3,
+  tokenBudget = 12000,
 }) => {
   const params = new URLSearchParams({
     query,
     limit: String(limit),
+    evidence_per_paper: String(evidencePerPaper),
+    token_budget: String(tokenBudget),
   });
   if (paperId) params.set('paper_id', paperId);
   if (kind) params.append('kind', kind);
+  categories.forEach((category) => params.append('category', category));
+  if (startYear) params.set('start_year', String(startYear));
+  if (endYear) params.set('end_year', String(endYear));
   return requestJson(`/research/search?${params.toString()}`);
 };
 

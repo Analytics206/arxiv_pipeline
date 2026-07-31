@@ -184,7 +184,9 @@ function ResearchWorkspace() {
               <h2>Results</h2>
             </div>
             {results && (
-              <span>{results.hits.length} of {results.limit} requested</span>
+              <span>
+                {results.papers.length} of {results.budget.requested_papers} requested
+              </span>
             )}
           </div>
 
@@ -198,49 +200,52 @@ function ResearchWorkspace() {
             </div>
           )}
 
-          {results?.hits.length === 0 && (
+          {results?.papers.length === 0 && (
             <div className="empty-state">
-              <strong>No curated result matched.</strong>
+              <strong>No research paper matched.</strong>
               <p>Try a broader question or remove the paper/type filter.</p>
             </div>
           )}
 
           <div className="result-list">
-            {results?.hits.map((hit, index) => (
-              <article className="result-card" key={hit.point_id}>
+            {results?.papers.map((paper) => (
+              <article className="result-card" key={paper.paper_id}>
                 <div className="result-meta">
-                  <span className={`kind-pill kind-${hit.kind}`}>
-                    {KIND_LABELS[hit.kind] || hit.kind}
+                  <span className={`kind-pill kind-${paper.tier}`}>
+                    {paper.tier === 'evidence_backed'
+                      ? 'Evidence backed'
+                      : 'Metadata lead'}
                   </span>
-                  <span>
-                    {results.retrieval_mode === 'hybrid'
-                      ? `hybrid rank ${index + 1}`
-                      : `${Math.round(hit.score * 100)}% match`}
-                  </span>
-                  <span>{hit.pages.length ? `p. ${hit.pages.join(', ')}` : ''}</span>
+                  <span>paper rank {paper.rank}</span>
+                  <span>{paper.metadata.categories.slice(0, 3).join(', ')}</span>
                 </div>
-                <h3>{hit.title}</h3>
-                <p className="result-text">{hit.text}</p>
-                {hit.evidence?.length > 0 && (
-                  <div className="evidence-preview">
-                    <span>Verified source</span>
+                <h3>{paper.metadata.title}</h3>
+                {paper.metadata.abstract && (
+                  <p className="result-text">{paper.metadata.abstract}</p>
+                )}
+                {paper.research_items.map((item) => (
+                  <div className="evidence-preview" key={item.point_id}>
+                    <span>{KIND_LABELS[item.kind] || item.kind}</span>
+                    <p>{item.text}</p>
                     <blockquote>
-                      “{hit.evidence[0].quote}”
-                      <small>Page {hit.evidence[0].page}</small>
+                      “{item.evidence[0].quote}”
+                      <small>Page {item.evidence[0].page}</small>
                     </blockquote>
                   </div>
-                )}
+                ))}
                 <div className="result-actions">
-                  <button
-                    type="button"
-                    onClick={() => openContext(hit.paper_id)}
-                  >
-                    Open paper context
-                  </button>
+                  {paper.tier === 'evidence_backed' && (
+                    <button
+                      type="button"
+                      onClick={() => openContext(paper.paper_id)}
+                    >
+                      Open paper context
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="secondary-button"
-                    onClick={() => copyResource(hit.resource_uri)}
+                    onClick={() => copyResource(paper.resource_uri)}
                   >
                     Copy resource URI
                   </button>

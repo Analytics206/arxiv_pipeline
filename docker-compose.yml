@@ -33,10 +33,8 @@ services:
       - MONGO_CONNECTION_STRING=mongodb://mongodb:27017/
       - MONGO_DB=arxiv_papers
       - MONGO_COLLECTION=papers
-      - MONGO_TRACKING_COLLECTION=vector_processed_pdfs
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
-      - QDRANT_COLLECTION=arxiv_papers
       - NEO4J_URI=bolt://neo4j:7687
       - NEO4J_USER=neo4j
       - NEO4J_PASSWORD=password
@@ -45,6 +43,10 @@ services:
       - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen3.5:4b}
       - OLLAMA_EMBEDDING_MODEL=${OLLAMA_EMBEDDING_MODEL:-mxbai-embed-large:latest}
       - QDRANT_RESEARCH_COLLECTION=${QDRANT_RESEARCH_COLLECTION:-research_knowledge_hybrid_v1}
+      - RESEARCH_SEARCH_HISTORY_ENABLED=${RESEARCH_SEARCH_HISTORY_ENABLED:-true}
+      - MONGO_SEARCH_RUNS_COLLECTION=${MONGO_SEARCH_RUNS_COLLECTION:-research_search_runs}
+      - MONGO_SEARCH_PULLS_COLLECTION=${MONGO_SEARCH_PULLS_COLLECTION:-research_search_source_pulls}
+      - MONGO_SEARCH_OUTPUTS_COLLECTION=${MONGO_SEARCH_OUTPUTS_COLLECTION:-research_search_outputs}
       - PDF_STORAGE_DIR=${PDF_STORAGE_DIR:-data/pdfs}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-*}
       - ENABLE_LEGACY_CYPHER_API=${ENABLE_LEGACY_CYPHER_API:-false}
@@ -245,27 +247,8 @@ services:
       - ./config:/app/config
       - ./data:/app/data
       
-  sync-qdrant:
-    profiles:
-      - legacy
-    image: arxiv_pipeline-legacy:latest
-    command: python -m src.pipeline.sync_qdrant
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
-      - QDRANT_URL=http://qdrant:6333
-      - AI_SERVICES_HOST=${AI_SERVICES_DOCKER_HOST:-host.docker.internal}
-      - AI_SERVICES_OLLAMA_PORT=${AI_SERVICES_OLLAMA_PORT:-11434}
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen3.5:4b}
-    volumes:
-      - ./config:/app/config
-      - ./data:/app/data
-      - ./src:/app/src:ro
-    depends_on:
-      - mongodb
-      - qdrant
-
   # Build owner only for the retired BERTopic, Top2Vec, and historical
-  # Hugging Face/Qdrant embedding processes.
+  # Hugging Face topic-modeling processes.
   legacy-runtime:
     profiles:
       - legacy
