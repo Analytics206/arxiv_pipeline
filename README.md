@@ -585,7 +585,10 @@ start as background services.
   docker compose --profile manual up -d index-kaggle
 
   # Bound one resumable invocation to about 75 embedding minutes
-  docker compose --profile manual run --rm index-kaggle --run-minutes 75
+  docker compose --profile manual run --rm index-kaggle --run-minutes 150
+
+  # Bound one resumable invocation to X number of papers
+  docker compose --profile manual run --rm index-kaggle --run-papers 10000
   ```
 
   See
