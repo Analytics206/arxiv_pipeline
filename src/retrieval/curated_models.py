@@ -95,7 +95,10 @@ class CuratedResearchSearchResponse(CuratedContract):
     query: str
     result_status: Literal["matches", "no_match"]
     no_match_reason: str | None = None
-    ranking: Literal["weighted-paper-rrf"] = "weighted-paper-rrf"
+    ranking: Literal[
+        "weighted-paper-rrf",
+        "weighted-paper-rrf-recency",
+    ] = "weighted-paper-rrf"
     coverage: CuratedSearchCoverage
     budget: CuratedSearchBudget
     papers: list[CuratedPaperResult]

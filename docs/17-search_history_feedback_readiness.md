@@ -89,12 +89,20 @@ The default configuration enables history:
 
 ```yaml
 research_search:
+  recency_weight: 0.0
+  recency_half_life_days: 365
   history:
     enabled: true
     runs_collection: "research_search_runs"
     source_pulls_collection: "research_search_source_pulls"
     outputs_collection: "research_search_outputs"
 ```
+
+Every run records both recency settings under `request.execution`. The default
+zero weight leaves ranking unchanged while preserving an auditable lever for
+the fast-moving LLM, coding-agent, and harness research corpus. A future
+non-zero setting should be evaluated against request-correlated feedback
+before it becomes the default.
 
 Environment overrides are:
 

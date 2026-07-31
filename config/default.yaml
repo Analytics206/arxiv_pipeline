@@ -75,6 +75,10 @@ research_search:
   evidence_weight: 1.0
   discovery_weight: 1.0
   rrf_k: 60
+  # Optional freshness blend for fast-moving AI research. Zero preserves pure
+  # relevance ranking; evaluate feedback before enabling a non-zero value.
+  recency_weight: 0.0
+  recency_half_life_days: 365
   evidence_items_per_paper: 3
   token_budget: 12000
   maximum_abstract_chars: 2400

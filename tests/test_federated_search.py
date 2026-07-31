@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
 from src.retrieval.curated_models import PaperSearchMetadata
@@ -173,7 +174,7 @@ class FakeHistoryRecorder:
         self.calls.append(("fail_search", kwargs))
 
 
-def make_service(research=None, discovery=None, history=None):
+def make_service(research=None, discovery=None, history=None, **service_kwargs):
     research_index = FakeIndex(
         "evidence",
         response=research if research is not None else evidence_response(),
@@ -187,6 +188,7 @@ def make_service(research=None, discovery=None, history=None):
         discovery_index=discovery_index,
         metadata_repository=FakeMetadataRepository(),
         history_recorder=history,
+        **service_kwargs,
     )
     return service, research_index, discovery_index
 
@@ -230,6 +232,8 @@ def test_search_merges_duplicate_sources_into_unique_papers():
     started = history.calls[0][1]
     assert started["request_id"] == response.request_id
     assert started["request"]["query"] == "agent retrieval"
+    assert started["request"]["execution"]["recency_weight"] == 0.0
+    assert started["request"]["execution"]["recency_half_life_days"] == 365.0
     assert started["client"]["channel"] == "test-agent"
     source_pulls = history.calls[1][1]["pulls"]
     assert [pull["source"] for pull in source_pulls] == [
@@ -326,3 +330,71 @@ def test_search_honors_filters_and_output_budget():
     assert result.papers
     assert result.budget.estimated_tokens <= result.budget.requested_tokens
     assert result.budget.truncated is True
+
+
+def test_recency_weight_is_neutral_by_default_and_can_favor_a_newer_paper():
+    older_id = "2401.00001"
+    newer_id = "2607.00001"
+    discovery = discovery_response().model_copy(
+        update={
+            "hits": [
+                discovery_hit(older_id),
+                discovery_hit(newer_id),
+            ]
+        }
+    )
+    now = datetime.now(timezone.utc)
+
+    def metadata_for(paper_ids):
+        published = {
+            older_id: now - timedelta(days=3 * 365),
+            newer_id: now - timedelta(days=1),
+        }
+        return {
+            paper_id: PaperSearchMetadata(
+                paper_id=paper_id,
+                title=paper_id,
+                published=published[paper_id].isoformat(),
+                update_year=published[paper_id].year,
+                arxiv_url=f"https://arxiv.org/abs/{paper_id}",
+                pdf_url=f"https://arxiv.org/pdf/{paper_id}",
+                metadata_sources=["arxiv_kaggle"],
+            )
+            for paper_id in paper_ids
+        }
+
+    neutral, _, neutral_discovery = make_service(discovery=discovery)
+    neutral.research_index = FakeIndex(
+        "evidence",
+        error=RuntimeError("evidence unavailable"),
+    )
+    neutral.research_index.embedder = neutral_discovery.embedder
+    neutral.metadata_repository = SimpleNamespace(hydrate_paper_metadata=metadata_for)
+
+    neutral_result = neutral.search("agent retrieval", limit=2)
+
+    assert neutral_result.ranking == "weighted-paper-rrf"
+    assert [paper.paper_id for paper in neutral_result.papers] == [
+        older_id,
+        newer_id,
+    ]
+
+    freshness, _, freshness_discovery = make_service(
+        discovery=discovery,
+        recency_weight=0.2,
+        recency_half_life_days=365,
+    )
+    freshness.research_index = FakeIndex(
+        "evidence",
+        error=RuntimeError("evidence unavailable"),
+    )
+    freshness.research_index.embedder = freshness_discovery.embedder
+    freshness.metadata_repository = SimpleNamespace(hydrate_paper_metadata=metadata_for)
+
+    freshness_result = freshness.search("agent retrieval", limit=2)
+
+    assert freshness_result.ranking == "weighted-paper-rrf-recency"
+    assert [paper.paper_id for paper in freshness_result.papers] == [
+        newer_id,
+        older_id,
+    ]

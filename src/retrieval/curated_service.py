@@ -106,6 +106,8 @@ class CuratedResearchService:
         evidence_weight: float = 1.0,
         discovery_weight: float = 1.0,
         rrf_k: int = 60,
+        recency_weight: float = 0.0,
+        recency_half_life_days: float = 365.0,
         default_evidence_items_per_paper: int = 3,
         default_token_budget: int = 12_000,
         maximum_abstract_chars: int = 2_400,
@@ -117,6 +119,10 @@ class CuratedResearchService:
             raise ValueError("source weights must be positive")
         if rrf_k < 1:
             raise ValueError("rrf_k must be positive")
+        if not 0 <= recency_weight <= 1:
+            raise ValueError("recency_weight must be between 0 and 1")
+        if recency_half_life_days <= 0:
+            raise ValueError("recency_half_life_days must be positive")
         self.research_index = research_index
         self.discovery_index = discovery_index
         self.metadata_repository = metadata_repository
@@ -125,6 +131,8 @@ class CuratedResearchService:
         self.evidence_weight = evidence_weight
         self.discovery_weight = discovery_weight
         self.rrf_k = rrf_k
+        self.recency_weight = recency_weight
+        self.recency_half_life_days = recency_half_life_days
         self.default_evidence_items_per_paper = default_evidence_items_per_paper
         self.default_token_budget = default_token_budget
         self.maximum_abstract_chars = maximum_abstract_chars
@@ -195,6 +203,8 @@ class CuratedResearchService:
                 "evidence_weight": self.evidence_weight,
                 "discovery_weight": self.discovery_weight,
                 "rrf_k": self.rrf_k,
+                "recency_weight": self.recency_weight,
+                "recency_half_life_days": self.recency_half_life_days,
             },
         }
         self._history(
@@ -303,6 +313,11 @@ class CuratedResearchService:
                 discovery_ranks=discovery_ranks,
             )
             fused_relevance = self._paper_relevance(source_scores)
+            ranked_relevance = self._recency_adjusted_relevance(
+                fused_relevance,
+                metadata=paper_metadata,
+                reference_time=generated_at,
+            )
             selected_research = _curate_research_items(
                 paper_research_hits,
                 limit=selected_evidence_limit,
@@ -317,7 +332,7 @@ class CuratedResearchService:
                         else f"paper://arxiv/{candidate_id}"
                     ),
                     tier=("evidence_backed" if selected_research else "metadata_only"),
-                    relevance=fused_relevance,
+                    relevance=ranked_relevance,
                     source_scores=source_scores,
                     metadata=paper_metadata,
                     research_items=selected_research,
@@ -359,6 +374,11 @@ class CuratedResearchService:
             requested_papers=limit,
             evidence_items_per_paper=selected_evidence_limit,
             token_budget=selected_token_budget,
+            ranking=(
+                "weighted-paper-rrf-recency"
+                if self.recency_weight > 0
+                else "weighted-paper-rrf"
+            ),
         )
         response = _fit_response_to_budget(response, candidates=candidates)
         self._history(
@@ -442,6 +462,28 @@ class CuratedResearchService:
             fused += weight * quality / (self.rrf_k + score.rank)
         ideal = (self.evidence_weight + self.discovery_weight) / (self.rrf_k + 1)
         return min(1.0, max(0.0, fused / ideal))
+
+    def _recency_adjusted_relevance(
+        self,
+        relevance: float,
+        *,
+        metadata: PaperSearchMetadata,
+        reference_time: datetime,
+    ) -> float:
+        if self.recency_weight == 0:
+            return relevance
+        paper_time = _paper_recency_timestamp(metadata)
+        if paper_time is None:
+            return relevance
+        age_days = max(
+            0.0,
+            (reference_time - paper_time).total_seconds() / 86_400,
+        )
+        freshness = math.pow(0.5, age_days / self.recency_half_life_days)
+        blended = (
+            1 - self.recency_weight
+        ) * relevance + self.recency_weight * freshness
+        return min(1.0, max(0.0, blended))
 
     def _history(self, method: str, **kwargs: Any) -> None:
         if self.history_recorder is None:
@@ -664,6 +706,23 @@ def _metadata_matches_filters(
     return True
 
 
+def _paper_recency_timestamp(metadata: PaperSearchMetadata) -> datetime | None:
+    timestamps: list[datetime] = []
+    for value in (metadata.updated, metadata.published, metadata.update_date):
+        if not value:
+            continue
+        try:
+            timestamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.replace(tzinfo=timezone.utc)
+        else:
+            timestamp = timestamp.astimezone(timezone.utc)
+        timestamps.append(timestamp)
+    return max(timestamps) if timestamps else None
+
+
 def _research_coverage(
     collection: str,
     response: ResearchSearchResponse | None,
@@ -721,6 +780,7 @@ def _build_response(
     requested_papers: int,
     evidence_items_per_paper: int,
     token_budget: int,
+    ranking: Literal["weighted-paper-rrf", "weighted-paper-rrf-recency"],
 ) -> CuratedResearchSearchResponse:
     evidence_count = sum(item.tier == "evidence_backed" for item in selected)
     metadata_count = len(selected) - evidence_count
@@ -729,6 +789,7 @@ def _build_response(
         request_id=request_id,
         generated_at=generated_at,
         query=query,
+        ranking=ranking,
         result_status="matches" if selected else "no_match",
         no_match_reason=(
             None
