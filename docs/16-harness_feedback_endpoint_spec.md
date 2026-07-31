@@ -113,6 +113,7 @@ gives feedback on.
 | `workflow` | string | agent records | e.g. `research-scan` |
 | `run_id` | string | agent records | The harness run short id — ties the record to the run's transcript, tokens, and exact topic on the harness side. |
 | `stage` | string | yes | Where the judgment happened. Known values: `triage`, `curate`, `appraise`, `human`. Store unknown values as-is (forward compatibility). |
+| `request_id` | string | recommended | The `search_research` response that delivered the subject (docs/17 correlation contract, e.g. `rs_…`). The service archives the exact delivered response under this id — feedback is interpreted against that archive, so a record without it may be unresolvable. Agent records should always carry it; human records may lack it. |
 | `subject` | object | yes | What the feedback is about — see below. |
 | `reason` | string | yes | Snake_case code ≤ 40 chars from the registry below. **Unknown codes are accepted and stored**, and flagged in the ack — never rejected. |
 | `verdict` | string | no | The appraise verdict when applicable: `ADOPT`, `TRIAL`, `REJECT`, `UNVERIFIED`. |
@@ -129,6 +130,7 @@ gives feedback on.
 | --- | --- | --- | --- |
 | `kind` | `paper` \| `idea` \| `evidence` \| `topic` | yes | What the record judges. |
 | `paper_id` | string | `paper`, `idea`, `evidence` kinds | The paper as this service ids it (e.g. `2607.21557`). |
+| `point_id` | string | `idea`, `evidence` kinds (optional) | The delivered research item's point id, when the harness run recorded it. With `request_id` + `paper_id` it targets one exact idea per docs/17 (`request_id + paper_id + point_id`). |
 | `evidence_id` | string | `evidence` kind | The evidence record that failed to support its claim. |
 | `idea_ref` | string | `idea` kind | Harness-side anchor for the proposed idea (report path + section). Opaque here; meaningful when the owner cross-reads a harness report. |
 | `topic` | string | `topic` kind | The topic a `coverage_gap` record reports demand for. |
@@ -168,7 +170,7 @@ demand.
 | `evidence_unresolvable` | appraise | evidence | A cited `evidence_id` did not resolve. |
 | `evidence_mismatch` | appraise | evidence | The id resolved, but the quote does not support the claim it was cited for. |
 | `evidence_truncated` | appraise | evidence | The span was flagged truncated and cut the wording the claim rests on; the idea was marked UNVERIFIED rather than rejected. A chunking defect, not an idea defect. |
-| `analysis_gap` | any | paper | The analysis lacked fields the consumer needed (e.g. a profile returning no `problem` / `contributions` — a real measured case). |
+| `analysis_gap` | any | paper | The analysis lacked what the consumer needed. Two cases: an evidence-backed analysis missing fields (e.g. a profile returning no `problem` / `contributions` — a real measured case), and — since the 2026-07-31 curated-search uplift — a `metadata_only` DISCOVERY LEAD the scan judged on-topic and wanted to read but that has no curated analysis yet. The second case is this service's per-paper curation queue. |
 
 ### E — Positive (signal: what worked; completes the label distribution)
 
@@ -230,10 +232,16 @@ Per-record checks:
 - `reason` shape valid (unknown codes pass, and are listed in the ack's
   `unknown_reasons` so typos surface without data loss);
 - `note` within bounds; `records` array within 1–100;
-- **do not** validate that `paper_id` exists in the corpus — a paper may have
-  been removed since the scan ran, and the feedback about it is still real.
-  Store the record; flag it in the ack's `unresolved_papers` if the lookup
-  fails.
+- **when `request_id` is present**, resolve the target against the archived
+  curated output for that request (docs/17 `research_search_outputs`): a
+  `paper_id` — or `point_id` for an idea/evidence subject — that was not
+  actually delivered in that response is **rejected per-record** with a clear
+  error, per docs/17's rule. This is the one existence check worth doing,
+  because the archive is immutable and the check is exact;
+- **when `request_id` is absent** (older senders, human records), **do not**
+  validate that `paper_id` exists in the corpus — a paper may have been
+  removed since the scan ran, and the feedback about it is still real. Store
+  the record; flag it in the ack's `unresolved_papers` if the lookup fails.
 
 ## Response contract
 
@@ -354,6 +362,7 @@ its own repo (its doc 42 gains the mirror of this contract).
       "workflow": "research-scan",
       "run_id": "1a2b3c",
       "stage": "triage",
+      "request_id": "rs_6b81712a73ad4dd1a9c42e1a1ca95039",
       "subject": { "kind": "paper", "paper_id": "2607.99001" },
       "reason": "off_topic",
       "note": "Edge-device resource allocation; matched on 'orchestration' only.",
@@ -367,9 +376,11 @@ its own repo (its doc 42 gains the mirror of this contract).
       "workflow": "research-scan",
       "run_id": "1a2b3c",
       "stage": "appraise",
+      "request_id": "rs_6b81712a73ad4dd1a9c42e1a1ca95039",
       "subject": {
         "kind": "evidence",
         "paper_id": "2607.21557",
+        "point_id": "13e4fb17-9886-5553-863d-e64eac961ea3",
         "evidence_id": "ev_5002c8b64d726803e47397a1"
       },
       "reason": "evidence_mismatch",
@@ -484,7 +495,11 @@ same body: `accepted: 0, duplicates: 1`. A record with `"reason":
       `unknown_reasons`.
 - [ ] An invalid record is rejected individually with index + error; valid
       records in the same batch are accepted.
-- [ ] A `paper_id` absent from the corpus is stored and flagged, not rejected.
+- [ ] A `paper_id` absent from the corpus is stored and flagged, not rejected
+      (when the record carries no `request_id`).
+- [ ] A record whose `request_id` resolves to an archived curated output, but
+      whose `paper_id`/`point_id` was not delivered in that response, is
+      rejected per-record (docs/17 rule).
 - [ ] Records land append-only in `harness_feedback`; no API path updates or
       deletes them.
 - [ ] Ingestion source is resolved and stored server-side for records whose
@@ -525,5 +540,6 @@ same body: `accepted: 0, duplicates: 1`. A record with `"reason":
 | Doc | Why |
 | --- | --- |
 | [15-external_ai_harness_mcp_handoff.md](./15-external_ai_harness_mcp_handoff.md) | The read side of the same boundary; the adapter contract this document explicitly leaves untouched |
+| [17-search_history_feedback_readiness.md](./17-search_history_feedback_readiness.md) | The correlation layer this spec builds on: `request_id` traces, archived curated outputs, target resolution + rejection of undelivered targets |
 | [08-data_schema.md](./08-data_schema.md) | Where `harness_feedback` joins the canonical schema |
 | [06-system_design.md](./06-system_design.md) | REST API / adapter topology |
