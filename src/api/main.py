@@ -12,8 +12,8 @@ app = FastAPI(
     title="ArXiv Research Intelligence API",
     version=SERVICE_VERSION,
     description=(
-        "Read-only, evidence-backed research contracts for AI agents and "
-        "human review tools."
+        "Evidence-backed research contracts for AI agents and human review "
+        "tools, plus the isolated append-only harness feedback endpoint."
     ),
     servers=[{"url": "/", "description": "Current research-service host"}],
 )
@@ -74,4 +74,12 @@ app.include_router(
     research_router,
     prefix="/research",
     tags=["research"],
+)
+
+from src.api.routes.feedback import router as feedback_router
+
+app.include_router(
+    feedback_router,
+    prefix="/research",
+    tags=["feedback"],
 )

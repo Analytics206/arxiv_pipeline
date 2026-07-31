@@ -84,6 +84,14 @@ research_search:
     source_pulls_collection: "research_search_source_pulls"
     outputs_collection: "research_search_outputs"
 
+# Append-only judgments returned by the external research harness. Authentication
+# is enabled only when RESEARCH_FEEDBACK_BEARER_TOKEN is non-empty.
+research_feedback:
+  collection_name: "harness_feedback"
+  papers_collection: "papers"
+  kaggle_collection: "arxiv_kaggle"
+  analyses_collection: "paper_analyses"
+
 # ArXiv API settings 
 arxiv:
   categories: # used in sync_mongodb.py

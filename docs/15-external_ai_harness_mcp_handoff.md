@@ -50,12 +50,14 @@ This endpoint uses Streamable HTTP, not legacy MCP SSE.
 ```mermaid
 flowchart LR
     H["External harness / coding agent"] -->|"MCP :8001"| M["Read-only MCP adapter"]
+    H -->|"POST feedback :8000"| F["REST feedback endpoint"]
     M -->|"Canonical GET contracts"| A["Research REST API :8000"]
     A --> E["Qdrant evidence collection"]
     A --> D["Qdrant discovery collection"]
     A --> P["MongoDB papers"]
     A --> K["MongoDB arxiv_kaggle"]
     A --> T["MongoDB append-only search traces"]
+    F --> HF["MongoDB harness_feedback"]
     E --> C["Paper-centric fusion and curation"]
     D --> C
     P --> C
@@ -79,6 +81,13 @@ can increase them over time.
 MongoDB remains the canonical metadata and analysis store. Qdrant is a
 rebuildable retrieval layer. Neo4j, BERTopic, Top2Vec, and the retired
 `arxiv_papers` Qdrant collection are not part of this serving path.
+
+Feedback is the one write operation exposed to the external harness. It
+bypasses MCP and uses `POST /research/feedback` on REST port 8000. It writes
+only append-only evaluation events to `harness_feedback`; it cannot modify
+papers, analyses, indexes, search history, or any read response. The complete
+batch and taxonomy contract is in
+[External AI Harness Feedback Endpoint Specification](16-harness_feedback_endpoint_spec.md).
 
 ## Canonical search workflow
 
@@ -208,7 +217,10 @@ Important fields:
 ```
 
 The example identifiers and counts are illustrative, not fixed expectations.
-The `request_id` must be retained with any later paper or idea feedback.
+Retain the `request_id` in the harness run/report so a judgment can be
+cross-read against the exact stored search output. Feedback contract v1 does
+not require this field, but the endpoint preserves it as an extension when a
+sender includes it.
 
 ### Trust tiers
 
@@ -342,3 +354,5 @@ limiting, and an allowed-host policy.
 
 The trace collections and feedback-correlation contract are documented in
 [Research search history and feedback readiness](17-search_history_feedback_readiness.md).
+The isolated REST write contract is documented in
+[External AI Harness Feedback Endpoint Specification](16-harness_feedback_endpoint_spec.md).

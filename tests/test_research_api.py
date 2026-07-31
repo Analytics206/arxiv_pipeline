@@ -17,11 +17,21 @@ def test_research_routes_are_registered():
     assert "/research/capabilities" in paths
     assert "/research/evidence/{evidence_id}" in paths
     assert "/research/search" in paths
+    assert "/research/feedback" in paths
     assert "/research/discovery/search" not in paths
     assert "/research/federated-search" not in paths
     assert "/metrics/qdrant/status" in paths
     assert "/metrics/qdrant/paper-stats" not in paths
     assert "/health" in paths
+
+
+def test_feedback_route_is_rest_only_and_documents_batch_limits():
+    operation = app.openapi()["paths"]["/research/feedback"]["post"]
+    schema = operation["requestBody"]["content"]["application/json"]["schema"]
+
+    assert operation["operationId"] == "submit_research_feedback"
+    assert schema["properties"]["records"]["minItems"] == 1
+    assert schema["properties"]["records"]["maxItems"] == 100
 
 
 def test_capabilities_are_read_only_and_harness_discoverable():
