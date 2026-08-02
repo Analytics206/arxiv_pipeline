@@ -173,6 +173,16 @@ write contract. It accepts bounded harness evaluation batches and appends them
 to MongoDB `harness_feedback`. It is deliberately absent from MCP and cannot
 change research records, indexes, or read responses.
 
+Canonical search ranks papers by weighted paper-level RRF across the
+evidence-backed and discovery collections. Publication recency is not active
+by default: `research_search.recency_weight` is `0.0`, preserving relevance-only
+ranking (with `update_year` used only as a deterministic tie-breaker). A
+configurable exponential freshness score is available for this unusually
+fast-moving AI/coding-agent corpus. When enabled, it uses the newest valid
+`updated`, `published`, or `update_date` timestamp and the configured
+`recency_half_life_days`; papers without a usable timestamp retain their
+unadjusted relevance. The effective settings are saved in every search trace.
+
 MCP exposes the five operation names above. All tools declare read-only and
 non-destructive annotations. Four lookup tools are idempotent;
 `search_research` creates a new append-only request trace. Resources expose

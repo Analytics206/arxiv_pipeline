@@ -75,6 +75,10 @@ research_search:
   evidence_weight: 1.0
   discovery_weight: 1.0
   rrf_k: 60
+  # Optional freshness blend for fast-moving AI research. Zero preserves pure
+  # relevance ranking; evaluate feedback before enabling a non-zero value.
+  recency_weight: 0.0
+  recency_half_life_days: 365
   evidence_items_per_paper: 3
   token_budget: 12000
   maximum_abstract_chars: 2400
@@ -91,6 +95,7 @@ research_feedback:
   papers_collection: "papers"
   kaggle_collection: "arxiv_kaggle"
   analyses_collection: "paper_analyses"
+  search_outputs_collection: "research_search_outputs"
 
 # ArXiv API settings 
 arxiv:
@@ -100,18 +105,18 @@ arxiv:
     # - "cs.DB"
     # - "cs.DS"
     # - "cs.LG" 
-    # - "cs.MA"
-    # - "cs.NE"
-    # - "cs.RO"
+    - "cs.MA"
+    - "cs.NE"
+    - "cs.RO"
     - "cs.SE"
   max_results: 200 # Number of papers to fetch per category loop, 200 is max but can fail so set to 100
   sort_by: "submittedDate"
   sort_order: "descending"
   max_iterations: 50 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 3 # seconds to wait between api calls
-  start_date: "2026-01-01" # Inclusive submittedDate lower bound sent to the arXiv API
-  end_date: "2026-07-31" # Inclusive submittedDate upper bound sent to the arXiv API
-  max_no_papers: 10 # Maximum number of no paper fetches before breaking loop for category
+  start_date: "2026-07-01" # Inclusive submittedDate lower bound sent to the arXiv API
+  end_date: "2026-08-01" # Inclusive submittedDate upper bound sent to the arXiv API
+  max_no_papers: 2 # Maximum number of no paper fetches before breaking loop for category
 # Embedding model settings
 embedding:
   model_name: "all-MiniLM-L6-v2"  # Smaller model to start with

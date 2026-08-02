@@ -146,6 +146,25 @@ There are no separate discovery, federated, or legacy search tools.
 The token estimator is provider-neutral UTF-8 bytes divided by four. A harness
 may perform an exact final count for its own model.
 
+Paper recency is a service-side ranking policy, not a per-request MCP input.
+The lever exists because LLMs, coding agents, agent harnesses, and adjacent AI
+techniques move faster than many scientific fields:
+
+```yaml
+research_search:
+  recency_weight: 0.0
+  recency_half_life_days: 365
+```
+
+`recency_weight: 0.0` is intentionally neutral and is the current policy.
+Search therefore remains relevance-first; callers may still request a hard
+year window with `start_year` / `end_year`. If a non-zero weight is enabled
+after feedback evaluation, the response reports
+`ranking="weighted-paper-rrf-recency"` and blends RRF relevance with an
+exponentially decaying freshness score based on the newest paper update,
+publication, or imported update date. Undated papers keep their unadjusted
+relevance rather than receiving an arbitrary age penalty.
+
 ## Search response contract
 
 Successful search returns `contract="curated-research-results"` and one
@@ -218,9 +237,10 @@ Important fields:
 
 The example identifiers and counts are illustrative, not fixed expectations.
 Retain the `request_id` in the harness run/report so a judgment can be
-cross-read against the exact stored search output. Feedback contract v1 does
-not require this field, but the endpoint preserves it as an extension when a
-sender includes it.
+cross-read against the exact stored search output. Feedback contract v1
+recommends this field. When supplied, the endpoint verifies that the
+`paper_id` and optional `point_id` were actually delivered in that archived
+response before storing the judgment.
 
 ### Trust tiers
 

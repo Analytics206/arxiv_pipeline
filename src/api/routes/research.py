@@ -159,6 +159,8 @@ def search_research(
             evidence_weight=float(settings.get("evidence_weight", 1.0)),
             discovery_weight=float(settings.get("discovery_weight", 1.0)),
             rrf_k=int(settings.get("rrf_k", 60)),
+            recency_weight=float(settings.get("recency_weight", 0.0)),
+            recency_half_life_days=float(settings.get("recency_half_life_days", 365)),
             default_evidence_items_per_paper=int(
                 settings.get("evidence_items_per_paper", 3)
             ),

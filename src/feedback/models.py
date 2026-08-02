@@ -141,6 +141,8 @@ def validate_record(record: Any) -> dict[str, Any]:
         _required_string(record, "run_id")
 
     _required_string(record, "stage")
+    if "request_id" in record:
+        _required_string(record, "request_id")
     reason = _required_string(record, "reason")
     if len(reason) > 40 or _REASON_PATTERN.fullmatch(reason) is None:
         raise ValueError("reason must be snake_case and no longer than 40 characters")
@@ -153,6 +155,12 @@ def validate_record(record: Any) -> dict[str, Any]:
         raise ValueError("subject.kind must be 'paper', 'idea', 'evidence', or 'topic'")
     if kind in {"paper", "idea", "evidence"}:
         _required_string(subject, "paper_id", prefix="subject.")
+    if "point_id" in subject and kind not in {"idea", "evidence"}:
+        raise ValueError(
+            "subject.point_id is only valid for subject.kind 'idea' or 'evidence'"
+        )
+    if "point_id" in subject:
+        _required_string(subject, "point_id", prefix="subject.")
     if kind == "idea":
         _required_string(subject, "idea_ref", prefix="subject.")
     if kind == "evidence":
