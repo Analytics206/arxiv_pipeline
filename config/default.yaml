@@ -31,9 +31,9 @@ analysis:
 research_index:
   collection_name: "research_knowledge_hybrid_v1"
   schema_version: "2.1"
-  embedding_model: "mxbai-embed-large:latest"
+  embedding_model: "qwen3-embedding:latest"
   embedding_batch_size: 32
-  query_prefix: "Represent this sentence for searching relevant passages: "
+  query_prefix: "Instruct: Given an AI research question, retrieve relevant evidence passages and implementation ideas that answer the query\nQuery: "
   retrieval_mode: "hybrid"
   hybrid:
     candidate_multiplier: 4
@@ -100,11 +100,11 @@ research_feedback:
 # ArXiv API settings 
 arxiv:
   categories: # used in sync_mongodb.py
-    # - "cs.AI"
-    # - "cs.CV"
-    # - "cs.DB"
-    # - "cs.DS"
-    # - "cs.LG" 
+    - "cs.AI"
+    - "cs.CV"
+    - "cs.DB"
+    - "cs.DS"
+    - "cs.LG" 
     - "cs.MA"
     - "cs.NE"
     - "cs.RO"
@@ -115,11 +115,11 @@ arxiv:
   max_iterations: 50 # Number of times to loop the pipeline for each category above
   rate_limit_seconds: 3 # seconds to wait between api calls
   start_date: "2026-07-01" # Inclusive submittedDate lower bound sent to the arXiv API
-  end_date: "2026-08-01" # Inclusive submittedDate upper bound sent to the arXiv API
+  end_date: "2026-08-31" # Inclusive submittedDate upper bound sent to the arXiv API
   max_no_papers: 2 # Maximum number of no paper fetches before breaking loop for category
 # Embedding model settings
 embedding:
-  model_name: "all-MiniLM-L6-v2"  # Smaller model to start with
+  model_name: "qwen3-embedding:latest"  # Smaller model to start with
   batch_size: 200
 
 # 265,979 papers in arxiv_papers.papers
@@ -143,7 +143,7 @@ pdf_storage:
   download_date_filter:
     enabled: true         # Set to false to disable date filtering
     start_date: "2026-01-01" # Download papers published on or after this date (format: YYYY-MM-DD)
-    end_date: "2026-03-31"   # Download papers published on or before this date (format: YYYY-MM-DD)
+    end_date: "2026-08-31"   # Download papers published on or before this date (format: YYYY-MM-DD)
     sort_by_date: true    # Sort MongoDB query by published date
 
 # Retired topic-modeling experiment. This is available only through the
@@ -174,7 +174,7 @@ bertopic:
   date_filter:
     enabled: true
     start_date: "2026-01-01"  # Process papers published on or after this date
-    end_date: "2026-03-31"    # Process papers published on or before this date
+    end_date: "2026-08-31"    # Process papers published on or before this date
 
 # Retired topic-modeling experiment. This is available only through the
 # Docker Compose `legacy` profile and is not used by the research API/index.
@@ -209,7 +209,7 @@ top2vec:
   date_filter:
     enabled: true
     start_date: "2026-01-01"  # Process papers published on or after this date
-    end_date: "2026-03-31"    # Process papers published on or before this date
+    end_date: "2026-08-31"    # Process papers published on or before this date
 
 # Filtered Kaggle corpus used for paper discovery.
 kaggle_corpus:
@@ -227,7 +227,7 @@ kaggle_corpus:
   date_filter:
     enabled: false
     start_date: "2021-01-01"
-    end_date: "2026-03-31"
+    end_date: "2026-08-31"
   # Destructive replacement stops when a surprising import or policy falls
   # outside this expected range.
   retention_guard:
@@ -241,7 +241,7 @@ discovery_index:
   collection_prefix: "arxiv_discovery_hybrid_v1"
   alias_name: "arxiv_discovery_current"
   schema_version: "1.0"
-  embedding_model: "mxbai-embed-large:latest"
+  embedding_model: "qwen3-embedding:latest"
   # Benchmarked locally at ~31 papers/second; 512 provided no improvement.
   embedding_batch_size: 256
   source_collection: "arxiv_kaggle"
@@ -250,7 +250,7 @@ discovery_index:
   eligibility_collection: "papers"
   eligibility_id_field: "base_arxiv_id"
   checkpoint_collection: "discovery_index_runs"
-  query_prefix: "Represent this sentence for searching relevant passages: "
+  query_prefix: "Instruct: Given an AI research question, retrieve relevant evidence passages and implementation ideas that answer the query\nQuery: "
   retrieval_mode: "hybrid"
   hybrid:
     candidate_multiplier: 4
