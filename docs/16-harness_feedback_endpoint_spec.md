@@ -98,7 +98,7 @@ gives feedback on.
 | --- | --- | --- | --- |
 | `contract` | string | yes | Literal `research-feedback-batch` |
 | `contract_version` | string | yes | `"1.0"` |
-| `taxonomy_version` | string | yes | Reason-registry version the client used (`"1.0"`) |
+| `taxonomy_version` | string | yes | Reason-registry version the client used (current: `"1.1"` — 1.1 added group H's `test`) |
 | `client` | object | yes | `{ "name": "harness", "version": "<client version>" }` |
 | `project` | object | yes | `{ "id": "<stable pseudonymous slug>" }` — identifies the consuming project across batches. No display name, no paths. |
 | `records` | array | yes | 1–100 feedback records |
@@ -118,7 +118,7 @@ gives feedback on.
 | `reason` | string | yes | Snake_case code ≤ 40 chars from the registry below. **Unknown codes are accepted and stored**, and flagged in the ack — never rejected. |
 | `verdict` | string | no | The appraise verdict when applicable: `ADOPT`, `TRIAL`, `REJECT`, `UNVERIFIED`. |
 | `note` | string ≤ 2000 | no | Bounded free-text rationale. The harness enforces that no source code is included; store as received. |
-| `retrieval` | object | no | `{ "query": str, "relevance": float, "rank": int }` — the query that surfaced this paper and its normalized relevance *at the time*. Lets a signal be traced to retrieval behaviour even after index rebuilds shift scores. |
+| `retrieval` | object | no | `{ "query": str, "relevance": float, "rank": int }` — the query that surfaced this paper and its normalized relevance *at the time*. Lets a signal be traced to retrieval behaviour even after index rebuilds shift scores. **All-or-nothing**: when the block is present all three members are required (`rank` a 1-based int), and a partial block rejects the record per-record — verified live 2026-07-31. The harness client strips incomplete blocks before sending rather than lose the record. |
 | `queries` | array of strings | `coverage_gap` records | The queries that returned `no_match` — the demand signal itself. |
 | `analysis` | object | no | `{ "prompt_version": str, "analysis_model": str, "profile": str }` — ties evidence/analysis-defect signals to the analysis version that produced the artifact. |
 | `corpus` | object | no | `{ "papers": int, "points": int }` — the coverage snapshot the search response reported, so old records are read against the corpus size of their day. |
@@ -193,6 +193,12 @@ demand.
 | Code | Emitted by | Subject | Meaning |
 | --- | --- | --- | --- |
 | `coverage_gap` | triage, curate | topic | A real project asked the corpus about this topic and it held nothing (`TRIAGE_VERDICT: NO_MATCH`, or curated queries all returning `no_match`). Carries the failed `queries`. The most directly actionable signal in the registry: it is the ingestion side's demand queue. |
+
+### H — Diagnostic (taxonomy 1.1, 2026-07-31; signal: none — excluded from analysis)
+
+| Code | Emitted by | Subject | Meaning |
+| --- | --- | --- | --- |
+| `test` | human, tooling | any | The record is pipeline-verification data, NOT a judgment about the corpus. **Store it, but exclude it from every curation aggregation**; it may be purged freely. Typically filed with `follow_up_of` pointing at an earlier record to disown it as test data — when a `test` record targets an earlier `feedback_id`, treat the *referenced* record as test data too. |
 
 ### Registry rules
 
