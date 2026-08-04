@@ -1,6 +1,9 @@
 from src.analysis.models import EvidenceRef, PaperAnalysis
 from src.analysis.pdf_parser import PageText, ParsedPaperDocument
-from src.pipeline.repair_research_quality import repair_analysis_quality
+from src.pipeline.repair_research_quality import (
+    repair_analysis_quality,
+    resolve_pdf_path,
+)
 from tests.test_research_index import make_analysis
 
 
@@ -69,3 +72,23 @@ def test_quality_repair_rejects_wrong_pdf_hash():
         assert "PDF hash mismatch" in str(error)
     else:
         raise AssertionError("Expected the repair to reject a different PDF")
+
+
+def test_pdf_resolution_prefers_analysis_version_over_latest_paper_metadata(tmp_path):
+    analysis: PaperAnalysis = make_analysis()
+    version_one = tmp_path / f"{analysis.paper_version_id}.pdf"
+    version_two = tmp_path / f"{analysis.paper_id}v2.pdf"
+    version_one.write_bytes(b"version one")
+    version_two.write_bytes(b"version two")
+    paper = {
+        "local_pdf_path": str(version_two),
+        "pdf_document_hash": "b" * 64,
+    }
+    pdf_files = {
+        version_one.name: [version_one],
+        version_two.name: [version_two],
+    }
+
+    resolved = resolve_pdf_path(analysis, paper, tmp_path, pdf_files)
+
+    assert resolved == version_one

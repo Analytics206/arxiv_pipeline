@@ -120,20 +120,33 @@ def resolve_pdf_path(
     storage_root: Path,
     pdf_files: dict[str, list[Path]] | None = None,
 ) -> Path:
-    """Resolve metadata paths first, then the deterministic corpus filename."""
+    """Resolve the immutable analysis version before mutable paper metadata."""
+
+    available = pdf_files if pdf_files is not None else _index_pdf_files(storage_root)
+    matches = available.get(f"{analysis.paper_version_id}.pdf", [])
+    if len(matches) == 1:
+        return matches[0]
+    if len(matches) > 1:
+        raise FileNotFoundError(
+            f"expected one PDF for {analysis.paper_version_id}, found {len(matches)}"
+        )
 
     metadata_path = (paper or {}).get("local_pdf_path")
     if metadata_path:
         candidate = Path(metadata_path)
-        if candidate.is_file():
+        metadata_hash = (paper or {}).get("pdf_document_hash")
+        metadata_matches_analysis = (
+            candidate.stem == analysis.paper_version_id
+            or metadata_hash == analysis.document_hash
+        )
+        if metadata_matches_analysis and candidate.is_file():
             return candidate
-    available = pdf_files if pdf_files is not None else _index_pdf_files(storage_root)
-    matches = available.get(f"{analysis.paper_version_id}.pdf", [])
+
     if not matches:
         matches = [
             path
             for filename, paths in available.items()
-            if filename.startswith(analysis.paper_id) and filename.endswith(".pdf")
+            if filename == f"{analysis.paper_id}.pdf"
             for path in paths
         ]
     if len(matches) != 1:
